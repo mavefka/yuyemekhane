@@ -4,4 +4,5 @@ proje yalova universitesinin kendi yemekhane sitesinden verileri otomatik olarak
 
 sitenin live versiyonundaki scraper otomasyonu github actions uzerinde calisiyor fakat siz farkli sekillerde de tetikleyebilirsiniz.
 
+vibe coding ile yapilmistir, daha hazirlik egitimime bile baslamadim. :D
 tesekkurler, iyi kullanimlar.
