@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yalova Üniversitesi Yemekhane</title>
+    
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', 'sans-serif'],
+                    },
+                    colors: {
+                        cardBg: '#09090b', 
+                        cardBorder: '#1f1f22', 
+                        textMain: '#e4e4e7', 
+                        textMuted: '#a1a1aa' 
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="text-textMain font-sans flex flex-col min-h-screen bg-black bg-fixed bg-cover bg-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), url('drone.jpg');">
+
+    <header class="border-b border-cardBorder p-4 flex justify-between items-center bg-cardBg bg-opacity-70 backdrop-blur-md">
+        <div class="flex items-center">
+            <img src="logo.png" alt="Yalova Uni Logo" class="h-12 w-auto object-contain" style="filter: brightness(0) invert(1);">
+        </div>
+        <div class="flex items-center gap-5">
+            <a href="https://github.com/kullanici-adin" target="_blank" class="text-textMuted hover:text-white transition" title="GitHub Profilim">
+                <i class="fa-brands fa-github text-xl"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center p-4 mt-6 mb-24">
+        
+        <div id="infoBox" class="max-w-2xl w-full border border-cardBorder rounded-lg p-3 mb-6 text-center text-sm text-textMuted flex justify-between items-center transition-opacity duration-300 bg-[#09090b] bg-opacity-90">
+            <span class="font-medium">Bu proje üniversiteden bağımsız, gönüllü olarak geliştirilmektedir.</span>
+            <button onclick="document.getElementById('infoBox').style.display='none'" class="hover:text-white p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="max-w-2xl w-full bg-cardBg border border-cardBorder rounded-xl shadow-2xl p-6 bg-opacity-95">
+            
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h2 id="dayTitle" class="text-xl font-bold capitalize tracking-tight">Yükleniyor...</h2>
+                    <p class="text-xs text-textMuted mt-1 font-medium">Yemek verileri son dakika değiştirilmiş olabilir.</p>
+                </div>
+                
+                <div class="relative">
+                    <button id="aiButton" onclick="toggleAIMenu()" class="flex items-center justify-center w-9 h-9 rounded-md bg-[#18181b] hover:bg-[#27272a] border border-cardBorder transition" title="Yapay Zekaya Sor">
+                        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                    </button>
+                    <div id="aiMenu" class="absolute right-0 mt-2 w-36 bg-cardBg border border-cardBorder rounded-lg shadow-xl z-50 overflow-hidden font-medium transition-all duration-200 ease-out opacity-0 scale-95 pointer-events-none origin-top-right">
+                        <div class="p-2 text-xs text-textMuted border-b border-cardBorder">Değerlendir:</div>
+                        <button onclick="askAI('chatgpt')" class="w-full text-left px-4 py-2 text-sm hover:bg-[#18181b] transition">ChatGPT</button>
+                        <button onclick="askAI('claude')" class="w-full text-left px-4 py-2 text-sm hover:bg-[#18181b] transition">Claude</button>
+                        <button onclick="askAI('gemini')" class="w-full text-left px-4 py-2 text-sm hover:bg-[#18181b] transition">Gemini</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mealSelector" class="relative grid grid-cols-2 p-1 bg-[#121212] rounded-lg mb-6 border border-[#1f1f22]">
+                <div id="mealIndicator" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#27272a] rounded-md shadow-sm transition-transform duration-300 ease-out"></div>
+                
+                <button id="mealBtn-ogle" onclick="setMeal('ogle')" class="relative z-10 py-1.5 text-sm font-semibold text-white transition-colors duration-300">Öğle Yemeği</button>
+                <button id="mealBtn-aksam" onclick="setMeal('aksam')" class="relative z-10 py-1.5 text-sm font-semibold text-textMuted hover:text-white transition-colors duration-300">Akşam Yemeği</button>
+            </div>
+
+            <ul id="foodList" class="flex flex-col min-h-[150px]"></ul>
+            
+            <div class="mt-6 pt-4 border-t border-cardBorder flex justify-between items-center">
+                <span class="font-semibold text-sm text-textMuted">Toplam Kalori:</span>
+                <span id="totalCalories" class="font-bold text-lg text-white tracking-tight transition-all duration-300">0 kcal</span>
+            </div>
+        </div>
+
+        <div class="max-w-2xl w-full text-left mt-3 px-2">
+            <div class="text-xs text-gray-400 font-medium tracking-wide drop-shadow-md">
+                <span>Son Güncelleme:</span> <span id="lastUpdateSpan">Güncelleniyor...</span>
+            </div>
+        </div>
+    </main>
+
+    <footer class="fixed bottom-0 w-full bg-cardBg bg-opacity-80 backdrop-blur-md border-t border-cardBorder p-3 flex justify-center items-center z-40">
+        
+        <div class="relative flex items-center gap-1 bg-[#09090b] border border-cardBorder rounded-lg p-1">
+            <button onclick="changeDay(-1)" id="prevBtn" class="w-9 h-9 flex items-center justify-center rounded-md hover:bg-[#18181b] transition text-textMuted hover:text-white">
+                <i class="fa-solid fa-chevron-left text-sm"></i>
+            </button>
+            
+            <div id="calButton" onclick="toggleCalendar()" class="flex items-center justify-center gap-2 w-36 py-2 rounded-md hover:bg-[#18181b] transition cursor-pointer select-none">
+                <i class="fa-regular fa-calendar text-sm text-textMuted"></i>
+                <span id="navDateText" class="text-sm font-semibold capitalize tracking-tight">...</span>
+            </div>
+            
+            <button onclick="changeDay(1)" id="nextBtn" class="w-9 h-9 flex items-center justify-center rounded-md hover:bg-[#18181b] transition text-textMuted hover:text-white">
+                <i class="fa-solid fa-chevron-right text-sm"></i>
+            </button>
+
+            <div id="calendarModal" class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-64 bg-cardBg border border-cardBorder rounded-xl shadow-2xl p-4 z-50 transition-all duration-300 ease-out opacity-0 translate-y-3 pointer-events-none">
+                <div class="flex justify-between items-center mb-4">
+                    <button onclick="changeCalMonth(-1)" class="text-textMuted hover:text-white p-1 transition rounded"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <span id="calMonthYearText" class="font-bold text-sm tracking-wide">...</span>
+                    <button onclick="changeCalMonth(1)" class="text-textMuted hover:text-white p-1 transition rounded"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+                <div id="calWeekdays" class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-textMuted mb-2 uppercase tracking-wider"></div>
+                <div id="calDays" class="grid grid-cols-7 gap-1 text-center text-sm font-medium"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const weekdaysTR = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
+        const monthsTR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+
+        let mockDatabase = {};
+
+        let today = new Date();
+        today.setHours(0, 0, 0, 0); 
+        
+        let currentDate = new Date(today); 
+        let minDate = new Date(today); 
+        let maxDate = new Date(today);
+        maxDate.setDate(maxDate.getDate() + 7); 
+
+        let calRenderMonth = currentDate.getMonth();
+        let calRenderYear = currentDate.getFullYear();
+        
+        let currentMeal = 'ogle';
+
+        async function initializeApp() {
+            try {
+                const timeResponse = await fetch('https://worldtimeapi.org/api/timezone/Europe/Istanbul');
+                if (timeResponse.ok) {
+                    const timeData = await timeResponse.json();
+                    const internetDate = new Date(timeData.datetime);
+                    
+                    today = new Date(internetDate);
+                    today.setHours(0, 0, 0, 0);
+                    
+                    currentDate = new Date(today);
+                    minDate = new Date(today);
+                    maxDate = new Date(today);
+                    maxDate.setDate(maxDate.getDate() + 7);
+
+                    calRenderMonth = currentDate.getMonth();
+                    calRenderYear = currentDate.getFullYear();
+                }
+            } catch (error) {
+                console.warn("İnternet saati çekilemedi, cihaz saati kullanılacak.");
+            }
+
+            try {
+                const menuResponse = await fetch('veri.json', { cache: "no-store" });
+                if (menuResponse.ok) {
+                    const jsonData = await menuResponse.json();
+                    
+                    // Yeni JSON yapısı (last_updated ve menus içeriyorsa)
+                    if (jsonData.menus) {
+                        mockDatabase = jsonData.menus;
+                        document.getElementById('lastUpdateSpan').innerText = jsonData.last_updated;
+                    } else {
+                        // Eski yapıdaysa (sadece günler varsa)
+                        mockDatabase = jsonData;
+                        document.getElementById('lastUpdateSpan').innerText = "Bilinmiyor";
+                    }
+                } else {
+                    console.error("veri.json dosyası bulunamadı.");
+                }
+            } catch (error) {
+                console.error("JSON okuma hatası:", error);
+            }
+            
+            renderMenu(currentDate);
+        }
+
+        function setMeal(mealType) {
+            currentMeal = mealType;
+            
+            const indicator = document.getElementById('mealIndicator');
+            const btnOgle = document.getElementById('mealBtn-ogle');
+            const btnAksam = document.getElementById('mealBtn-aksam');
+            
+            if (mealType === 'ogle') {
+                indicator.style.transform = 'translateX(0)';
+                btnOgle.classList.add('text-white');
+                btnOgle.classList.remove('text-textMuted');
+                btnAksam.classList.add('text-textMuted');
+                btnAksam.classList.remove('text-white');
+            } else {
+                indicator.style.transform = 'translateX(100%)';
+                btnAksam.classList.add('text-white');
+                btnAksam.classList.remove('text-textMuted');
+                btnOgle.classList.add('text-textMuted');
+                btnOgle.classList.remove('text-white');
+            }
+            
+            renderMenu(currentDate);
+        }
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDisplayDate(date) {
+            const options = { day: 'numeric', month: 'long', weekday: 'long' };
+            return date.toLocaleDateString('tr-TR', options);
+        }
+        
+        function formatNavDate(date) {
+            const options = { day: 'numeric', month: 'long' };
+            return date.toLocaleDateString('tr-TR', options);
+        }
+
+        function renderMenu(date) {
+            const dateStr = formatDate(date);
+            const dateData = mockDatabase[dateStr];
+            const menuData = dateData ? dateData[currentMeal] : null; 
+            
+            const listEl = document.getElementById('foodList');
+            const mealSelector = document.getElementById('mealSelector');
+            let totalCal = 0;
+
+            document.getElementById('dayTitle').innerText = formatDisplayDate(date);
+            document.getElementById('navDateText').innerText = formatNavDate(date);
+            
+            document.getElementById('nextBtn').disabled = date.getTime() >= maxDate.getTime();
+            document.getElementById('nextBtn').style.opacity = date.getTime() >= maxDate.getTime() ? "0.3" : "1";
+            
+            document.getElementById('prevBtn').disabled = date.getTime() <= minDate.getTime();
+            document.getElementById('prevBtn').style.opacity = date.getTime() <= minDate.getTime() ? "0.3" : "1";
+
+            listEl.innerHTML = '';
+
+            const dayOfWeek = date.getDay();
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+            if (isWeekend) {
+                mealSelector.style.display = 'none';
+                listEl.innerHTML = `<li class="py-6 text-center font-medium text-textMuted italic">Hafta sonları kafeterya servis yapmamaktadır.</li>`;
+            } else {
+                mealSelector.style.display = 'grid';
+
+                if (menuData && menuData.length > 0) {
+                    menuData.forEach((food, index) => {
+                        totalCal += food.cal;
+                        const isLast = index === menuData.length - 1;
+                        const borderClass = isLast ? "" : "border-b border-[#1f1f22]";
+                        
+                        listEl.innerHTML += `
+                            <li class="flex justify-between items-center py-4 ${borderClass} hover:bg-[#121212] px-2 rounded transition">
+                                <span class="font-semibold">${food.name}</span>
+                                <span class="text-sm font-medium text-textMuted tracking-wider">${food.cal} kcal</span>
+                            </li>
+                        `;
+                    });
+                } else {
+                    const mealText = currentMeal === 'ogle' ? 'Öğle' : 'Akşam';
+                    listEl.innerHTML = `<li class="py-6 text-center font-medium text-textMuted italic">Bu tarihe ait ${mealText} yemeği menüsü bulunamadı.</li>`;
+                }
+            }
+
+            document.getElementById('totalCalories').innerText = `${totalCal} kcal`;
+        }
+
+        function changeDay(offset) {
+            const newDate = new Date(currentDate);
+            newDate.setDate(currentDate.getDate() + offset);
+            
+            if (newDate.getTime() < minDate.getTime() || newDate.getTime() > maxDate.getTime()) {
+                return; 
+            }
+            currentDate = newDate;
+            calRenderMonth = currentDate.getMonth(); 
+            calRenderYear = currentDate.getFullYear();
+            renderMenu(currentDate);
+            
+            const calModal = document.getElementById('calendarModal');
+            if(calModal.classList.contains('opacity-100')){
+                buildCalendarUI(); 
+            }
+        }
+
+        function toggleCalendar() {
+            const calModal = document.getElementById('calendarModal');
+            
+            if(calModal.classList.contains('opacity-0')){
+                calRenderMonth = currentDate.getMonth();
+                calRenderYear = currentDate.getFullYear();
+                buildCalendarUI();
+                calModal.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
+                calModal.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+            } else {
+                closeCalendar();
+            }
+        }
+
+        function closeCalendar() {
+            const calModal = document.getElementById('calendarModal');
+            calModal.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
+            calModal.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+        }
+
+        function changeCalMonth(offset) {
+            calRenderMonth += offset;
+            if (calRenderMonth > 11) {
+                calRenderMonth = 0;
+                calRenderYear++;
+            } else if (calRenderMonth < 0) {
+                calRenderMonth = 11;
+                calRenderYear--;
+            }
+            buildCalendarUI();
+        }
+
+        function buildCalendarUI() {
+            document.getElementById('calMonthYearText').innerText = `${monthsTR[calRenderMonth]} ${calRenderYear}`;
+            
+            const weekdaysEl = document.getElementById('calWeekdays');
+            weekdaysEl.innerHTML = weekdaysTR.map(d => `<div>${d}</div>`).join('');
+
+            const calDaysEl = document.getElementById('calDays');
+            calDaysEl.innerHTML = '';
+
+            const firstDayOfMonth = new Date(calRenderYear, calRenderMonth, 1);
+            const lastDayOfMonth = new Date(calRenderYear, calRenderMonth + 1, 0);
+            
+            let startDayIndex = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1;
+
+            for (let i = 0; i < startDayIndex; i++) {
+                calDaysEl.innerHTML += `<div></div>`;
+            }
+
+            for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+                let iterDate = new Date(calRenderYear, calRenderMonth, i);
+                iterDate.setHours(0,0,0,0);
+                
+                let isPast = iterDate.getTime() < minDate.getTime();
+                let isTooFar = iterDate.getTime() > maxDate.getTime();
+                let isDisabled = isPast || isTooFar;
+                let isSelected = iterDate.getTime() === currentDate.getTime();
+                
+                let classes = "w-7 h-7 flex items-center justify-center rounded-md mx-auto transition-colors ";
+                
+                if (isDisabled) {
+                    classes += "text-[#3f3f46] cursor-not-allowed"; 
+                } else if (isSelected) {
+                    classes += "bg-white text-black font-bold cursor-pointer shadow-lg"; 
+                } else {
+                    classes += "hover:bg-[#27272a] text-textMain cursor-pointer"; 
+                }
+
+                let onClickAttr = isDisabled ? "" : `onclick="selectCustomDate(${calRenderYear}, ${calRenderMonth}, ${i})"`;
+                
+                calDaysEl.innerHTML += `<div class="${classes}" ${onClickAttr}>${i}</div>`;
+            }
+        }
+
+        function selectCustomDate(y, m, d) {
+            let selDate = new Date(y, m, d);
+            selDate.setHours(0,0,0,0);
+            currentDate = selDate;
+            renderMenu(currentDate);
+            closeCalendar(); 
+        }
+
+        function toggleAIMenu() {
+            const aiMenu = document.getElementById('aiMenu');
+            if (aiMenu.classList.contains('opacity-0')) {
+                aiMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                aiMenu.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+            } else {
+                closeAIMenu();
+            }
+        }
+
+        function closeAIMenu() {
+            const aiMenu = document.getElementById('aiMenu');
+            aiMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            aiMenu.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+        }
+
+        document.addEventListener('click', function(event) {
+            const aiButton = document.getElementById('aiButton');
+            const aiMenu = document.getElementById('aiMenu');
+            if (!aiButton.contains(event.target) && !aiMenu.contains(event.target)) {
+                closeAIMenu();
+            }
+
+            const calButton = document.getElementById('calButton');
+            const calModal = document.getElementById('calendarModal');
+            if (!calButton.contains(event.target) && !calModal.contains(event.target)) {
+                closeCalendar();
+            }
+        });
+
+        async function askAI(aiType) {
+            const dayOfWeek = currentDate.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                alert("Hafta sonu için değerlendirilecek menü bulunmamaktadır.");
+                closeAIMenu();
+                return;
+            }
+
+            const dateStr = formatDate(currentDate);
+            const dateData = mockDatabase[dateStr];
+            const menuData = dateData ? dateData[currentMeal] : null;
+            
+            if (!menuData || menuData.length === 0) {
+                alert("Değerlendirilecek menü bulunamadı.");
+                return;
+            }
+
+            const mealName = currentMeal === 'ogle' ? 'öğle' : 'akşam';
+            const foodNames = menuData.map(f => f.name).join(", ");
+            const totalCal = menuData.reduce((acc, curr) => acc + curr.cal, 0);
+            
+            const promptText = `Bugünün üniversite yemekhane ${mealName} yemeği menüsü şu şekilde: ${foodNames}. Toplam kalori: ${totalCal} kcal. Bir öğrenci için bu menüyü diyet, besleyicilik, makro dengesi ve doyuruculuk açısından detaylıca değerlendirir misin?`;
+
+            try {
+                await navigator.clipboard.writeText(promptText);
+            } catch (err) {
+                console.error("Panoya kopyalanamadı: ", err);
+            }
+
+            closeAIMenu();
+
+            if (aiType === 'chatgpt') window.open(`https://chatgpt.com/?q=${encodeURIComponent(promptText)}`, '_blank');
+            else if (aiType === 'claude') window.open('https://claude.ai/new', '_blank');
+            else if (aiType === 'gemini') window.open('https://gemini.google.com/app', '_blank');
+        }
+
+        window.onload = () => {
+            initializeApp();
+        }
+    </script>
+</body>
+</html>

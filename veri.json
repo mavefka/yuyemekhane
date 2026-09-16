@@ -1,0 +1,603 @@
+{
+    "last_updated": "16.09.2026",
+    "menus": {
+        "2026-09-01": {
+            "ogle": [
+                {
+                    "name": "YOĞURTLU ŞEHRİYE ÇORBA",
+                    "cal": 100
+                },
+                {
+                    "name": "TAVUK DÖNER",
+                    "cal": 149
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-02": {
+            "ogle": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137
+                },
+                {
+                    "name": "ÇOBAN KAVURMA",
+                    "cal": 370
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "SÜTLAÇ",
+                    "cal": 268
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-03": {
+            "ogle": [
+                {
+                    "name": "TAVUK SUYU ÇORBA",
+                    "cal": 117
+                },
+                {
+                    "name": "SEBZE MUSAKKA",
+                    "cal": 365
+                },
+                {
+                    "name": "MAKARNA (SOSLU)",
+                    "cal": 206
+                },
+                {
+                    "name": "CACIK",
+                    "cal": 128
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-04": {
+            "ogle": [
+                {
+                    "name": "YAYLA ÇORBA",
+                    "cal": 98
+                },
+                {
+                    "name": "HASAN PAŞA KÖFTE",
+                    "cal": 282
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "KAZANDİBİ",
+                    "cal": 280
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-07": {
+            "ogle": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132
+                },
+                {
+                    "name": "KURU FASULYE",
+                    "cal": 267
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "SALATA",
+                    "cal": 90
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-08": {
+            "ogle": [
+                {
+                    "name": "MAHLUTA ÇORBA",
+                    "cal": 161
+                },
+                {
+                    "name": "KURU KÖFTE(ELMA DİL. PAT.)",
+                    "cal": 745
+                },
+                {
+                    "name": "FIRIN MAKARNA",
+                    "cal": 292
+                },
+                {
+                    "name": "MEŞRUBAT",
+                    "cal": 60
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-09": {
+            "ogle": [
+                {
+                    "name": "SEBZE ÇORBA",
+                    "cal": 114
+                },
+                {
+                    "name": "FIRIN TAVUK",
+                    "cal": 465
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "KAKAOLU PUDİNG",
+                    "cal": 76
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-10": {
+            "ogle": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137
+                },
+                {
+                    "name": "PATATES MUSAKKA",
+                    "cal": 468
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "CACIK",
+                    "cal": 128
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-11": {
+            "ogle": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132
+                },
+                {
+                    "name": "ET DÖNER",
+                    "cal": 239
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-14": {
+            "ogle": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137
+                },
+                {
+                    "name": "NOHUT",
+                    "cal": 285
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "YOĞURT",
+                    "cal": 130
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-15": {
+            "ogle": [
+                {
+                    "name": "TAVUK SUYU ÇORBA",
+                    "cal": 117
+                },
+                {
+                    "name": "GÜVEÇ",
+                    "cal": 148
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "KAZANDİBİ",
+                    "cal": 280
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-16": {
+            "ogle": [
+                {
+                    "name": "YAYLA ÇORBA",
+                    "cal": 98
+                },
+                {
+                    "name": "KURU KÖFTE(ELMA DİL. PAT.)",
+                    "cal": 745
+                },
+                {
+                    "name": "MAKARNA (SOSLU)",
+                    "cal": 206
+                },
+                {
+                    "name": "MEŞRUBAT",
+                    "cal": 60
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-17": {
+            "ogle": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132
+                },
+                {
+                    "name": "FIRIN TAVUK",
+                    "cal": 465
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "SALATA",
+                    "cal": 90
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-18": {
+            "ogle": [
+                {
+                    "name": "MAHLUTA ÇORBA",
+                    "cal": 161
+                },
+                {
+                    "name": "TAZE FASULYE",
+                    "cal": 200
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "MEŞRUBAT",
+                    "cal": 60
+                }
+            ],
+            "aksam": []
+        },
+        "2026-09-21": {
+            "ogle": [
+                {
+                    "name": "MAHLUTA ÇORBA",
+                    "cal": 161
+                },
+                {
+                    "name": "TAVUK DÖNER",
+                    "cal": 149
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "AYRAN/MEŞRUBAT",
+                    "cal": 60
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137
+                },
+                {
+                    "name": "BELEN TAVA",
+                    "cal": 221
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "MEŞRUBAT",
+                    "cal": 60
+                }
+            ]
+        },
+        "2026-09-22": {
+            "ogle": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132
+                },
+                {
+                    "name": "KÖFTE  PATATES",
+                    "cal": 150
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "MEYVE",
+                    "cal": 65
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "YAYLA ÇORBA",
+                    "cal": 98
+                },
+                {
+                    "name": "İZMİR KÖFTE",
+                    "cal": 197
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "HAYDARİ",
+                    "cal": 134
+                }
+            ]
+        },
+        "2026-09-23": {
+            "ogle": [
+                {
+                    "name": "YAYLA ÇORBA",
+                    "cal": 98
+                },
+                {
+                    "name": "ET DÖNER",
+                    "cal": 239
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132
+                },
+                {
+                    "name": "FIRIN TAVUK",
+                    "cal": 465
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "MEYVE",
+                    "cal": 65
+                }
+            ]
+        },
+        "2026-09-24": {
+            "ogle": [
+                {
+                    "name": "TAVUK SUYU ÇORBA",
+                    "cal": 117
+                },
+                {
+                    "name": "SEBZE MUSAKKA",
+                    "cal": 365
+                },
+                {
+                    "name": "MAKARNA (PEYNİRLİ)",
+                    "cal": 308
+                },
+                {
+                    "name": "SÜTLAÇ",
+                    "cal": 268
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125
+                },
+                {
+                    "name": "NOHUT",
+                    "cal": 285
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "YOĞURT",
+                    "cal": 130
+                }
+            ]
+        },
+        "2026-09-25": {
+            "ogle": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125
+                },
+                {
+                    "name": "ANKARA TAVA",
+                    "cal": 283
+                },
+                {
+                    "name": "KARIŞIK KIZARTMA (SOSLU)",
+                    "cal": 224
+                },
+                {
+                    "name": "YOĞURT",
+                    "cal": 130
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "MAHLUTA ÇORBA",
+                    "cal": 161
+                },
+                {
+                    "name": "TAZE FASULYE",
+                    "cal": 200
+                },
+                {
+                    "name": "FIRIN MAKARNA",
+                    "cal": 292
+                },
+                {
+                    "name": "SÜTLAÇ",
+                    "cal": 268
+                }
+            ]
+        },
+        "2026-09-28": {
+            "ogle": [
+                {
+                    "name": "YAYLA ÇORBA",
+                    "cal": 98
+                },
+                {
+                    "name": "ETLİ TAZE FASULYE",
+                    "cal": 159
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "CACIK",
+                    "cal": 128
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132
+                },
+                {
+                    "name": "KURU FASULYE",
+                    "cal": 267
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "YOĞURT",
+                    "cal": 130
+                }
+            ]
+        },
+        "2026-09-29": {
+            "ogle": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132
+                },
+                {
+                    "name": "HASAN PAŞA KÖFTE",
+                    "cal": 282
+                },
+                {
+                    "name": "MAKARNA (NAPOLİTEN)",
+                    "cal": 308
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "YAYLA ÇORBA",
+                    "cal": 98
+                },
+                {
+                    "name": "TAVUK SOTE",
+                    "cal": 288
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "SALATA",
+                    "cal": 90
+                }
+            ]
+        },
+        "2026-09-30": {
+            "ogle": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125
+                },
+                {
+                    "name": "TAVUK FAJİTA",
+                    "cal": 217
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169
+                },
+                {
+                    "name": "MEYVE",
+                    "cal": 65
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125
+                },
+                {
+                    "name": "ETLİ PATATES YEMEĞİ",
+                    "cal": 400
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56
+                }
+            ]
+        }
+    }
+}
