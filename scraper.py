@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import json
 import urllib3
 from datetime import datetime
+import re
 
 # SSL sertifika uyarılarını gizle
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -89,7 +90,18 @@ def fetch_and_combine_menus():
                         isim = isim_kism_ayri[0].strip()
                         kalori = int(isim_kism_ayri[1].replace('Cal)', '').strip())
                         
-                        yemekler_listesi.append({"name": isim, "cal": kalori})
+                        # İçindekiler kısmını HTML etiketlerinden ayıklayarak çekme
+                        icindekiler = ""
+                        if satir.has_attr('data-original-title'):
+                            raw_title = satir['data-original-title']
+                            clean_title = re.sub(r'<[^>]+>', '', raw_title)
+                            icindekiler = clean_title.replace('İÇİNDEKİLER:', '').strip()
+                        
+                        yemekler_listesi.append({
+                            "name": isim, 
+                            "cal": kalori,
+                            "ingredients": icindekiler
+                        })
                     except Exception:
                         pass
             
@@ -112,7 +124,6 @@ def fetch_and_combine_menus():
             "aksam": aksam_verisi.get(date, [])
         }
         
-    # Sadece Gün.Ay.Yıl formatında saat olmadan alıyoruz
     guncel_zaman = datetime.now().strftime("%d.%m.%Y")
     
     final_output = {

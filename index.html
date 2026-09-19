@@ -172,12 +172,10 @@
                 if (menuResponse.ok) {
                     const jsonData = await menuResponse.json();
                     
-                    // Yeni JSON yapısı (last_updated ve menus içeriyorsa)
                     if (jsonData.menus) {
                         mockDatabase = jsonData.menus;
                         document.getElementById('lastUpdateSpan').innerText = jsonData.last_updated;
                     } else {
-                        // Eski yapıdaysa (sadece günler varsa)
                         mockDatabase = jsonData;
                         document.getElementById('lastUpdateSpan').innerText = "Bilinmiyor";
                     }
@@ -267,9 +265,24 @@
                         const isLast = index === menuData.length - 1;
                         const borderClass = isLast ? "" : "border-b border-[#1f1f22]";
                         
+                        // İçindekiler bilgisi varsa HTML şablonunu oluştur
+                        const infoIconHTML = food.ingredients ? `
+                            <div class="relative flex items-center group cursor-help ml-2">
+                                <i class="fa-solid fa-circle-info text-textMuted hover:text-white transition-colors text-xs"></i>
+                                <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2.5 bg-[#27272a] border border-cardBorder rounded-md text-[11px] text-textMain opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-50 text-center leading-relaxed">
+                                    <span class="font-bold text-white block mb-1 uppercase tracking-wider">İçindekiler</span>
+                                    ${food.ingredients}
+                                    <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-cardBorder"></div>
+                                </div>
+                            </div>
+                        ` : '';
+                        
                         listEl.innerHTML += `
                             <li class="flex justify-between items-center py-4 ${borderClass} hover:bg-[#121212] px-2 rounded transition">
-                                <span class="font-semibold">${food.name}</span>
+                                <div class="flex items-center">
+                                    <span class="font-semibold">${food.name}</span>
+                                    ${infoIconHTML}
+                                </div>
                                 <span class="text-sm font-medium text-textMuted tracking-wider">${food.cal} kcal</span>
                             </li>
                         `;
