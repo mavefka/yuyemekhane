@@ -1,5 +1,5 @@
 {
-    "last_updated": "20.09.2026",
+    "last_updated": "21.09.2026",
     "menus": {
         "2026-09-01": {
             "ogle": [
@@ -369,9 +369,9 @@
                     "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
                 },
                 {
-                    "name": "AYRAN/MEŞRUBAT",
-                    "cal": 60,
-                    "ingredients": ""
+                    "name": "HAYDARİ",
+                    "cal": 134,
+                    "ingredients": "Yoğurt, kuru nane, zeytinyağı"
                 }
             ],
             "aksam": [
@@ -437,9 +437,9 @@
                     "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
-                    "name": "HAYDARİ",
-                    "cal": 134,
-                    "ingredients": "Yoğurt, kuru nane, zeytinyağı"
+                    "name": "KAKAOLU PUDİNG",
+                    "cal": 76,
+                    "ingredients": ""
                 }
             ]
         },
