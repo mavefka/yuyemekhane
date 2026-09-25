@@ -1,5 +1,5 @@
 {
-    "last_updated": "24.09.2026",
+    "last_updated": "25.09.2026",
     "menus": {
         "2026-09-01": {
             "ogle": [
@@ -575,9 +575,9 @@
                     "ingredients": "Makarna,yumurta,süt,k.peynir,yağ,tuz,un,maydonoz"
                 },
                 {
-                    "name": "SÜTLAÇ",
-                    "cal": 268,
-                    "ingredients": "Süt,Şeker,pirinç,nişasta,tarçın,vanilya"
+                    "name": "MEŞRUBAT",
+                    "cal": 60,
+                    "ingredients": ""
                 }
             ]
         },
@@ -589,9 +589,9 @@
                     "ingredients": "Yoğurt, Pirinç, Yumurta, Un, Yağ, Nane, Tuz"
                 },
                 {
-                    "name": "ETLİ TAZE FASULYE",
-                    "cal": 159,
-                    "ingredients": ""
+                    "name": "ETLİ PATATES YEMEĞİ",
+                    "cal": 400,
+                    "ingredients": "Patates, Et, Kuru Soğan, Sıvı Yağ, Salça, Karabiber, Pulbiber , Tuz"
                 },
                 {
                     "name": "PİRİNÇ PİLAVI",
