@@ -480,7 +480,8 @@ def fetch_and_combine_menus():
             try:
                 resp = session.get(f"https://ntfy.sh/{topic}/json?poll=1&since=all", timeout=6)
                 if resp.status_code == 200 and resp.text.strip():
-                    for line in resp.text.strip().splitlines():
+                    lines = [ln for ln in resp.text.strip().splitlines() if ln.strip()][-100:]
+                    for line in lines:
                         try:
                             ev = json.loads(line)
                             if ev.get("event") != "message":
@@ -526,14 +527,25 @@ def fetch_and_combine_menus():
                             except Exception:
                                 clean_rating = None
 
-                            # Yönetici ECDSA imza doğrulaması (onaysız hiçbir yorum arşive giremez)
-                            approval_payload = f"APPROVE|{slot_key}|{c_id}|{author}|{clean_rating or ''}|{text}"
+                            try:
+                                raw_ts = int(float(c_obj.get("ts", now_ms)))
+                                if raw_ts < now_ms - 45 * 86400000 or raw_ts > now_ms + 600000:
+                                    clean_ts = now_ms
+                                else:
+                                    clean_ts = raw_ts
+                            except Exception:
+                                clean_ts = now_ms
+
+                            img_val = c_obj.get("img", "")
+                            has_img_flag = "1" if (isinstance(img_val, str) and bool(img_val.strip())) else "0"
+
+                            # Yönetici ECDSA imza doğrulaması (ts ve görsel varlığı dahil)
+                            approval_payload = f"APPROVE_V2|{slot_key}|{c_id}|{author}|{clean_rating or ''}|{text}|{clean_ts}|{has_img_flag}"
                             if not verify_admin_sig(approval_payload, sig_val):
                                 continue
 
                             # Görsel doğrulaması (Magic-byte + boyut kontrolü)
                             clean_img = ""
-                            img_val = c_obj.get("img", "")
                             if isinstance(img_val, str):
                                 if re.match(r'^https://ntfy\.sh/file/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+)?$', img_val):
                                     try:
@@ -561,15 +573,6 @@ def fetch_and_combine_menus():
                             content_sig = f"{author_key}|{text.lower()}"
                             if content_sig in seen_content:
                                 continue
-
-                            try:
-                                raw_ts = int(float(c_obj.get("ts", now_ms)))
-                                if raw_ts < now_ms - 45 * 86400000 or raw_ts > now_ms + 600000:
-                                    clean_ts = now_ms
-                                else:
-                                    clean_ts = raw_ts
-                            except Exception:
-                                clean_ts = now_ms
 
                             raw_time = str(c_obj.get("time") or "").strip()
                             clean_time = raw_time if re.match(r'^\d{2}:\d{2}$', raw_time) else now_dt.strftime("%H:%M")

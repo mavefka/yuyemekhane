@@ -1982,10 +1982,14 @@
                 y: "xhScBPA2HRfkakF_ogre4OtptGkZKwYb54N5sqK5fdQ",
                 crv: "P-256"
             },
-            saltB64: "t1EcsqqgAZZi1ykjyRA9gQ==",
-            ivB64: "xiwFK1sKJKGO1pdt",
-            ctB64: "Qt2iMlURd2dpPYPxcfAjIYas3MqUxNmPMUsJyvMu2gVimnYRHT6jM2YeH6nL5Gjf9fkRoxFgX+mxKpAO5v2h0cK9bSVlNXEd2PquhL57TCImrw63iFWrVEFl4ZydXPSMXQPw3bDnA41OsjDxm8l3wkPropqK+Pwlsr8QLZ3vuhP1P7bWgXsO/cCMkK/CH94mt0+CY3PfR8GONA=="
+            saltB64: "pu+LDk86DR9cAxxpXUJ+Cw==",
+            ivB64: "fxGAnlArK32mj2Ul",
+            ctB64: "ad1dZBQcs2BOdoOJcKXEglvVsELehNxWvOBrn2sYKdKRES1c/n9MuEwos4/Mq4Mxa6K6jj43sc3Qh2jHFD28D42f11ZYdsLgahY7KuvI+vAug1awvEdJywNL4an6gA6Wqo+xsAzyJfGjzbw6uUmhWr7mnshrvwkKJ4lck7jZpN8YA6LY33oyw/fogBgqfNOQkBxh2rI3ONizVw=="
         };
+
+        function sliceCodePoints(str, maxLen) {
+            return Array.from(String(str || "")).slice(0, maxLen).join("");
+        }
 
         function b64ToBytes(b64) {
             const bin = atob(b64);
@@ -2014,7 +2018,8 @@
         }
 
         function buildApprovalPayload(slotKey, item) {
-            return `APPROVE|${slotKey}|${item.id}|${item.author}|${item.rating || ''}|${item.text || ''}`;
+            const hasImg = item.img ? "1" : "0";
+            return `APPROVE_V2|${slotKey}|${item.id}|${item.author}|${item.rating || ''}|${item.text || ''}|${item.ts}|${hasImg}`;
         }
 
         async function verifyAdminSignature(payloadStr, sigB64) {
@@ -2035,6 +2040,7 @@
         }
 
         async function signAdminPayload(payloadStr) {
+            if (window.top !== window.self) throw new Error("Iframe içinde işlem yapılamaz");
             if (!adminPrivateKey) throw new Error("Yönetici oturumu açık değil");
             const dataBytes = new TextEncoder().encode(payloadStr);
             const sigBuf = await crypto.subtle.sign(
@@ -2061,24 +2067,17 @@
         }
 
         async function restoreAdminSession() {
+            // Clean up any legacy plaintext key from localStorage; keep admin key in RAM only
             try {
-                const savedPkcs8 = localStorage.getItem('yuyemekhane_admin_pkcs8');
-                if (!savedPkcs8) return;
-                const pkcs8Bytes = b64ToBytes(savedPkcs8);
-                adminPrivateKey = await crypto.subtle.importKey(
-                    "pkcs8",
-                    pkcs8Bytes,
-                    { name: "ECDSA", namedCurve: "P-256" },
-                    false,
-                    ["sign"]
-                );
-                syncAdminUIState();
-            } catch (e) {
-                adminPrivateKey = null;
+                localStorage.removeItem('yuyemekhane_admin_pkcs8');
+            } catch (e) {}
+            if (window.top !== window.self) {
+                try { window.top.location = window.self.location.href; } catch (e) {}
             }
         }
 
         async function unlockAdminWithPassword(password) {
+            if (window.top !== window.self) throw new Error("Iframe içinde oturum açılamaz");
             const passBytes = new TextEncoder().encode((password || "").trim());
             const salt = b64ToBytes(ADMIN_CRYPTO_CONFIG.saltB64);
             const iv = b64ToBytes(ADMIN_CRYPTO_CONFIG.ivB64);
@@ -2086,7 +2085,7 @@
 
             const baseKey = await crypto.subtle.importKey("raw", passBytes, "PBKDF2", false, ["deriveKey"]);
             const aesKey = await crypto.subtle.deriveKey(
-                { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+                { name: "PBKDF2", salt, iterations: 600000, hash: "SHA-256" },
                 baseKey,
                 { name: "AES-GCM", length: 256 },
                 false,
@@ -2100,9 +2099,8 @@
                 false,
                 ["sign"]
             );
-            try {
-                localStorage.setItem('yuyemekhane_admin_pkcs8', bytesToB64(pkcs8Buf));
-            } catch (e) {}
+            // Zero out temporary decrypted buffer
+            new Uint8Array(pkcs8Buf).fill(0);
             syncAdminUIState();
         }
 
@@ -2125,17 +2123,17 @@
 
         function sanitizeCommentObject(raw, allowAdminName = false) {
             if (!raw || typeof raw !== 'object') return null;
-            const cleanAuthor = String(raw.author || '')
-                .replace(/[\u0000-\u001F\u007F]/g, '')
-                .trim()
-                .slice(0, 28);
+            const cleanAuthor = sliceCodePoints(
+                String(raw.author || '').replace(/[\u0000-\u001F\u007F]/g, '').trim(),
+                28
+            );
             if (cleanAuthor.length < 2) return null;
             if (!allowAdminName && RESERVED_AUTHOR_PATTERN.test(cleanAuthor)) return null;
 
-            const cleanText = String(raw.text || '')
-                .replace(/[\u0000-\u001F\u007F]/g, '')
-                .trim()
-                .slice(0, 240);
+            const cleanText = sliceCodePoints(
+                String(raw.text || '').replace(/[\u0000-\u001F\u007F]/g, '').trim(),
+                240
+            );
 
             const cleanImg = isValidCommentImageSrc(raw.img) ? raw.img : "";
             if (!cleanText && !cleanImg) return null;
@@ -2218,16 +2216,23 @@
             const dismissedSet = dismissedPendingIdsCache[slotKey] instanceof Set ? dismissedPendingIdsCache[slotKey] : new Set();
 
             const seenIds = new Set();
+            const authorCounts = new Map();
             const result = [];
             for (const rawItem of rawPending) {
                 const item = sanitizeCommentObject(rawItem, false);
                 if (!item) continue;
                 if (approvedIds.has(item.id) || dismissedSet.has(item.id) || seenIds.has(item.id)) continue;
+
+                const aKey = item.author.toLocaleLowerCase('tr-TR');
+                const prevCount = authorCounts.get(aKey) || 0;
+                if (prevCount >= 3) continue;
+
                 seenIds.add(item.id);
+                authorCounts.set(aKey, prevCount + 1);
                 result.push(item);
             }
             result.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-            return result;
+            return result.slice(-30);
         }
 
         function setSelectedCommentRating(stars) {
@@ -2532,8 +2537,8 @@
                     const verifiedApproved = [];
                     const deletedIds = new Set();
 
-                    for (const line of text.split('\n')) {
-                        if (!line.trim()) continue;
+                    const lines = text.split('\n').filter(l => l.trim()).slice(-100);
+                    for (const line of lines) {
                         try {
                             const ev = JSON.parse(line);
                             if (ev.event !== 'message' || !ev.message) continue;
@@ -2570,8 +2575,8 @@
                         const rawPending = [];
                         const dismissedIds = new Set();
 
-                        for (const line of pText.split('\n')) {
-                            if (!line.trim()) continue;
+                        const pLines = pText.split('\n').filter(l => l.trim()).slice(-80);
+                        for (const line of pLines) {
                             try {
                                 const ev = JSON.parse(line);
                                 if (ev.event !== 'message' || !ev.message) continue;
