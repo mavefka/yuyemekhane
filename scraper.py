@@ -277,11 +277,15 @@ def fetch_and_combine_menus():
             "Ogun": meal_code
         }
 
-        response = session.post(MENU_URL, data=data, verify=False, timeout=15)
-        response.encoding = 'utf-8'
-        msoup = BeautifulSoup(response.text, 'html.parser')
-
         meal_data = {}
+        try:
+            response = session.post(MENU_URL, data=data, verify=False, timeout=15)
+            response.encoding = 'utf-8'
+            msoup = BeautifulSoup(response.text, 'html.parser')
+        except Exception as e:
+            print(f"Menü sayfası çekilemedi ({target_year}-{target_month}, Öğün {meal_code}): {e}")
+            return meal_data
+
         home_table = msoup.find('ul', class_='home-table')
 
         if not home_table:
@@ -360,7 +364,7 @@ def fetch_and_combine_menus():
     # Üniversite duyurularını çek
     announcements_list = fetch_announcements(session)
 
-    # Mevcut veri.json dosyasını oku (eski duyuru ve arşivlenmiş yorumları korumak için)
+    # Mevcut veri.json dosyasını oku (eski menü, duyuru ve arşivlenmiş yorumları korumak için)
     old_data = {}
     try:
         with open('veri.json', 'r', encoding='utf-8') as old_f:
@@ -368,13 +372,16 @@ def fetch_and_combine_menus():
     except Exception:
         old_data = {}
 
+    if not combined_database and isinstance(old_data.get('menus'), dict):
+        combined_database = old_data.get('menus', {})
+
     if not announcements_list:
         announcements_list = old_data.get('announcements', [])
 
-    # Yorumları senkronize et ve kalıcı olarak arşivle (bugün + gelecek 8 gün)
+    # Yorumları senkronize et ve kalıcı olarak arşivle (geçmiş 7 gün + gelecek 14 gün)
     comments_archive = old_data.get('comments', {}) if isinstance(old_data.get('comments'), dict) else {}
     now_dt = datetime.now()
-    target_comment_dates = [(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-1, 9)]
+    target_comment_dates = [(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-7, 15)]
 
     for c_date in target_comment_dates:
         for meal_key in ("ogle", "aksam"):
