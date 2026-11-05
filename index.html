@@ -21,6 +21,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -97,14 +98,27 @@
 
         body {
             background-color: #000000;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.35s ease, color 0.25s ease;
+        }
+
+        /* GPU-composited fixed background layer (prevents mobile scroll repaints) */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #000000;
             background-image:
                 linear-gradient(180deg, rgba(0, 0, 0, 0.76) 0%, rgba(0, 0, 0, 0.80) 50%, rgba(0, 0, 0, 0.84) 100%),
                 url('drone.jpg');
-            background-attachment: fixed;
+            background-image:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.76) 0%, rgba(0, 0, 0, 0.80) 50%, rgba(0, 0, 0, 0.84) 100%),
+                image-set(url('drone.webp') type('image/webp'), url('drone.jpg') type('image/jpeg'));
             background-size: cover;
             background-position: center center;
-            -webkit-font-smoothing: antialiased;
-            transition: background-color 0.35s ease, color 0.25s ease;
+            transform: translateZ(0);
         }
 
         /* Pure AMOLED Black Glass Cards (Default Dark Mode - 100% Untouched) */
@@ -133,10 +147,17 @@
            ========================================================================== */
         html[data-theme="light"] body {
             background-color: #eef2f7;
+            color: #0f172a;
+        }
+
+        html[data-theme="light"] body::before {
+            background-color: #eef2f7;
             background-image:
                 linear-gradient(180deg, rgba(242, 247, 255, 0.34) 0%, rgba(235, 243, 255, 0.42) 50%, rgba(226, 236, 250, 0.50) 100%),
                 url('drone.jpg');
-            color: #0f172a;
+            background-image:
+                linear-gradient(180deg, rgba(242, 247, 255, 0.34) 0%, rgba(235, 243, 255, 0.42) 50%, rgba(226, 236, 250, 0.50) 100%),
+                image-set(url('drone.webp') type('image/webp'), url('drone.jpg') type('image/jpeg'));
         }
 
         html[data-theme="light"] #topHeader {
@@ -887,9 +908,32 @@
         let searchQuery = "";
         let activeMobileTab = "menu";
 
-        let today = new Date();
-        const initialHour = today.getHours();
-        today.setHours(0, 0, 0, 0);
+        function getIstanbulDateAndHour() {
+            try {
+                const parts = new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'Europe/Istanbul',
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    hour12: false
+                }).formatToParts(new Date());
+                const map = {};
+                for (const p of parts) map[p.type] = parseInt(p.value, 10);
+                const d = new Date(map.year, map.month - 1, map.day);
+                d.setHours(0, 0, 0, 0);
+                return { date: d, hour: map.hour % 24 };
+            } catch (e) {
+                const d = new Date();
+                const h = d.getHours();
+                d.setHours(0, 0, 0, 0);
+                return { date: d, hour: h };
+            }
+        }
+
+        const istanbulInit = getIstanbulDateAndHour();
+        let today = istanbulInit.date;
+        const initialHour = istanbulInit.hour;
 
         let currentDate = new Date(today);
         let minDate = new Date(today);
@@ -1740,11 +1784,9 @@
                 applyPayload(window.__VERI_DATA__);
                 renderMenu(currentDate);
                 renderAnnouncements();
-            }
-
-            if (window.location.protocol.startsWith('http')) {
+            } else if (window.location.protocol.startsWith('http')) {
                 try {
-                    const menuResponse = await fetch('veri.json', { cache: "no-store" });
+                    const menuResponse = await fetch('veri.json');
                     if (menuResponse.ok) {
                         const jsonData = await menuResponse.json();
                         applyPayload(jsonData);
@@ -1752,32 +1794,8 @@
                         renderAnnouncements();
                     }
                 } catch (error) {
-                    console.warn("veri.json fetch atlandı, yerel veri kullanılıyor.");
+                    console.warn("veri.json fetch atlandı.");
                 }
-            }
-
-            try {
-                const controller = new AbortController();
-                const timer = setTimeout(() => controller.abort(), 2000);
-                const timeResponse = await fetch('https://worldtimeapi.org/api/timezone/Europe/Istanbul', {
-                    signal: controller.signal
-                });
-                clearTimeout(timer);
-                if (timeResponse.ok) {
-                    const timeData = await timeResponse.json();
-                    const internetDate = new Date(timeData.datetime);
-                    today = new Date(internetDate);
-                    today.setHours(0, 0, 0, 0);
-                    currentDate = new Date(today);
-                    minDate = new Date(today);
-                    maxDate = new Date(today);
-                    maxDate.setDate(maxDate.getDate() + 7);
-                    calRenderMonth = currentDate.getMonth();
-                    calRenderYear = currentDate.getFullYear();
-                    renderMenu(currentDate);
-                }
-            } catch (error) {
-                // Cihaz saati ile devam et
             }
         }
 
@@ -1849,9 +1867,13 @@
             }
         });
 
+        let searchRafId = 0;
         document.getElementById('announcementSearchInput').addEventListener('input', (e) => {
             searchQuery = e.target.value || "";
-            renderAnnouncements();
+            if (searchRafId) cancelAnimationFrame(searchRafId);
+            searchRafId = requestAnimationFrame(() => {
+                renderAnnouncements();
+            });
         });
 
         document.getElementById('mobileTabMenu').addEventListener('click', () => setMobileTab('menu'));
