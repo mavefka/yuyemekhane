@@ -2,8 +2,8 @@ name: yemek menusu otomatik guncelleme
 
 on:
   schedule:
-    # Her gün Türkiye saati ile sabah 06:00'da çalışır (UTC saatine göre ayarlanmıştır)
-    - cron: '0 3 * * *'
+    # Her gün Türkiye saati ile 06:00, 12:00 ve 18:00'de çalışır (menü ve duyuru senkronizasyonu)
+    - cron: '0 3,9,15 * * *'
   workflow_dispatch: # İsterse elinle panelden de tetikleyebilirsin
 
 jobs:
@@ -32,6 +32,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add veri.json
+          git add veri.json veri.js
           git commit -m "Günlük otomatik menü güncellemesi: $(date +'%Y-%m-%d')" || exit 0
           git push

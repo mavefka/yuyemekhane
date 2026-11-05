@@ -3,214 +3,1089 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#000000" id="themeColorMeta">
+    <script>
+        try {
+            const savedTheme = localStorage.getItem('yuyemekhane_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.querySelector('meta[name="color-scheme"]').content = savedTheme;
+            document.getElementById('themeColorMeta').content = savedTheme === 'light' ? '#eef2f7' : '#000000';
+        } catch (e) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
     <title>YÜ Yemekhane</title>
-    
+
     <link rel="icon" href="logo.ico" type="image/x-icon">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.7/purify.min.js" defer></script>
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['"Inter"', 'sans-serif'],
+                        sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
                     },
                     colors: {
-                        cardBg: '#09090b', 
-                        cardBorder: '#1f1f22', 
-                        textMain: '#e4e4e7', 
-                        textMuted: '#a1a1aa' 
+                        amoled: '#000000',
+                        surface: '#030304',
+                        surfaceElevated: '#08080b',
+                        surfaceHover: '#101015',
+                        surfaceActive: '#181820',
+                        borderSubtle: 'rgba(255, 255, 255, 0.08)',
+                        borderHighlight: 'rgba(255, 255, 255, 0.15)',
+                        textMain: '#f4f4f6',
+                        textSecondary: '#a1a1aa',
+                        textMuted: '#71717a'
                     }
                 }
             }
         }
     </script>
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --scrollbar-track: #000000;
+            --scrollbar-thumb: #27272a;
+            --spring-easing: cubic-bezier(0.22, 1, 0.36, 1);
+            scrollbar-width: thin;
+            scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+
+            &:has(> head > meta[name="color-scheme"][content="light"]),
+            &[data-theme="light"] {
+                color-scheme: light;
+                --scrollbar-track: rgba(255, 255, 255, 0.25);
+                --scrollbar-thumb: rgba(15, 23, 42, 0.24);
+            }
+        }
+
+        @supports not (scrollbar-color: auto) {
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--scrollbar-thumb);
+                border-radius: 9999px;
+            }
+            ::-webkit-scrollbar-track {
+                background: var(--scrollbar-track);
+            }
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body {
+            background-color: #000000;
+            background-image:
+                linear-gradient(180deg, rgba(0, 0, 0, 0.76) 0%, rgba(0, 0, 0, 0.80) 50%, rgba(0, 0, 0, 0.84) 100%),
+                url('drone.jpg');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center center;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            transition: background-color 0.35s ease, color 0.25s ease;
+        }
+
+        /* Pure AMOLED Black Glass Cards (Default Dark Mode - 100% Untouched) */
+        .amoled-card {
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow:
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+                0 24px 48px -12px rgba(0, 0, 0, 0.95);
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .amoled-pill {
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* ==========================================================================
+           APPLE LIQUID GLASS LIGHT THEME (Only active when html[data-theme="light"])
+           ========================================================================== */
+        html[data-theme="light"] body {
+            background-color: #eef2f7;
+            background-image:
+                linear-gradient(180deg, rgba(242, 247, 255, 0.34) 0%, rgba(235, 243, 255, 0.42) 50%, rgba(226, 236, 250, 0.50) 100%),
+                url('drone.jpg');
+            color: #0f172a;
+        }
+
+        html[data-theme="light"] #topHeader {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.50) 100%) !important;
+            backdrop-filter: blur(30px) saturate(200%) brightness(1.04) !important;
+            -webkit-backdrop-filter: blur(30px) saturate(200%) brightness(1.04) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.84) !important;
+            box-shadow:
+                inset 0 -1px 0 0 rgba(255, 255, 255, 0.65),
+                0 8px 32px -8px rgba(15, 23, 42, 0.09);
+        }
+
+        html[data-theme="light"] #headerLogo {
+            filter: brightness(0) opacity(0.86) !important;
+        }
+
+        html[data-theme="light"] .amoled-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.46) 55%, rgba(246, 251, 255, 0.60) 100%);
+            backdrop-filter: blur(36px) saturate(200%) brightness(1.04);
+            -webkit-backdrop-filter: blur(36px) saturate(200%) brightness(1.04);
+            border: 1px solid rgba(255, 255, 255, 0.86);
+            box-shadow:
+                inset 0 1.5px 0 0 rgba(255, 255, 255, 0.98),
+                inset 0 -1px 0 0 rgba(255, 255, 255, 0.55),
+                inset 1px 0 0 0 rgba(255, 255, 255, 0.65),
+                0 24px 48px -12px rgba(15, 23, 42, 0.16),
+                0 4px 16px -2px rgba(15, 23, 42, 0.07);
+        }
+
+        html[data-theme="light"] .amoled-pill {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.52) 100%);
+            backdrop-filter: blur(30px) saturate(195%);
+            -webkit-backdrop-filter: blur(30px) saturate(195%);
+            border: 1px solid rgba(255, 255, 255, 0.88);
+            box-shadow:
+                inset 0 1.5px 0 0 rgba(255, 255, 255, 0.96),
+                0 12px 28px -8px rgba(15, 23, 42, 0.11);
+        }
+
+        /* Liquid Glass Header Buttons & Controls */
+        html[data-theme="light"] .header-icon-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.55) 100%) !important;
+            border-color: rgba(255, 255, 255, 0.9) !important;
+            color: #1e293b !important;
+            box-shadow: inset 0 1px 0 #ffffff, 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+        }
+        html[data-theme="light"] .header-icon-btn:hover {
+            background: rgba(255, 255, 255, 0.92) !important;
+            color: #0f172a !important;
+        }
+
+        /* Liquid Glass Segmented Switchers (Mobile Nav & Meal Selector) */
+        html[data-theme="light"] #mobileNavBar,
+        html[data-theme="light"] #mealSelector {
+            background: rgba(15, 23, 42, 0.06) !important;
+            border-color: rgba(255, 255, 255, 0.75) !important;
+            box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.07);
+        }
+        html[data-theme="light"] #mealIndicator {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 100%) !important;
+            box-shadow: inset 0 1px 0 #ffffff, 0 4px 12px rgba(15, 23, 42, 0.12) !important;
+        }
+
+        /* Liquid Glass Sub-Cards (Food items, Announcement cards, Empty states) */
+        html[data-theme="light"] #foodList > li,
+        html[data-theme="light"] #announcementsList > article,
+        html[data-theme="light"] #announcementsList > div {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.66) 0%, rgba(255, 255, 255, 0.46) 100%) !important;
+            border-color: rgba(255, 255, 255, 0.86) !important;
+            box-shadow:
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+                0 6px 18px -4px rgba(15, 23, 42, 0.06);
+        }
+        html[data-theme="light"] #foodList > li:hover,
+        html[data-theme="light"] #announcementsList > article:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.70) 100%) !important;
+            border-color: #ffffff !important;
+            box-shadow:
+                inset 0 1.5px 0 0 #ffffff,
+                0 10px 24px -6px rgba(15, 23, 42, 0.10);
+        }
+
+        /* Liquid Glass Secondary Controls (Copy, External Link, Fire Icon Box, Search) */
+        html[data-theme="light"] #copyMenuBtn,
+        html[data-theme="light"] #officialAnnLink,
+        html[data-theme="light"] #calorieIconBox {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0.56) 100%) !important;
+            border-color: rgba(255, 255, 255, 0.88) !important;
+            color: #1e293b !important;
+            box-shadow: inset 0 1px 0 #ffffff, 0 4px 12px -2px rgba(15, 23, 42, 0.07);
+        }
+        html[data-theme="light"] #copyMenuBtn:hover,
+        html[data-theme="light"] #officialAnnLink:hover {
+            background: rgba(255, 255, 255, 0.94) !important;
+            color: #0f172a !important;
+        }
+
+        html[data-theme="light"] #aiButton,
+        html[data-theme="light"] #relativeDayBadge,
+        html[data-theme="light"] #annDialogExternalLink {
+            background: #0f172a !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 16px -3px rgba(15, 23, 42, 0.25);
+        }
+        html[data-theme="light"] #aiButton:hover,
+        html[data-theme="light"] #annDialogExternalLink:hover {
+            background: #1e293b !important;
+        }
+
+        html[data-theme="light"] #announcementSearchInput {
+            background: rgba(255, 255, 255, 0.65) !important;
+            border-color: rgba(255, 255, 255, 0.88) !important;
+            color: #0f172a !important;
+            box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05), 0 2px 8px rgba(15, 23, 42, 0.03);
+        }
+        html[data-theme="light"] #announcementSearchInput:focus {
+            background: rgba(255, 255, 255, 0.90) !important;
+            border-color: rgba(15, 23, 42, 0.28) !important;
+        }
+
+        /* Liquid Glass Floating Dock, Popovers & Modal Dialog */
+        html[data-theme="light"] #bottomDockPill {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.58) 100%) !important;
+            backdrop-filter: blur(32px) saturate(200%) !important;
+            -webkit-backdrop-filter: blur(32px) saturate(200%) !important;
+            border-color: rgba(255, 255, 255, 0.90) !important;
+            box-shadow:
+                inset 0 1.5px 0 0 #ffffff,
+                0 20px 50px rgba(15, 23, 42, 0.20) !important;
+        }
+
+        html[data-theme="light"] #calendarModal,
+        html[data-theme="light"] #aiMenu,
+        html[data-theme="light"] #announcementDialog {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 251, 255, 0.78) 100%) !important;
+            backdrop-filter: blur(36px) saturate(200%) !important;
+            -webkit-backdrop-filter: blur(36px) saturate(200%) !important;
+            border-color: rgba(255, 255, 255, 0.92) !important;
+            color: #0f172a !important;
+            box-shadow:
+                inset 0 1.5px 0 0 #ffffff,
+                0 24px 60px rgba(15, 23, 42, 0.22) !important;
+        }
+
+        html[data-theme="light"] #annDialogHeader,
+        html[data-theme="light"] #annDialogFooter {
+            background: rgba(255, 255, 255, 0.65) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+
+        html[data-theme="light"] dialog[open]:where(:not([data-closing]))::backdrop {
+            background-color: rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Typography & Border Adaptations inside Liquid Glass Mode */
+        html[data-theme="light"] .text-white,
+        html[data-theme="light"] .text-zinc-300,
+        html[data-theme="light"] .text-textMain {
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] .text-textSecondary {
+            color: #334155 !important;
+        }
+        html[data-theme="light"] .text-textMuted {
+            color: #64748b !important;
+        }
+        html[data-theme="light"] .hover\:text-white:hover,
+        html[data-theme="light"] .group:hover .group-hover\:text-white,
+        html[data-theme="light"] .group:hover .group-hover\:text-zinc-100 {
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] .hover\:bg-white\/\[0\.08\]:hover,
+        html[data-theme="light"] .hover\:bg-white\/\[0\.1\]:hover,
+        html[data-theme="light"] .hover\:bg-white\/\[0\.14\]:hover,
+        html[data-theme="light"] .hover\:bg-white\/\[0\.16\]:hover {
+            background-color: rgba(15, 23, 42, 0.08) !important;
+        }
+        html[data-theme="light"] #infoBox .w-6.h-6 {
+            background: rgba(15, 23, 42, 0.08) !important;
+            border-color: rgba(15, 23, 42, 0.12) !important;
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] .border-white\/\[0\.08\],
+        html[data-theme="light"] .border-white\/\[0\.07\],
+        html[data-theme="light"] .border-white\/\[0\.06\] {
+            border-color: rgba(15, 23, 42, 0.09) !important;
+        }
+        html[data-theme="light"] .bg-white\/\[0\.06\],
+        html[data-theme="light"] .bg-white\/\[0\.05\],
+        html[data-theme="light"] .bg-white\/\[0\.07\],
+        html[data-theme="light"] .bg-white\/\[0\.1\],
+        html[data-theme="light"] .bg-white\/10 {
+            background-color: rgba(255, 255, 255, 0.72) !important;
+            border-color: rgba(15, 23, 42, 0.10) !important;
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] #annDialogAttachments > a {
+            background: rgba(255, 255, 255, 0.68) !important;
+            border-color: rgba(255, 255, 255, 0.9) !important;
+            box-shadow: inset 0 1px 0 #ffffff, 0 4px 10px rgba(15, 23, 42, 0.05);
+        }
+        html[data-theme="light"] #annDialogAttachments > a:hover {
+            background: rgba(255, 255, 255, 0.92) !important;
+        }
+
+        html[data-theme="light"] .announcement-prose {
+            color: #1e293b;
+        }
+        html[data-theme="light"] .announcement-prose strong,
+        html[data-theme="light"] .announcement-prose b {
+            color: #0f172a;
+        }
+        html[data-theme="light"] .announcement-prose a {
+            color: #0284c7;
+        }
+        html[data-theme="light"] .announcement-prose a:hover {
+            color: #0369a1;
+        }
+        html[data-theme="light"] .announcement-prose table {
+            border-color: rgba(15, 23, 42, 0.12);
+            background: rgba(255, 255, 255, 0.55);
+        }
+        html[data-theme="light"] .announcement-prose td,
+        html[data-theme="light"] .announcement-prose th {
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+        html[data-theme="light"] .announcement-prose tr:first-child td,
+        html[data-theme="light"] .announcement-prose th {
+            background: rgba(15, 23, 42, 0.05);
+            color: #0f172a;
+        }
+
+        /* Mandatory scroll containment for native modal dialogs */
+        dialog:modal {
+            overscroll-behavior: contain;
+        }
+
+        dialog::backdrop {
+            overflow: hidden;
+            overscroll-behavior: contain;
+        }
+
+        /* Top-layer animations for <dialog> */
+        dialog {
+            opacity: 0;
+            transform: scale(0.96) translateY(8px);
+            transition-property: opacity, transform, display, overlay;
+            transition-duration: 0.22s;
+            transition-timing-function: var(--spring-easing);
+            transition-behavior: allow-discrete;
+        }
+
+        dialog[open]:where(:not([data-closing])) {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+
+            @starting-style {
+                opacity: 0;
+                transform: scale(0.96) translateY(8px);
+            }
+        }
+
+        dialog::backdrop {
+            background-color: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            transition-property: background-color, backdrop-filter, display, overlay;
+            transition-duration: 0.22s;
+            transition-timing-function: ease-out;
+            transition-behavior: allow-discrete;
+        }
+
+        dialog[open]:where(:not([data-closing]))::backdrop {
+            background-color: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(10px);
+
+            @starting-style {
+                background-color: rgba(0, 0, 0, 0);
+                backdrop-filter: blur(0px);
+            }
+        }
+
+        /* Smooth, shake-free localized fade for list items */
+        @keyframes softFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-item {
+            animation: softFadeIn 0.2s var(--spring-easing) both;
+            animation-delay: calc(var(--stagger, 0) * 20ms);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            dialog {
+                transform: none;
+                transition-duration: 0.1s;
+            }
+            @starting-style {
+                dialog[open] {
+                    transform: none;
+                }
+            }
+            .animate-item {
+                animation: none;
+            }
+        }
+
+        /* Rich Announcement Content Styling inside AMOLED Modal */
+        .announcement-prose {
+            color: #d4d4d8;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            word-break: break-word;
+        }
+        .announcement-prose p {
+            margin-bottom: 0.85rem;
+        }
+        .announcement-prose strong,
+        .announcement-prose b {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .announcement-prose ul,
+        .announcement-prose ol {
+            margin: 0.75rem 0 1rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .announcement-prose ul {
+            list-style-type: disc;
+        }
+        .announcement-prose ol {
+            list-style-type: decimal;
+        }
+        .announcement-prose a {
+            color: #60a5fa;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+        .announcement-prose a:hover {
+            color: #93c5fd;
+        }
+        .announcement-prose table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 1rem 0;
+            font-size: 0.78rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            overflow: hidden;
+            display: block;
+            overflow-x: auto;
+        }
+        .announcement-prose td,
+        .announcement-prose th {
+            padding: 0.55rem 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            border-right: 1px solid rgba(255, 255, 255, 0.07);
+            vertical-align: top;
+        }
+        .announcement-prose tr:first-child td,
+        .announcement-prose th {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* High-Contrast Jewel Tones & Active States in Liquid Glass Light Mode */
+        html[data-theme="light"] .cat-chip:not([data-active="true"]) {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.48) 100%) !important;
+            border-color: rgba(255, 255, 255, 0.86) !important;
+            color: #334155 !important;
+            box-shadow: inset 0 1px 0 #ffffff;
+        }
+        html[data-theme="light"] .cat-chip:not([data-active="true"]):hover {
+            background: rgba(255, 255, 255, 0.88) !important;
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] .cat-chip[data-active="true"],
+        html[data-theme="light"] .cal-day-selected,
+        html[data-theme="light"] #jumpMondayBtn {
+            background: #0f172a !important;
+            color: #ffffff !important;
+            border-color: #0f172a !important;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.22);
+        }
+        html[data-theme="light"] .text-amber-300 { color: #b45309 !important; }
+        html[data-theme="light"] .text-yellow-300 { color: #a16207 !important; }
+        html[data-theme="light"] .text-emerald-300,
+        html[data-theme="light"] .text-emerald-400 { color: #047857 !important; }
+        html[data-theme="light"] .text-rose-300,
+        html[data-theme="light"] .text-rose-400 { color: #be123c !important; }
+        html[data-theme="light"] .text-sky-300,
+        html[data-theme="light"] .text-sky-400 { color: #0369a1 !important; }
+        html[data-theme="light"] .text-purple-300 { color: #6d28d9 !important; }
+        html[data-theme="light"] .text-orange-300,
+        html[data-theme="light"] .text-orange-400 { color: #c2410c !important; }
+        html[data-theme="light"] .text-blue-400 { color: #1d4ed8 !important; }
+        html[data-theme="light"] .text-zinc-700 { color: #94a3b8 !important; }
+        html[data-theme="light"] #annDialogImages span,
+        html[data-theme="light"] #toastNotice {
+            background: rgba(15, 23, 42, 0.88) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            backdrop-filter: blur(16px);
+        }
+    </style>
 </head>
 
-<body class="text-textMain font-sans flex flex-col min-h-screen bg-black bg-fixed bg-cover bg-center" style="background-image: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), url('drone.jpg');">
+<body class="text-textMain font-sans flex flex-col min-h-screen selection:bg-white selection:text-black">
 
-    <header class="border-b border-cardBorder p-4 flex justify-between items-center bg-cardBg bg-opacity-70 backdrop-blur-md">
-        <div class="flex items-center">
-            <img src="logo.png" alt="Yalova Uni Logo" class="h-12 w-auto object-contain" style="filter: brightness(0) invert(1);">
-        </div>
-        <div class="flex items-center gap-5">
-            <a href="https://github.com/mavefka/yuyemekhane" target="_blank" class="text-textMuted hover:text-white transition" title="GitHub Profilim">
-                <i class="fa-brands fa-github text-xl"></i>
-            </a>
+    <!-- Minimalist Top Header: Logo + Mobile Tab Switcher + Theme Toggle + GitHub Icon -->
+    <header id="topHeader" class="sticky top-0 z-30 border-b border-white/[0.08] bg-black/85 backdrop-blur-2xl">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center gap-2">
+            <div class="flex items-center shrink-0">
+                <h1 class="sr-only">Yalova Üniversitesi Yemekhane ve Duyurular</h1>
+                <img id="headerLogo" src="logo.png" alt="Yalova Üniversitesi Logosu" width="48" height="48" fetchpriority="high" class="h-10 sm:h-11 w-auto object-contain transition-all duration-300" style="filter: brightness(0) invert(1);">
+            </div>
+
+            <!-- Mobile View Switcher (Pill Segmented Control) -->
+            <nav id="mobileNavBar" aria-label="Bölüm Seçici" class="flex lg:hidden items-center p-1 rounded-full bg-[#050507] border border-white/[0.1]">
+                <button type="button" id="mobileTabMenu" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center gap-1.5">
+                    <i class="fa-solid fa-utensils text-[10px]" aria-hidden="true"></i>
+                    <span>Menü</span>
+                </button>
+                <button type="button" id="mobileTabAnnouncements" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center gap-1.5">
+                    <i class="fa-solid fa-bullhorn text-[10px]" aria-hidden="true"></i>
+                    <span>Duyurular</span>
+                    <span id="mobileAnnouncementBadge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white">0</span>
+                </button>
+            </nav>
+
+            <!-- Theme Toggle (Left of GitHub) + GitHub Icon -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" id="themeToggleBtn" aria-label="Gece / Gündüz Temasını Değiştir" title="Gece / Gündüz Teması" class="header-icon-btn w-9 h-9 rounded-full flex items-center justify-center text-textSecondary hover:text-white bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.09] transition active:scale-95">
+                    <i id="themeToggleIcon" class="fa-solid fa-sun text-sm transition-transform duration-300" aria-hidden="true"></i>
+                </button>
+                <a href="https://github.com/mavefka/yuyemekhane" target="_blank" rel="noopener noreferrer" aria-label="GitHub Projesi" class="header-icon-btn w-9 h-9 rounded-full flex items-center justify-center text-textSecondary hover:text-white bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.09] transition active:scale-95">
+                    <i class="fa-brands fa-github text-lg" aria-hidden="true"></i>
+                </a>
+            </div>
         </div>
     </header>
 
-    <main class="flex-grow flex flex-col items-center p-4 mt-6 mb-24">
-        
-        <div id="infoBox" class="max-w-2xl w-full border border-cardBorder rounded-lg p-3 mb-6 text-center text-sm text-textMuted flex justify-between items-center transition-opacity duration-300 bg-[#09090b] bg-opacity-90">
-            <span class="font-medium">Bu proje üniversiteden bağımsızdır ve gönüllü öğrenciler tarafından geliştirilmektedir.</span>
-            <button onclick="document.getElementById('infoBox').style.display='none'" class="hover:text-white p-1">
-                <i class="fa-solid fa-xmark"></i>
+    <!-- Main Content Container -->
+    <main class="flex-grow w-full max-w-6xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 pb-28">
+
+        <!-- Independent Volunteer Notice Banner -->
+        <div id="infoBox" class="amoled-pill rounded-2xl px-3.5 sm:px-4 py-2.5 mb-4 sm:mb-6 flex justify-between items-center gap-3 text-[11px] sm:text-xs text-textSecondary transition-all duration-300">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-6 h-6 rounded-full bg-white/[0.08] border border-white/[0.12] flex items-center justify-center text-white shrink-0">
+                    <i class="fa-solid fa-graduation-cap text-[11px]" aria-hidden="true"></i>
+                </span>
+                <span class="leading-snug text-zinc-300">Bu proje üniversiteden bağımsızdır ve gönüllü öğrenciler tarafından geliştirilmektedir.</span>
+            </div>
+            <button type="button" id="closeInfoBtn" aria-label="Bilgi kutusunu kapat" class="w-7 h-7 rounded-full flex items-center justify-center text-textMuted hover:text-white hover:bg-white/[0.08] transition shrink-0">
+                <i class="fa-solid fa-xmark text-xs" aria-hidden="true"></i>
             </button>
         </div>
 
-        <div class="max-w-2xl w-full bg-cardBg border border-cardBorder rounded-xl shadow-2xl p-6 bg-opacity-95">
-            
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h2 id="dayTitle" class="text-xl font-bold capitalize tracking-tight">Yükleniyor...</h2>
-                    <p class="text-xs text-textMuted mt-1 font-medium">Yemek bilgileri bazı durumlarda farklı olabilir.</p>
-                </div>
-                
-                <div class="relative">
-                    <button id="aiButton" onclick="toggleAIMenu()" class="flex items-center justify-center w-9 h-9 rounded-md bg-[#18181b] hover:bg-[#27272a] border border-cardBorder transition" title="Yapay Zekaya Sor">
-                        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
-                    </button>
-                    <div id="aiMenu" class="absolute right-0 mt-2 w-36 bg-cardBg border border-cardBorder rounded-lg shadow-xl z-50 overflow-hidden font-medium transition-all duration-200 ease-out opacity-0 scale-95 pointer-events-none origin-top-right">
-                        <div class="p-2 text-xs text-textMuted border-b border-cardBorder">Değerlendir:</div>
-                        <button onclick="askAI('chatgpt')" class="w-full text-left px-4 py-2 text-sm hover:bg-[#18181b] transition">ChatGPT</button>
-                        <button onclick="askAI('claude')" class="w-full text-left px-4 py-2 text-sm hover:bg-[#18181b] transition">Claude</button>
-                        <button onclick="askAI('gemini')" class="w-full text-left px-4 py-2 text-sm hover:bg-[#18181b] transition">Gemini</button>
+        <!-- Bento Grid: Menu dictates natural height; Announcements matches its exact top & bottom on desktop -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
+
+            <!-- SECTION 1: CAFETERIA MENU (Natural fit, never scrolls internally) -->
+            <section id="menuSection" aria-labelledby="dayTitle" class="lg:col-span-7 amoled-card rounded-[24px] sm:rounded-[28px] p-5 sm:p-6 flex lg:flex flex-col lg:min-h-[540px]">
+
+                <!-- Top Row: Day Header + Actions -->
+                <div class="flex justify-between items-start gap-3 mb-4 sm:mb-5 shrink-0">
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="relativeDayBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-white text-black tracking-wide">
+                                Bugün
+                            </span>
+                            <span class="text-[11px] sm:text-xs text-textMuted font-medium" id="fullDateSubtext">...</span>
+                        </div>
+                        <h2 id="dayTitle" class="text-xl sm:text-2xl font-bold capitalize tracking-tight text-white leading-tight truncate">
+                            Yükleniyor...
+                        </h2>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+                        <!-- Share / Copy Menu Button -->
+                        <button type="button" id="copyMenuBtn" aria-label="Günün menüsünü kopyala" class="h-9 sm:h-10 px-3 sm:px-3.5 rounded-full bg-[#070709] hover:bg-[#121218] border border-white/[0.1] text-xs font-medium text-textSecondary hover:text-white flex items-center gap-1.5 transition active:scale-95">
+                            <i class="fa-regular fa-copy text-xs" aria-hidden="true"></i>
+                            <span class="hidden sm:inline">Paylaş</span>
+                        </button>
+
+                        <!-- AI Evaluation Dropdown Container -->
+                        <div class="relative">
+                            <button type="button" id="aiButton" aria-expanded="false" aria-controls="aiMenu" aria-label="Yapay Zekaya Sor" class="h-9 sm:h-10 px-3 sm:px-3.5 rounded-full bg-white text-black hover:bg-zinc-200 font-semibold text-xs flex items-center gap-1.5 shadow-lg transition active:scale-95">
+                                <i class="fa-solid fa-wand-magic-sparkles text-xs" aria-hidden="true"></i>
+                                <span>AI Analiz</span>
+                            </button>
+
+                            <div id="aiMenu" class="absolute right-0 top-full mt-2 w-60 sm:w-64 rounded-2xl bg-[#040406] text-textMain border border-white/[0.14] shadow-[0_20px_50px_rgba(0,0,0,0.95)] p-2 z-50 origin-top-right transition-all duration-200 opacity-0 scale-95 -translate-y-1 pointer-events-none" style="transition-timing-function: var(--spring-easing);">
+                                <div class="px-3 py-2 border-b border-white/[0.08] mb-1">
+                                    <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                                        <i class="fa-solid fa-wand-magic-sparkles text-amber-300 text-[11px]" aria-hidden="true"></i>
+                                        <span>Yapay Zekaya Yorumlat</span>
+                                    </div>
+                                    <p class="text-[10px] text-textMuted mt-0.5 leading-snug">Menü otomatik kopyalanır ve seçtiğiniz asistan açılır.</p>
+                                </div>
+                                <button type="button" data-ai="chatgpt" class="ai-choice-btn w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-white/[0.08] transition flex items-center justify-between group">
+                                    <span class="flex items-center gap-2.5">
+                                        <span class="w-6 h-6 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
+                                            <i class="fa-solid fa-bolt text-[10px]" aria-hidden="true"></i>
+                                        </span>
+                                        <span>ChatGPT</span>
+                                    </span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-textMuted group-hover:text-white transition" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" data-ai="claude" class="ai-choice-btn w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-white/[0.08] transition flex items-center justify-between group">
+                                    <span class="flex items-center gap-2.5">
+                                        <span class="w-6 h-6 rounded-full bg-orange-500/15 text-orange-300 border border-orange-500/30 flex items-center justify-center">
+                                            <i class="fa-solid fa-feather-pointed text-[10px]" aria-hidden="true"></i>
+                                        </span>
+                                        <span>Claude</span>
+                                    </span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-textMuted group-hover:text-white transition" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" data-ai="gemini" class="ai-choice-btn w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-white/[0.08] transition flex items-center justify-between group">
+                                    <span class="flex items-center gap-2.5">
+                                        <span class="w-6 h-6 rounded-full bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center justify-center">
+                                            <i class="fa-solid fa-star-of-life text-[10px]" aria-hidden="true"></i>
+                                        </span>
+                                        <span>Google Gemini</span>
+                                    </span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-textMuted group-hover:text-white transition" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="mealSelector" class="relative grid grid-cols-2 p-1 bg-[#121212] rounded-lg mb-6 border border-[#1f1f22]">
-                <div id="mealIndicator" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#27272a] rounded-md shadow-sm transition-transform duration-300 ease-out"></div>
-                
-                <button id="mealBtn-ogle" onclick="setMeal('ogle')" class="relative z-10 py-1.5 text-sm font-semibold text-white transition-colors duration-300">Öğle Yemeği</button>
-                <button id="mealBtn-aksam" onclick="setMeal('aksam')" class="relative z-10 py-1.5 text-sm font-semibold text-textMuted hover:text-white transition-colors duration-300">Akşam Yemeği</button>
-            </div>
+                <!-- Segmented Meal Switcher (Apple Pill Style) -->
+                <div id="mealSelector" role="tablist" aria-label="Öğün Seçimi" class="relative grid grid-cols-2 p-1.5 bg-[#000000] rounded-full mb-4 sm:mb-5 border border-white/[0.09] shrink-0">
+                    <div id="mealIndicator" class="absolute top-1.5 bottom-1.5 left-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-md transition-transform duration-300" style="transition-timing-function: var(--spring-easing);"></div>
 
-            <ul id="foodList" class="flex flex-col min-h-[150px]"></ul>
-            
-            <div class="mt-6 pt-4 border-t border-cardBorder flex justify-between items-center">
-                <span class="font-semibold text-sm text-textMuted">Toplam Kalori:</span>
-                <span id="totalCalories" class="font-bold text-lg text-white tracking-tight transition-all duration-300">0 kcal</span>
-            </div>
-        </div>
+                    <button type="button" role="tab" aria-selected="true" id="mealBtn-ogle" class="relative z-10 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold text-black transition-colors duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-sun text-xs" aria-hidden="true"></i>
+                        <span>Öğle Yemeği</span>
+                    </button>
+                    <button type="button" role="tab" aria-selected="false" id="mealBtn-aksam" class="relative z-10 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold text-textSecondary hover:text-white transition-colors duration-200 flex items-center justify-center gap-2">
+                        <i class="fa-regular fa-moon text-xs" aria-hidden="true"></i>
+                        <span>Akşam Yemeği</span>
+                    </button>
+                </div>
 
-        <div class="max-w-2xl w-full text-left mt-3 px-2">
-            <div class="text-xs text-gray-400 font-medium tracking-wide drop-shadow-md">
-                <span>Son Güncelleme:</span> <span id="lastUpdateSpan">Güncelleniyor...</span>
-            </div>
+                <!-- Food Items List (Natural fit, never scrolls internally) -->
+                <ul id="foodList" class="flex-1 flex flex-col gap-3 min-h-[260px]"></ul>
+
+                <!-- Calorie & Nutrition Footer Card (Pinned to bottom via mt-auto) -->
+                <div class="mt-6 pt-4 border-t border-white/[0.08] shrink-0">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div id="calorieIconBox" class="w-10 h-10 rounded-2xl bg-[#07070a] border border-white/[0.09] flex items-center justify-center text-white shrink-0">
+                                <i class="fa-solid fa-fire-flame-curved text-sm text-orange-400" aria-hidden="true"></i>
+                            </div>
+                            <div>
+                                <div class="text-[11px] font-medium text-textSecondary">Toplam Öğün Enerjisi</div>
+                                <div class="flex items-baseline gap-2 flex-wrap">
+                                    <span id="totalCalories" class="font-extrabold text-lg sm:text-xl text-white tracking-tight">0 kcal</span>
+                                    <span id="calorieContextText" class="text-[11px] text-textMuted">• Günlük referansın %0'ı</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-full sm:w-32">
+                            <div class="h-2 w-full rounded-full bg-white/[0.07] overflow-hidden border border-white/[0.05]">
+                                <div id="calorieBar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-300 to-orange-400 rounded-full transition-all duration-500" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 flex flex-wrap justify-between items-center gap-2 text-[11px] text-textMuted">
+                        <span><i class="fa-regular fa-clock mr-1" aria-hidden="true"></i>Son Güncelleme: <strong id="lastUpdateSpan" class="text-textSecondary font-medium">Güncelleniyor...</strong></span>
+                        <span class="hidden sm:inline">İçindekiler için yemeğe dokunun</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: UNIVERSITY ANNOUNCEMENTS (Matches Menu height automatically on desktop via lg:h-0 lg:min-h-full) -->
+            <section id="announcementsSection" aria-labelledby="announcementsHeading" class="hidden lg:flex lg:col-span-5 amoled-card rounded-[24px] sm:rounded-[28px] p-5 sm:p-6 flex-col lg:h-0 lg:min-h-full">
+                <div class="flex justify-between items-start gap-2 mb-3.5 shrink-0">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-white/[0.1] text-white">
+                                Kampüs
+                            </span>
+                            <span id="announcementCountBadge" class="text-[11px] sm:text-xs text-textMuted font-medium">0 duyuru</span>
+                        </div>
+                        <h2 id="announcementsHeading" class="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">Duyurular</h2>
+                    </div>
+
+                    <a id="officialAnnLink" href="https://yalova.edu.tr/tr/duyuru" target="_blank" rel="noopener noreferrer" aria-label="Resmi duyurular sayfasını yeni sekmede aç" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#07070a] hover:bg-[#121218] border border-white/[0.09] flex items-center justify-center text-textSecondary hover:text-white transition shrink-0">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i>
+                    </a>
+                </div>
+
+                <!-- Search Input for Announcements -->
+                <search class="mb-3 shrink-0">
+                    <div class="relative flex items-center">
+                        <i class="fa-solid fa-magnifying-glass text-textMuted text-xs absolute left-3.5 pointer-events-none" aria-hidden="true"></i>
+                        <input type="search" id="announcementSearchInput" aria-label="Duyurularda ara" placeholder="Duyurularda ara (burs, işkur, ders...)" class="w-full pl-9 pr-4 py-2 rounded-full bg-[#050507] border border-white/[0.08] focus:border-white/[0.22] focus:outline-none text-xs text-white placeholder:text-textMuted transition">
+                    </div>
+                </search>
+
+                <!-- Category Filter Pills (Wraps cleanly so all categories are always visible and clickable) -->
+                <div id="categoryFilterBar" role="toolbar" aria-label="Duyuru Kategorileri" class="flex flex-wrap items-center gap-1.5 mb-3 shrink-0">
+                    <button type="button" data-category="all" data-active="true" class="cat-chip px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white text-black border border-transparent transition">
+                        Tümü
+                    </button>
+                    <button type="button" data-category="Burs & Kariyer" class="cat-chip px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#07070a] text-textSecondary hover:text-white border border-white/[0.08] hover:border-white/[0.18] transition">
+                        Burs & Kariyer
+                    </button>
+                    <button type="button" data-category="Öğrenci İşleri" class="cat-chip px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#07070a] text-textSecondary hover:text-white border border-white/[0.08] hover:border-white/[0.18] transition">
+                        Öğrenci İşleri
+                    </button>
+                    <button type="button" data-category="Proje & Ar-Ge" class="cat-chip px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#07070a] text-textSecondary hover:text-white border border-white/[0.08] hover:border-white/[0.18] transition">
+                        Proje & Ar-Ge
+                    </button>
+                    <button type="button" data-category="SKS & Kampüs" class="cat-chip px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#07070a] text-textSecondary hover:text-white border border-white/[0.08] hover:border-white/[0.18] transition">
+                        SKS & Kampüs
+                    </button>
+                </div>
+
+                <!-- Announcements Feed (Scrolls smoothly on desktop, flows naturally on mobile) -->
+                <div id="announcementsList" class="flex-1 flex flex-col gap-2.5 lg:overflow-y-auto lg:min-h-0 pr-0.5">
+                    <div class="py-12 text-center text-sm text-textMuted">Duyurular yükleniyor...</div>
+                </div>
+            </section>
+
         </div>
     </main>
 
-    <footer class="fixed bottom-0 w-full bg-cardBg bg-opacity-80 backdrop-blur-md border-t border-cardBorder p-3 flex justify-center items-center z-40">
-        
-        <div class="relative flex items-center gap-1 bg-[#09090b] border border-cardBorder rounded-lg p-1">
-            <button onclick="changeDay(-1)" id="prevBtn" class="w-9 h-9 flex items-center justify-center rounded-md hover:bg-[#18181b] transition text-textMuted hover:text-white">
-                <i class="fa-solid fa-chevron-left text-sm"></i>
-            </button>
-            
-            <div id="calButton" onclick="toggleCalendar()" class="flex items-center justify-center gap-2 w-36 py-2 rounded-md hover:bg-[#18181b] transition cursor-pointer select-none">
-                <i class="fa-regular fa-calendar text-sm text-textMuted"></i>
-                <span id="navDateText" class="text-sm font-semibold capitalize tracking-tight">...</span>
+    <!-- Floating Bottom Pill Dock + Anchored Responsive Calendar Popup -->
+    <footer class="fixed bottom-4 sm:bottom-5 left-0 right-0 z-40 pointer-events-none flex justify-center px-3">
+        <div id="bottomDockPill" class="relative pointer-events-auto flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-black/90 backdrop-blur-2xl border border-white/[0.14] shadow-[0_20px_50px_rgba(0,0,0,0.95)]">
+
+            <!-- Calendar Popup: Grows Responsively Upwards from the Bottom Date Text -->
+            <div id="calendarModal" role="dialog" aria-labelledby="calMonthYearText" class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-[min(18.5rem,calc(100vw-1.5rem))] rounded-[24px] bg-[#040406] text-textMain border border-white/[0.14] shadow-[0_24px_60px_rgba(0,0,0,0.95)] p-4 z-50 origin-bottom transition-all duration-250 opacity-0 scale-90 translate-y-3 pointer-events-none" style="transition-timing-function: var(--spring-easing);">
+                <div class="flex justify-between items-center mb-3">
+                    <button type="button" id="calPrevMonthBtn" aria-label="Önceki Ay" class="w-8 h-8 rounded-full flex items-center justify-center text-textSecondary hover:text-white hover:bg-white/[0.08] transition">
+                        <i class="fa-solid fa-chevron-left text-xs" aria-hidden="true"></i>
+                    </button>
+                    <h2 id="calMonthYearText" class="font-bold text-sm tracking-wide text-white">...</h2>
+                    <button type="button" id="calNextMonthBtn" aria-label="Sonraki Ay" class="w-8 h-8 rounded-full flex items-center justify-center text-textSecondary hover:text-white hover:bg-white/[0.08] transition">
+                        <i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div id="calWeekdays" class="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold text-textMuted mb-1.5 uppercase tracking-wider"></div>
+                <div id="calDays" class="grid grid-cols-7 gap-1 text-center text-xs font-medium"></div>
             </div>
-            
-            <button onclick="changeDay(1)" id="nextBtn" class="w-9 h-9 flex items-center justify-center rounded-md hover:bg-[#18181b] transition text-textMuted hover:text-white">
-                <i class="fa-solid fa-chevron-right text-sm"></i>
+
+            <button type="button" id="prevBtn" aria-label="Önceki Gün" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/[0.08] active:scale-90 transition text-textSecondary hover:text-white disabled:opacity-25 disabled:pointer-events-none">
+                <i class="fa-solid fa-chevron-left text-xs" aria-hidden="true"></i>
             </button>
 
-            <div id="calendarModal" class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-64 bg-cardBg border border-cardBorder rounded-xl shadow-2xl p-4 z-50 transition-all duration-300 ease-out opacity-0 translate-y-3 pointer-events-none">
-                <div class="flex justify-between items-center mb-4">
-                    <button onclick="changeCalMonth(-1)" class="text-textMuted hover:text-white p-1 transition rounded"><i class="fa-solid fa-chevron-left text-xs"></i></button>
-                    <span id="calMonthYearText" class="font-bold text-sm tracking-wide">...</span>
-                    <button onclick="changeCalMonth(1)" class="text-textMuted hover:text-white p-1 transition rounded"><i class="fa-solid fa-chevron-right text-xs"></i></button>
-                </div>
-                <div id="calWeekdays" class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-textMuted mb-2 uppercase tracking-wider"></div>
-                <div id="calDays" class="grid grid-cols-7 gap-1 text-center text-sm font-medium"></div>
-            </div>
+            <button type="button" id="todayQuickBtn" class="hidden px-2.5 sm:px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white/[0.1] hover:bg-white/[0.16] text-white transition active:scale-95">
+                Bugün
+            </button>
+
+            <button type="button" id="calButton" aria-expanded="false" aria-controls="calendarModal" aria-label="Takvimi Aç" class="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 rounded-full hover:bg-white/[0.08] active:scale-95 transition cursor-pointer select-none">
+                <i class="fa-regular fa-calendar text-xs text-textSecondary" aria-hidden="true"></i>
+                <span id="navDateText" class="text-xs sm:text-sm font-semibold capitalize tracking-tight text-white whitespace-nowrap">...</span>
+            </button>
+
+            <button type="button" id="nextBtn" aria-label="Sonraki Gün" class="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-white/[0.08] active:scale-90 transition text-textSecondary hover:text-white disabled:opacity-25 disabled:pointer-events-none">
+                <i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i>
+            </button>
         </div>
     </footer>
+
+    <!-- Native Modal Dialog: Announcement Content Reader -->
+    <dialog id="announcementDialog" closedby="any" aria-labelledby="annDialogTitle" class="m-auto w-[calc(100%-1.25rem)] max-w-2xl max-h-[85dvh] rounded-[24px] sm:rounded-[28px] bg-[#030305] text-textMain border border-white/[0.14] shadow-2xl p-0 overflow-hidden">
+        <div class="flex flex-col max-h-[85dvh]">
+            <!-- Sticky Modal Header -->
+            <div id="annDialogHeader" class="px-4 sm:px-7 py-3.5 sm:py-4 border-b border-white/[0.08] bg-black/90 backdrop-blur-xl flex items-start justify-between gap-3 shrink-0">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span id="annDialogCategory" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-white/10 text-white">Duyuru</span>
+                        <span id="annDialogDate" class="text-[11px] sm:text-xs text-textMuted">...</span>
+                    </div>
+                    <h2 id="annDialogTitle" class="text-sm sm:text-lg font-bold text-white leading-snug break-words">...</h2>
+                </div>
+                <form method="dialog" class="shrink-0">
+                    <button type="submit" aria-label="Duyuru penceresini kapat" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.07] hover:bg-white/[0.14] text-textSecondary hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Scrollable Modal Body -->
+            <div id="annDialogScrollBody" class="px-4 sm:px-7 py-4 sm:py-5 overflow-y-auto space-y-4 sm:space-y-5">
+                <!-- Embedded Images (if any) -->
+                <div id="annDialogImages" class="hidden grid grid-cols-1 gap-3"></div>
+
+                <!-- Sanitized Announcement Content -->
+                <article id="annDialogBody" class="announcement-prose"></article>
+
+                <!-- Attachments / Quick Links Section -->
+                <div id="annDialogAttachmentsWrap" class="hidden pt-4 border-t border-white/[0.08]">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-textSecondary mb-2.5 flex items-center gap-2">
+                        <i class="fa-solid fa-paperclip text-textMuted" aria-hidden="true"></i>
+                        <span>Ekler ve Bağlantılar</span>
+                    </h3>
+                    <div id="annDialogAttachments" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Sticky Modal Footer -->
+            <div id="annDialogFooter" class="px-4 sm:px-7 py-3 border-t border-white/[0.08] bg-black/95 flex flex-wrap items-center justify-between gap-2 shrink-0">
+                <span class="text-[11px] text-textMuted hidden sm:inline">Kaynak: Yalova Üniversitesi Resmi Duyuru Sistemi</span>
+                <div class="flex items-center justify-end w-full sm:w-auto">
+                    <a id="annDialogExternalLink" href="#" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto justify-center px-4 py-2 rounded-full text-xs font-semibold bg-white text-black hover:bg-zinc-200 transition flex items-center gap-2">
+                        <span>Resmi Sayfada Aç</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Subtle Toast Notification -->
+    <div id="toastNotice" role="status" aria-live="polite" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-white text-black font-semibold text-xs shadow-2xl transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-circle-check text-emerald-600" aria-hidden="true"></i>
+        <span id="toastText">Kopyalandı</span>
+    </div>
+
+    <!-- Local file:// & Instant Data Support -->
+    <script src="veri.js"></script>
 
     <script>
         const weekdaysTR = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
         const monthsTR = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
 
         let mockDatabase = {};
+        let announcementsData = [];
+        let selectedCategory = "all";
+        let searchQuery = "";
+        let activeMobileTab = "menu";
 
         let today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        
-        let currentDate = new Date(today); 
-        let minDate = new Date(today); 
+        const initialHour = today.getHours();
+        today.setHours(0, 0, 0, 0);
+
+        let currentDate = new Date(today);
+        let minDate = new Date(today);
         let maxDate = new Date(today);
-        maxDate.setDate(maxDate.getDate() + 7); 
+        maxDate.setDate(maxDate.getDate() + 7);
 
         let calRenderMonth = currentDate.getMonth();
         let calRenderYear = currentDate.getFullYear();
-        
-        let currentMeal = 'ogle';
 
-        async function initializeApp() {
-            try {
-                const timeResponse = await fetch('https://worldtimeapi.org/api/timezone/Europe/Istanbul');
-                if (timeResponse.ok) {
-                    const timeData = await timeResponse.json();
-                    const internetDate = new Date(timeData.datetime);
-                    
-                    today = new Date(internetDate);
-                    today.setHours(0, 0, 0, 0);
-                    
-                    currentDate = new Date(today);
-                    minDate = new Date(today);
-                    maxDate = new Date(today);
-                    maxDate.setDate(maxDate.getDate() + 7);
+        // Saat 14:30 sonrasıysa varsayılan olarak Akşam Yemeği sekmesini seç
+        let currentMeal = (initialHour >= 15 && initialHour < 21) ? 'aksam' : 'ogle';
 
-                    calRenderMonth = currentDate.getMonth();
-                    calRenderYear = currentDate.getFullYear();
-                }
-            } catch (error) {
-                console.warn("İnternet saati çekilemedi, cihaz saati kullanılacak.");
+        // --- Modern Web Guidance: Top-layer exit & light-dismiss fallbacks ---
+        let supportsDisplayTransition;
+        function canTransitionDisplay() {
+            if (supportsDisplayTransition !== undefined) return supportsDisplayTransition;
+            if (!window.CSS?.supports?.('transition-behavior', 'allow-discrete') || !document.body) {
+                return false;
             }
-
-            try {
-                const menuResponse = await fetch('veri.json', { cache: "no-store" });
-                if (menuResponse.ok) {
-                    const jsonData = await menuResponse.json();
-                    
-                    if (jsonData.menus) {
-                        mockDatabase = jsonData.menus;
-                        document.getElementById('lastUpdateSpan').innerText = jsonData.last_updated;
-                    } else {
-                        mockDatabase = jsonData;
-                        document.getElementById('lastUpdateSpan').innerText = "Bilinmiyor";
-                    }
-                } else {
-                    console.error("veri.json dosyası bulunamadı.");
-                }
-            } catch (error) {
-                console.error("JSON okuma hatası:", error);
-            }
-            
-            renderMenu(currentDate);
+            const probe = document.createElement('div');
+            probe.style.cssText = 'transition: display 1s allow-discrete !important; display: block;';
+            document.body.appendChild(probe);
+            getComputedStyle(probe).display;
+            probe.style.display = 'none';
+            supportsDisplayTransition = getComputedStyle(probe).display === 'block';
+            probe.remove();
+            return supportsDisplayTransition;
         }
 
-        function setMeal(mealType) {
-            currentMeal = mealType;
-            
-            const indicator = document.getElementById('mealIndicator');
-            const btnOgle = document.getElementById('mealBtn-ogle');
-            const btnAksam = document.getElementById('mealBtn-aksam');
-            
-            if (mealType === 'ogle') {
-                indicator.style.transform = 'translateX(0)';
-                btnOgle.classList.add('text-white');
-                btnOgle.classList.remove('text-textMuted');
-                btnAksam.classList.add('text-textMuted');
-                btnAksam.classList.remove('text-white');
-            } else {
-                indicator.style.transform = 'translateX(100%)';
-                btnAksam.classList.add('text-white');
-                btnAksam.classList.remove('text-textMuted');
-                btnOgle.classList.add('text-textMuted');
-                btnOgle.classList.remove('text-white');
+        function supportsTopLayerExit() {
+            return window.CSS?.supports?.('overlay', 'auto') && canTransitionDisplay();
+        }
+
+        async function closeTopLayer(element) {
+            if (!supportsTopLayerExit()) {
+                element.setAttribute('data-closing', '');
+                const animations = element.getAnimations({ subtree: true });
+                if (animations.length > 0) {
+                    await Promise.race([
+                        Promise.allSettled(animations.map((a) => a.finished)),
+                        new Promise((r) => setTimeout(r, 2000)),
+                    ]);
+                }
+                if (!element.hasAttribute('data-closing')) return;
+                element.removeAttribute('data-closing');
             }
-            
-            renderMenu(currentDate);
+            if (typeof element.close === 'function') {
+                element.close();
+            }
+        }
+
+        if (!('closedBy' in HTMLDialogElement.prototype)) {
+            for (const dialog of document.querySelectorAll('dialog[closedby="any"]')) {
+                dialog.addEventListener('click', (event) => {
+                    if (event.target !== dialog) return;
+                    const rect = dialog.getBoundingClientRect();
+                    const isDialogContent = (
+                        rect.top <= event.clientY &&
+                        event.clientY <= rect.top + rect.height &&
+                        rect.left <= event.clientX &&
+                        event.clientX <= rect.left + rect.width
+                    );
+                    if (isDialogContent) return;
+                    closeTopLayer(dialog);
+                });
+            }
+        }
+
+        for (const dialog of document.querySelectorAll('dialog')) {
+            dialog.addEventListener('cancel', (event) => {
+                event.preventDefault();
+                closeTopLayer(dialog);
+            });
+        }
+
+        // --- Modern Web Guidance: Sanitizer API with DOMPurify fallback ---
+        function safeSetHTML(el, html) {
+            const elements = [
+                'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li',
+                'h2', 'h3', 'h4', 'h5', 'table', 'thead', 'tbody', 'tr', 'th', 'td',
+                'a', 'blockquote'
+            ];
+            const attributes = ['href', 'target', 'rel'];
+
+            if ('setHTML' in Element.prototype) {
+                el.setHTML(html, { sanitizer: { elements, attributes } });
+            } else if (window.DOMPurify) {
+                el.innerHTML = window.DOMPurify.sanitize(html, {
+                    ALLOWED_TAGS: [...elements, '#text'],
+                    ALLOWED_ATTR: attributes,
+                    ALLOW_ARIA_ATTR: false,
+                    ALLOW_DATA_ATTR: false,
+                    KEEP_CONTENT: false
+                });
+            } else {
+                el.textContent = html.replace(/<[^>]+>/g, ' ');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toastNotice');
+            document.getElementById('toastText').innerText = message;
+            toast.classList.remove('opacity-0', '-translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2200);
+        }
+
+        // --- Turkish Title Case & Ingredient Parser ---
+        function toTurkishTitleCase(str) {
+            if (!str) return "";
+            const normalized = str.replace(/\s+/g, ' ').trim().toLocaleLowerCase('tr-TR');
+            return normalized.replace(/(^|\s|\(|\.|\/)([a-zçğıöşü])/g, (match, sep, char) => {
+                return sep + char.toLocaleUpperCase('tr-TR');
+            });
+        }
+
+        function parseIngredientsList(rawIngredients) {
+            if (!rawIngredients) return [];
+            return rawIngredients
+                .split(',')
+                .map(item => toTurkishTitleCase(item.replace(/\./g, '. ').trim()))
+                .filter(Boolean);
+        }
+
+        // --- Anchored Calendar & AI Menu Toggles ---
+        function toggleCalendar() {
+            const calModal = document.getElementById('calendarModal');
+            const calBtn = document.getElementById('calButton');
+            const isClosed = calModal.classList.contains('opacity-0');
+            if (isClosed) {
+                calRenderMonth = currentDate.getMonth();
+                calRenderYear = currentDate.getFullYear();
+                buildCalendarUI();
+                calModal.classList.remove('opacity-0', 'scale-90', 'translate-y-3', 'pointer-events-none');
+                calModal.classList.add('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+                calBtn.setAttribute('aria-expanded', 'true');
+            } else {
+                closeCalendar();
+            }
+        }
+
+        function closeCalendar() {
+            const calModal = document.getElementById('calendarModal');
+            const calBtn = document.getElementById('calButton');
+            calModal.classList.add('opacity-0', 'scale-90', 'translate-y-3', 'pointer-events-none');
+            calModal.classList.remove('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+            calBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleAIMenu() {
+            const aiMenu = document.getElementById('aiMenu');
+            const aiBtn = document.getElementById('aiButton');
+            const isClosed = aiMenu.classList.contains('opacity-0');
+            if (isClosed) {
+                aiMenu.classList.remove('opacity-0', 'scale-95', '-translate-y-1', 'pointer-events-none');
+                aiMenu.classList.add('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+                aiBtn.setAttribute('aria-expanded', 'true');
+            } else {
+                closeAIMenu();
+            }
+        }
+
+        function closeAIMenu() {
+            const aiMenu = document.getElementById('aiMenu');
+            const aiBtn = document.getElementById('aiButton');
+            aiMenu.classList.add('opacity-0', 'scale-95', '-translate-y-1', 'pointer-events-none');
+            aiMenu.classList.remove('opacity-100', 'scale-100', 'translate-y-0', 'pointer-events-auto');
+            aiBtn.setAttribute('aria-expanded', 'false');
+        }
+
+        // --- Dish Icon & Category Helper ---
+        function getDishVisuals(name, index) {
+            const upper = name.toLocaleUpperCase('tr-TR');
+            if (upper.includes('ÇORBA')) {
+                return { icon: 'fa-bowl-food', label: 'Başlangıç / Çorba', accent: 'text-amber-300 bg-amber-500/10 border-amber-500/20' };
+            }
+            if (upper.includes('PİLAV') || upper.includes('MAKARNA') || upper.includes('ERİŞTE') || upper.includes('BÖREK') || upper.includes('SPAGETTİ') || upper.includes('BULGUR') || upper.includes('MANTI')) {
+                return { icon: 'fa-wheat-awn', label: 'Yardımcı Yemek', accent: 'text-yellow-300 bg-yellow-500/10 border-yellow-500/20' };
+            }
+            if (upper.includes('AYRAN') || upper.includes('SALATA') || upper.includes('CACIK') || upper.includes('YOĞURT') || upper.includes('MEŞRUBAT') || upper.includes('TATLI') || upper.includes('MEYVE') || upper.includes('HELVA') || upper.includes('SÜTLAÇ') || upper.includes('KOMPOSTO') || upper.includes('ŞEKERBURA') || upper.includes('BAKLAVA')) {
+                return { icon: 'fa-leaf', label: 'Tamamlayıcı', accent: 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20' };
+            }
+            if (index === 1) {
+                return { icon: 'fa-utensils', label: 'Ana Yemek', accent: 'text-rose-300 bg-rose-500/10 border-rose-500/20' };
+            }
+            return { icon: 'fa-plate-wheat', label: 'Menü Öğesi', accent: 'text-sky-300 bg-sky-500/10 border-sky-500/20' };
+        }
+
+        function getRelativeDayLabel(date) {
+            const diffDays = Math.round((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return "Bugün";
+            if (diffDays === 1) return "Yarın";
+            if (diffDays === -1) return "Dün";
+            return `${diffDays} Gün Sonra`;
         }
 
         function formatDate(date) {
@@ -224,29 +1099,57 @@
             const options = { day: 'numeric', month: 'long', weekday: 'long' };
             return date.toLocaleDateString('tr-TR', options);
         }
-        
+
         function formatNavDate(date) {
             const options = { day: 'numeric', month: 'long' };
             return date.toLocaleDateString('tr-TR', options);
         }
 
+        function syncMealUI(mealType) {
+            const indicator = document.getElementById('mealIndicator');
+            const btnOgle = document.getElementById('mealBtn-ogle');
+            const btnAksam = document.getElementById('mealBtn-aksam');
+
+            if (mealType === 'ogle') {
+                indicator.style.transform = 'translateX(0)';
+                btnOgle.className = "relative z-10 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold text-black transition-colors duration-200 flex items-center justify-center gap-2";
+                btnOgle.setAttribute('aria-selected', 'true');
+                btnAksam.className = "relative z-10 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold text-textSecondary hover:text-white transition-colors duration-200 flex items-center justify-center gap-2";
+                btnAksam.setAttribute('aria-selected', 'false');
+            } else {
+                indicator.style.transform = 'translateX(100%)';
+                btnAksam.className = "relative z-10 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold text-black transition-colors duration-200 flex items-center justify-center gap-2";
+                btnAksam.setAttribute('aria-selected', 'true');
+                btnOgle.className = "relative z-10 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold text-textSecondary hover:text-white transition-colors duration-200 flex items-center justify-center gap-2";
+                btnOgle.setAttribute('aria-selected', 'false');
+            }
+        }
+
+        // --- Render Cafeteria Menu ---
         function renderMenu(date) {
             const dateStr = formatDate(date);
             const dateData = mockDatabase[dateStr];
-            const menuData = dateData ? dateData[currentMeal] : null; 
-            
+            const menuData = dateData ? dateData[currentMeal] : null;
+
             const listEl = document.getElementById('foodList');
             const mealSelector = document.getElementById('mealSelector');
             let totalCal = 0;
 
             document.getElementById('dayTitle').innerText = formatDisplayDate(date);
             document.getElementById('navDateText').innerText = formatNavDate(date);
-            
+            document.getElementById('relativeDayBadge').innerText = getRelativeDayLabel(date);
+            document.getElementById('fullDateSubtext').innerText = dateStr.split('-').reverse().join('.');
+
+            const isToday = date.getTime() === today.getTime();
+            const todayQuickBtn = document.getElementById('todayQuickBtn');
+            if (isToday) {
+                todayQuickBtn.classList.add('hidden');
+            } else {
+                todayQuickBtn.classList.remove('hidden');
+            }
+
             document.getElementById('nextBtn').disabled = date.getTime() >= maxDate.getTime();
-            document.getElementById('nextBtn').style.opacity = date.getTime() >= maxDate.getTime() ? "0.3" : "1";
-            
             document.getElementById('prevBtn').disabled = date.getTime() <= minDate.getTime();
-            document.getElementById('prevBtn').style.opacity = date.getTime() <= minDate.getTime() ? "0.3" : "1";
 
             listEl.innerHTML = '';
 
@@ -255,100 +1158,372 @@
 
             if (isWeekend) {
                 mealSelector.style.display = 'none';
-                listEl.innerHTML = `<li class="py-6 text-center font-medium text-textMuted italic">Hafta sonları kafeterya servis yapmamaktadır.</li>`;
+                const daysUntilMonday = dayOfWeek === 6 ? 2 : 1;
+                const nextMonday = new Date(date);
+                nextMonday.setDate(date.getDate() + daysUntilMonday);
+                const canJumpMonday = nextMonday.getTime() <= maxDate.getTime();
+
+                const li = document.createElement('li');
+                li.className = "animate-item py-12 px-4 rounded-3xl bg-[#050507] border border-white/[0.07] text-center flex flex-col items-center justify-center gap-3.5 my-auto flex-1";
+                li.innerHTML = `
+                    <div class="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-textSecondary">
+                        <i class="fa-solid fa-mug-hot text-lg" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <div class="font-semibold text-white text-sm">Hafta Sonu Tatili</div>
+                        <p class="text-xs text-textMuted mt-1 max-w-xs mx-auto">Cumartesi ve Pazar günleri üniversite yemekhanesinde servis yapılmamaktadır.</p>
+                    </div>
+                    ${canJumpMonday ? `
+                        <button type="button" id="jumpMondayBtn" class="mt-1 px-4 py-2 rounded-full text-xs font-semibold bg-white text-black hover:bg-zinc-200 transition inline-flex items-center gap-2 active:scale-95">
+                            <span>Pazartesi Menüsüne Geç</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]" aria-hidden="true"></i>
+                        </button>
+                    ` : ''}
+                `;
+                listEl.appendChild(li);
+
+                const jumpBtn = li.querySelector('#jumpMondayBtn');
+                if (jumpBtn) {
+                    jumpBtn.addEventListener('click', () => {
+                        currentDate = nextMonday;
+                        renderMenu(currentDate);
+                    });
+                }
             } else {
                 mealSelector.style.display = 'grid';
 
                 if (menuData && menuData.length > 0) {
                     menuData.forEach((food, index) => {
                         totalCal += food.cal;
-                        const isLast = index === menuData.length - 1;
-                        const borderClass = isLast ? "" : "border-b border-[#1f1f22]";
-                        
-                        // İçindekiler bilgisi varsa HTML şablonunu oluştur
-                        const infoIconHTML = food.ingredients ? `
-                            <div class="relative flex items-center group cursor-help ml-2">
-                                <i class="fa-solid fa-circle-info text-textMuted hover:text-white transition-colors text-xs"></i>
-                                <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-48 p-2.5 bg-[#27272a] border border-cardBorder rounded-md text-[11px] text-textMain opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-50 text-center leading-relaxed">
-                                    <span class="font-bold text-white block mb-1 uppercase tracking-wider">İçindekiler</span>
-                                    ${food.ingredients}
-                                    <div class="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-cardBorder"></div>
+                        const visuals = getDishVisuals(food.name, index);
+                        const formattedName = toTurkishTitleCase(food.name);
+                        const ingredientItems = parseIngredientsList(food.ingredients);
+                        const hasIngredients = ingredientItems.length > 0;
+
+                        const li = document.createElement('li');
+                        li.style.setProperty('--stagger', index);
+                        li.className = "animate-item group rounded-[18px] sm:rounded-[20px] bg-[#050507] hover:bg-[#0c0c12] border border-white/[0.08] hover:border-white/[0.15] p-3.5 sm:p-4 transition-colors duration-200";
+
+                        const ingredientPillsHTML = ingredientItems
+                            .map(ing => `<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/[0.05] text-zinc-300 border border-white/[0.08]">${ing}</span>`)
+                            .join('');
+
+                        li.innerHTML = `
+                            <div class="flex justify-between items-center gap-2.5 sm:gap-3 ${hasIngredients ? 'cursor-pointer select-none' : ''}">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border flex items-center justify-center shrink-0 ${visuals.accent}">
+                                        <i class="fa-solid ${visuals.icon} text-xs sm:text-sm" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-sm sm:text-[15px] text-white tracking-tight leading-snug break-words">${formattedName}</div>
+                                        <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                                            <span class="text-[10px] sm:text-[11px] text-textMuted font-medium">${visuals.label}</span>
+                                            ${hasIngredients ? `
+                                                <span class="text-[10px] px-2 py-0.2 rounded-full bg-white/[0.05] group-hover:bg-white/[0.09] text-textSecondary border border-white/[0.07] inline-flex items-center gap-1 transition">
+                                                    <span>İçindekiler</span>
+                                                    <i class="fa-solid fa-chevron-down text-[8px] transition-transform duration-200 ing-chevron" aria-hidden="true"></i>
+                                                </span>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="shrink-0 text-right">
+                                    <span class="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-white/[0.06] text-white border border-white/[0.08] whitespace-nowrap">
+                                        ${food.cal} kcal
+                                    </span>
                                 </div>
                             </div>
-                        ` : '';
-                        
-                        listEl.innerHTML += `
-                            <li class="flex justify-between items-center py-4 ${borderClass} hover:bg-[#121212] px-2 rounded transition">
-                                <div class="flex items-center">
-                                    <span class="font-semibold">${food.name}</span>
-                                    ${infoIconHTML}
+                            ${hasIngredients ? `
+                                <div class="ingredients-drawer hidden mt-3 pt-3 border-t border-white/[0.06]">
+                                    <div class="text-[10px] font-semibold uppercase tracking-wider text-textMuted mb-2">İçindekiler (${ingredientItems.length} bileşen)</div>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        ${ingredientPillsHTML}
+                                    </div>
                                 </div>
-                                <span class="text-sm font-medium text-textMuted tracking-wider">${food.cal} kcal</span>
-                            </li>
+                            ` : ''}
                         `;
+
+                        if (hasIngredients) {
+                            li.addEventListener('click', () => {
+                                const drawer = li.querySelector('.ingredients-drawer');
+                                const chevron = li.querySelector('.ing-chevron');
+                                if (drawer) {
+                                    drawer.classList.toggle('hidden');
+                                    if (chevron) {
+                                        chevron.classList.toggle('rotate-180');
+                                    }
+                                }
+                            });
+                        }
+
+                        listEl.appendChild(li);
                     });
                 } else {
                     const mealText = currentMeal === 'ogle' ? 'Öğle' : 'Akşam';
-                    listEl.innerHTML = `<li class="py-6 text-center font-medium text-textMuted italic">Bu tarihe ait ${mealText} yemeği menüsü bulunamadı.</li>`;
+                    listEl.innerHTML = `
+                        <li class="animate-item py-12 px-4 rounded-3xl bg-[#050507] border border-white/[0.07] text-center flex flex-col items-center justify-center gap-2 my-auto flex-1">
+                            <i class="fa-regular fa-calendar-xmark text-xl text-textMuted" aria-hidden="true"></i>
+                            <span class="text-xs sm:text-sm font-medium text-textSecondary">Bu tarihe ait ${mealText} yemeği menüsü henüz yayınlanmamış.</span>
+                        </li>`;
                 }
             }
 
             document.getElementById('totalCalories').innerText = `${totalCal} kcal`;
+            const dailyPercent = Math.min(100, Math.round((totalCal / 2000) * 100));
+            document.getElementById('calorieContextText').innerText = `• Günlük 2000 kcal referansının %${dailyPercent}'i`;
+            document.getElementById('calorieBar').style.width = `${dailyPercent}%`;
         }
 
+        // --- Category Badge Styling ---
+        function getCategoryStyle(category) {
+            switch (category) {
+                case "Burs & Kariyer":
+                    return { icon: "fa-briefcase", cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" };
+                case "Proje & Ar-Ge":
+                    return { icon: "fa-flask", cls: "bg-purple-500/15 text-purple-300 border-purple-500/30" };
+                case "Öğrenci İşleri":
+                    return { icon: "fa-graduation-cap", cls: "bg-sky-500/15 text-sky-300 border-sky-500/30" };
+                case "SKS & Kampüs":
+                    return { icon: "fa-users", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30" };
+                default:
+                    return { icon: "fa-bullhorn", cls: "bg-zinc-500/15 text-zinc-300 border-zinc-500/30" };
+            }
+        }
+
+        // --- Render Announcements Feed ---
+        function renderAnnouncements() {
+            const container = document.getElementById('announcementsList');
+            const query = searchQuery.trim().toLocaleLowerCase('tr-TR');
+
+            const filtered = announcementsData.filter(ann => {
+                const matchesCategory = selectedCategory === "all" || ann.category === selectedCategory;
+                if (!matchesCategory) return false;
+                if (!query) return true;
+                const titleMatch = (ann.title || '').toLocaleLowerCase('tr-TR').includes(query);
+                const summaryMatch = (ann.summary || '').toLocaleLowerCase('tr-TR').includes(query);
+                return titleMatch || summaryMatch;
+            });
+
+            document.getElementById('announcementCountBadge').innerText = `${announcementsData.length} duyuru`;
+            document.getElementById('mobileAnnouncementBadge').innerText = announcementsData.length;
+
+            container.innerHTML = '';
+
+            if (!filtered || filtered.length === 0) {
+                const hasFilter = selectedCategory !== "all" || query !== "";
+                container.innerHTML = `
+                    <div class="py-10 px-4 rounded-2xl bg-[#050507] border border-white/[0.07] text-center flex flex-col items-center justify-center gap-2.5 my-auto">
+                        <span class="text-xs text-textMuted">Aradığınız kriterlere uygun duyuru bulunamadı.</span>
+                        ${hasFilter ? `
+                            <button type="button" id="resetFilterBtn" class="px-3.5 py-1.5 rounded-full text-[11px] font-semibold bg-white/[0.08] hover:bg-white/[0.15] text-white transition">
+                                Filtreyi Temizle
+                            </button>
+                        ` : ''}
+                    </div>`;
+                const resetBtn = container.querySelector('#resetFilterBtn');
+                if (resetBtn) {
+                    resetBtn.addEventListener('click', () => {
+                        selectedCategory = "all";
+                        searchQuery = "";
+                        document.getElementById('announcementSearchInput').value = "";
+                        document.querySelectorAll('.cat-chip').forEach(c => {
+                            if (c.dataset.category === "all") {
+                                c.setAttribute('data-active', 'true');
+                                c.className = "cat-chip px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white text-black border border-transparent transition";
+                            } else {
+                                c.removeAttribute('data-active');
+                                c.className = "cat-chip px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#07070a] text-textSecondary hover:text-white border border-white/[0.08] hover:border-white/[0.18] transition";
+                            }
+                        });
+                        renderAnnouncements();
+                    });
+                }
+                return;
+            }
+
+            filtered.forEach((ann, idx) => {
+                const catStyle = getCategoryStyle(ann.category);
+                const attCount = ann.attachments ? ann.attachments.length : 0;
+                const imgCount = ann.images ? ann.images.length : 0;
+
+                const card = document.createElement('article');
+                card.style.setProperty('--stagger', idx);
+                card.className = "animate-item group rounded-[18px] sm:rounded-[20px] bg-[#050507] hover:bg-[#0c0c12] border border-white/[0.08] hover:border-white/[0.16] p-3.5 sm:p-4 transition-colors duration-200 cursor-pointer shrink-0";
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${catStyle.cls}">
+                            <i class="fa-solid ${catStyle.icon} text-[9px]" aria-hidden="true"></i>
+                            <span>${ann.category || 'Duyuru'}</span>
+                        </span>
+                        <span class="text-[10px] sm:text-[11px] text-textMuted font-medium truncate">${ann.date || ''}</span>
+                    </div>
+
+                    <h3 class="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-100 leading-snug line-clamp-2 mb-1.5">
+                        ${ann.title}
+                    </h3>
+
+                    <p class="text-[11px] sm:text-xs text-textSecondary line-clamp-2 leading-relaxed mb-3">
+                        ${ann.summary || ''}
+                    </p>
+
+                    <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-white/[0.06]">
+                        <div class="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-textMuted">
+                            ${attCount > 0 ? `
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.05] text-textSecondary">
+                                    <i class="fa-solid fa-paperclip text-[9px]" aria-hidden="true"></i>
+                                    <span>${attCount} Ek</span>
+                                </span>
+                            ` : ''}
+                            ${imgCount > 0 ? `
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/[0.05] text-textSecondary">
+                                    <i class="fa-regular fa-image text-[9px]" aria-hidden="true"></i>
+                                    <span>${imgCount} Görsel</span>
+                                </span>
+                            ` : ''}
+                        </div>
+                        <span class="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-white group-hover:translate-x-0.5 transition-transform">
+                            <span>İçeriği Oku</span>
+                            <i class="fa-solid fa-chevron-right text-[9px]" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openAnnouncementModal(ann));
+                container.appendChild(card);
+            });
+        }
+
+        // --- Open Native Announcement Modal ---
+        function openAnnouncementModal(ann) {
+            const dialog = document.getElementById('announcementDialog');
+            const catStyle = getCategoryStyle(ann.category);
+
+            const catBadge = document.getElementById('annDialogCategory');
+            catBadge.className = `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold border ${catStyle.cls}`;
+            catBadge.innerHTML = `<i class="fa-solid ${catStyle.icon} text-[9px]" aria-hidden="true"></i><span>${ann.category || 'Duyuru'}</span>`;
+
+            document.getElementById('annDialogDate').innerText = ann.date || '';
+            document.getElementById('annDialogTitle').innerText = ann.title || '';
+            document.getElementById('annDialogExternalLink').href = ann.url || ann.original_url || 'https://yalova.edu.tr/tr/duyuru';
+
+            const imgWrap = document.getElementById('annDialogImages');
+            imgWrap.innerHTML = '';
+            if (ann.images && ann.images.length > 0) {
+                imgWrap.classList.remove('hidden');
+                ann.images.forEach(imgUrl => {
+                    const link = document.createElement('a');
+                    link.href = imgUrl;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.className = "relative block group rounded-2xl overflow-hidden border border-white/[0.08] bg-black";
+
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.alt = ann.title;
+                    img.loading = "lazy";
+                    img.width = 800;
+                    img.height = 450;
+                    img.className = "w-full max-h-96 object-contain";
+
+                    const badge = document.createElement('span');
+                    badge.className = "absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-black/80 text-white border border-white/15 backdrop-blur-md opacity-80 group-hover:opacity-100 transition flex items-center gap-1.5";
+                    badge.innerHTML = `<span>Tam Boyut Gör</span><i class="fa-solid fa-arrow-up-right-from-square text-[9px]" aria-hidden="true"></i>`;
+
+                    link.appendChild(img);
+                    link.appendChild(badge);
+                    imgWrap.appendChild(link);
+                });
+            } else {
+                imgWrap.classList.add('hidden');
+            }
+
+            const bodyEl = document.getElementById('annDialogBody');
+            if (ann.content_html && ann.content_html.trim()) {
+                safeSetHTML(bodyEl, ann.content_html);
+            } else {
+                bodyEl.textContent = ann.summary || "Detaylı içerik için resmi duyuru bağlantısını ziyaret edebilirsiniz.";
+            }
+
+            const attWrap = document.getElementById('annDialogAttachmentsWrap');
+            const attList = document.getElementById('annDialogAttachments');
+            attList.innerHTML = '';
+
+            if (ann.attachments && ann.attachments.length > 0) {
+                attWrap.classList.remove('hidden');
+                ann.attachments.forEach(att => {
+                    let icon = 'fa-arrow-up-right-from-square';
+                    let badgeColor = 'text-sky-400 bg-sky-500/10 border-sky-500/20';
+                    if (att.type === 'pdf') {
+                        icon = 'fa-file-pdf';
+                        badgeColor = 'text-rose-400 bg-rose-500/10 border-rose-500/20';
+                    } else if (att.type === 'excel') {
+                        icon = 'fa-file-excel';
+                        badgeColor = 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20';
+                    } else if (att.type === 'word') {
+                        icon = 'fa-file-word';
+                        badgeColor = 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+                    }
+
+                    const a = document.createElement('a');
+                    a.href = att.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.className = "flex items-center justify-between gap-2.5 p-3 rounded-2xl bg-[#08080c] hover:bg-[#12121a] border border-white/[0.08] hover:border-white/[0.18] transition group";
+                    a.innerHTML = `
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 ${badgeColor}">
+                                <i class="fa-solid ${icon} text-xs" aria-hidden="true"></i>
+                            </span>
+                            <span class="text-xs font-semibold text-white truncate">${att.label}</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-textMuted group-hover:text-white shrink-0" aria-hidden="true"></i>
+                    `;
+                    attList.appendChild(a);
+                });
+            } else {
+                attWrap.classList.add('hidden');
+            }
+
+            dialog.showModal();
+            const scrollBody = document.getElementById('annDialogScrollBody');
+            if (scrollBody) scrollBody.scrollTop = 0;
+        }
+
+        // --- Meal Switcher ---
+        function setMeal(mealType) {
+            if (currentMeal === mealType) return;
+            currentMeal = mealType;
+            syncMealUI(mealType);
+            renderMenu(currentDate);
+        }
+
+        // --- Date Navigation ---
         function changeDay(offset) {
             const newDate = new Date(currentDate);
             newDate.setDate(currentDate.getDate() + offset);
-            
+
             if (newDate.getTime() < minDate.getTime() || newDate.getTime() > maxDate.getTime()) {
-                return; 
+                return;
             }
             currentDate = newDate;
-            calRenderMonth = currentDate.getMonth(); 
+            calRenderMonth = currentDate.getMonth();
             calRenderYear = currentDate.getFullYear();
+
+            if (activeMobileTab !== 'menu' && window.innerWidth < 1024) {
+                setMobileTab('menu');
+            }
+
             renderMenu(currentDate);
-            
             const calModal = document.getElementById('calendarModal');
-            if(calModal.classList.contains('opacity-100')){
-                buildCalendarUI(); 
-            }
-        }
-
-        function toggleCalendar() {
-            const calModal = document.getElementById('calendarModal');
-            
-            if(calModal.classList.contains('opacity-0')){
-                calRenderMonth = currentDate.getMonth();
-                calRenderYear = currentDate.getFullYear();
+            if (calModal.classList.contains('opacity-100')) {
                 buildCalendarUI();
-                calModal.classList.remove('opacity-0', 'translate-y-3', 'pointer-events-none');
-                calModal.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
-            } else {
-                closeCalendar();
             }
-        }
-
-        function closeCalendar() {
-            const calModal = document.getElementById('calendarModal');
-            calModal.classList.add('opacity-0', 'translate-y-3', 'pointer-events-none');
-            calModal.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
-        }
-
-        function changeCalMonth(offset) {
-            calRenderMonth += offset;
-            if (calRenderMonth > 11) {
-                calRenderMonth = 0;
-                calRenderYear++;
-            } else if (calRenderMonth < 0) {
-                calRenderMonth = 11;
-                calRenderYear--;
-            }
-            buildCalendarUI();
         }
 
         function buildCalendarUI() {
             document.getElementById('calMonthYearText').innerText = `${monthsTR[calRenderMonth]} ${calRenderYear}`;
-            
+
             const weekdaysEl = document.getElementById('calWeekdays');
             weekdaysEl.innerHTML = weekdaysTR.map(d => `<div>${d}</div>`).join('');
 
@@ -357,63 +1532,333 @@
 
             const firstDayOfMonth = new Date(calRenderYear, calRenderMonth, 1);
             const lastDayOfMonth = new Date(calRenderYear, calRenderMonth + 1, 0);
-            
-            let startDayIndex = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1;
+
+            const startDayIndex = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1;
 
             for (let i = 0; i < startDayIndex; i++) {
                 calDaysEl.innerHTML += `<div></div>`;
             }
 
             for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
-                let iterDate = new Date(calRenderYear, calRenderMonth, i);
-                iterDate.setHours(0,0,0,0);
-                
-                let isPast = iterDate.getTime() < minDate.getTime();
-                let isTooFar = iterDate.getTime() > maxDate.getTime();
-                let isDisabled = isPast || isTooFar;
-                let isSelected = iterDate.getTime() === currentDate.getTime();
-                
-                let classes = "w-7 h-7 flex items-center justify-center rounded-md mx-auto transition-colors ";
-                
+                const iterDate = new Date(calRenderYear, calRenderMonth, i);
+                iterDate.setHours(0, 0, 0, 0);
+
+                const isPast = iterDate.getTime() < minDate.getTime();
+                const isTooFar = iterDate.getTime() > maxDate.getTime();
+                const isDisabled = isPast || isTooFar;
+                const isSelected = iterDate.getTime() === currentDate.getTime();
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = i;
+                btn.disabled = isDisabled;
+
+                let classes = "w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-full mx-auto transition-all text-xs ";
                 if (isDisabled) {
-                    classes += "text-[#3f3f46] cursor-not-allowed"; 
+                    classes += "text-zinc-700 cursor-not-allowed";
                 } else if (isSelected) {
-                    classes += "bg-white text-black font-bold cursor-pointer shadow-lg"; 
+                    classes += "cal-day-selected bg-white text-black font-bold shadow-md scale-105";
                 } else {
-                    classes += "hover:bg-[#27272a] text-textMain cursor-pointer"; 
+                    classes += "hover:bg-white/[0.1] text-textMain cursor-pointer";
+                }
+                btn.className = classes;
+
+                if (!isDisabled) {
+                    btn.addEventListener('click', () => {
+                        const selDate = new Date(calRenderYear, calRenderMonth, i);
+                        selDate.setHours(0, 0, 0, 0);
+                        currentDate = selDate;
+                        if (activeMobileTab !== 'menu' && window.innerWidth < 1024) {
+                            setMobileTab('menu');
+                        }
+                        renderMenu(currentDate);
+                        closeCalendar();
+                    });
                 }
 
-                let onClickAttr = isDisabled ? "" : `onclick="selectCustomDate(${calRenderYear}, ${calRenderMonth}, ${i})"`;
-                
-                calDaysEl.innerHTML += `<div class="${classes}" ${onClickAttr}>${i}</div>`;
+                calDaysEl.appendChild(btn);
             }
         }
 
-        function selectCustomDate(y, m, d) {
-            let selDate = new Date(y, m, d);
-            selDate.setHours(0,0,0,0);
-            currentDate = selDate;
-            renderMenu(currentDate);
-            closeCalendar(); 
+        // --- Copy / Share Menu & Easter Egg ---
+        let shareClickStreak = 0;
+        let shareStreakTimer = null;
+
+        async function copyCurrentMenu() {
+            shareClickStreak++;
+            clearTimeout(shareStreakTimer);
+            if (shareClickStreak >= 5) {
+                document.getElementById('headerLogo').classList.add('cursor-pointer');
+            }
+            shareStreakTimer = setTimeout(() => {
+                shareClickStreak = 0;
+                document.getElementById('headerLogo').classList.remove('cursor-pointer');
+            }, 15000);
+
+            const dateStr = formatDate(currentDate);
+            const dateData = mockDatabase[dateStr];
+            const menuData = dateData ? dateData[currentMeal] : null;
+            const mealLabel = currentMeal === 'ogle' ? 'Öğle Yemeği' : 'Akşam Yemeği';
+
+            if (!menuData || menuData.length === 0) {
+                showToast("Paylaşılacak menü bulunamadı");
+                return;
+            }
+
+            const totalCal = menuData.reduce((acc, item) => acc + item.cal, 0);
+            const lines = menuData.map(item => `• ${toTurkishTitleCase(item.name)} (${item.cal} kcal)`).join('\n');
+            const shareText = `🍽️ YÜ Yemekhane - ${formatDisplayDate(currentDate)} (${mealLabel})\n${lines}\n🔥 Toplam: ${totalCal} kcal\n🔗 https://yuyemekhane.site`;
+
+            try {
+                await navigator.clipboard.writeText(shareText);
+                showToast("Menü panoya kopyalandı!");
+            } catch (e) {
+                console.error(e);
+            }
         }
 
-        function toggleAIMenu() {
-            const aiMenu = document.getElementById('aiMenu');
-            if (aiMenu.classList.contains('opacity-0')) {
-                aiMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
-                aiMenu.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+        // --- AI Prompt Assistant ---
+        async function askAI(aiType) {
+            closeAIMenu();
+
+            const dayOfWeek = currentDate.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                showToast("Hafta sonu için menü bulunmamaktadır");
+                return;
+            }
+
+            const dateStr = formatDate(currentDate);
+            const dateData = mockDatabase[dateStr];
+            const menuData = dateData ? dateData[currentMeal] : null;
+
+            if (!menuData || menuData.length === 0) {
+                showToast("Değerlendirilecek menü bulunamadı");
+                return;
+            }
+
+            const mealName = currentMeal === 'ogle' ? 'öğle' : 'akşam';
+            const foodNames = menuData.map(f => toTurkishTitleCase(f.name)).join(", ");
+            const totalCal = menuData.reduce((acc, curr) => acc + curr.cal, 0);
+
+            const promptText = `Bugünün üniversite yemekhane ${mealName} yemeği menüsü şu şekilde: ${foodNames}. Toplam kalori: ${totalCal} kcal. Bir öğrenci için bu menüyü diyet, besleyicilik, makro dengesi ve doyuruculuk açısından detaylıca değerlendirir misin?`;
+
+            try {
+                await navigator.clipboard.writeText(promptText);
+                showToast("Prompt kopyalandı, yönlendiriliyor...");
+            } catch (err) {
+                console.error("Panoya kopyalanamadı: ", err);
+            }
+
+            if (aiType === 'chatgpt') window.open(`https://chatgpt.com/?q=${encodeURIComponent(promptText)}`, '_blank');
+            else if (aiType === 'claude') window.open('https://claude.ai/new', '_blank');
+            else if (aiType === 'gemini') window.open('https://gemini.google.com/app', '_blank');
+        }
+
+        // --- Mobile Section Switching ---
+        function setMobileTab(tab) {
+            activeMobileTab = tab;
+            const menuSec = document.getElementById('menuSection');
+            const annSec = document.getElementById('announcementsSection');
+            const btnMenu = document.getElementById('mobileTabMenu');
+            const btnAnn = document.getElementById('mobileTabAnnouncements');
+
+            if (tab === 'menu') {
+                menuSec.classList.remove('hidden');
+                menuSec.classList.add('flex');
+                annSec.classList.add('hidden');
+                annSec.classList.remove('flex');
+                btnMenu.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center gap-1.5";
+                btnAnn.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center gap-1.5";
             } else {
-                closeAIMenu();
+                menuSec.classList.add('hidden');
+                menuSec.classList.remove('flex');
+                annSec.classList.remove('hidden');
+                annSec.classList.add('flex');
+                btnAnn.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center gap-1.5";
+                btnMenu.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center gap-1.5";
             }
         }
 
-        function closeAIMenu() {
-            const aiMenu = document.getElementById('aiMenu');
-            aiMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-            aiMenu.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+        function applyPayload(jsonData) {
+            if (!jsonData) return;
+            if (jsonData.menus) {
+                mockDatabase = jsonData.menus;
+                document.getElementById('lastUpdateSpan').innerText = jsonData.last_updated || "Bilinmiyor";
+            } else {
+                mockDatabase = jsonData;
+                document.getElementById('lastUpdateSpan').innerText = "Bilinmiyor";
+            }
+
+            if (Array.isArray(jsonData.announcements)) {
+                announcementsData = jsonData.announcements;
+            }
         }
 
-        document.addEventListener('click', function(event) {
+        // --- Theme Management (Default: AMOLED Dark, Toggle: Apple Liquid Glass Light) ---
+        function applyTheme(theme, showFeedback = false) {
+            const normalized = theme === 'light' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', normalized);
+            const schemeMeta = document.querySelector('meta[name="color-scheme"]');
+            if (schemeMeta) schemeMeta.content = normalized;
+            const themeColorMeta = document.getElementById('themeColorMeta');
+            if (themeColorMeta) themeColorMeta.content = normalized === 'light' ? '#eef2f7' : '#000000';
+
+            const icon = document.getElementById('themeToggleIcon');
+            if (icon) {
+                icon.className = normalized === 'light'
+                    ? 'fa-solid fa-moon text-sm transition-transform duration-300'
+                    : 'fa-solid fa-sun text-sm transition-transform duration-300';
+            }
+
+            if (showFeedback) {
+                showToast(normalized === 'light' ? 'Liquid Glass (Gündüz) Teması' : 'AMOLED (Gece) Teması');
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            try {
+                localStorage.setItem('yuyemekhane_theme', nextTheme);
+            } catch (e) {}
+            applyTheme(nextTheme, true);
+        }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'yuyemekhane_theme') {
+                applyTheme(e.newValue || 'dark', false);
+            }
+        });
+
+        // --- Initialize App & Event Listeners ---
+        async function initializeApp() {
+            const initialTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            applyTheme(initialTheme, false);
+            syncMealUI(currentMeal);
+
+            if (window.__VERI_DATA__) {
+                applyPayload(window.__VERI_DATA__);
+                renderMenu(currentDate);
+                renderAnnouncements();
+            }
+
+            if (window.location.protocol.startsWith('http')) {
+                try {
+                    const menuResponse = await fetch('veri.json', { cache: "no-store" });
+                    if (menuResponse.ok) {
+                        const jsonData = await menuResponse.json();
+                        applyPayload(jsonData);
+                        renderMenu(currentDate);
+                        renderAnnouncements();
+                    }
+                } catch (error) {
+                    console.warn("veri.json fetch atlandı, yerel veri kullanılıyor.");
+                }
+            }
+
+            try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 2000);
+                const timeResponse = await fetch('https://worldtimeapi.org/api/timezone/Europe/Istanbul', {
+                    signal: controller.signal
+                });
+                clearTimeout(timer);
+                if (timeResponse.ok) {
+                    const timeData = await timeResponse.json();
+                    const internetDate = new Date(timeData.datetime);
+                    today = new Date(internetDate);
+                    today.setHours(0, 0, 0, 0);
+                    currentDate = new Date(today);
+                    minDate = new Date(today);
+                    maxDate = new Date(today);
+                    maxDate.setDate(maxDate.getDate() + 7);
+                    calRenderMonth = currentDate.getMonth();
+                    calRenderYear = currentDate.getFullYear();
+                    renderMenu(currentDate);
+                }
+            } catch (error) {
+                // Cihaz saati ile devam et
+            }
+        }
+
+        // Wire up DOM events
+        document.getElementById('closeInfoBtn').addEventListener('click', () => {
+            const box = document.getElementById('infoBox');
+            box.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            setTimeout(() => { box.style.display = 'none'; }, 250);
+        });
+
+        document.getElementById('mealBtn-ogle').addEventListener('click', () => setMeal('ogle'));
+        document.getElementById('mealBtn-aksam').addEventListener('click', () => setMeal('aksam'));
+        document.getElementById('copyMenuBtn').addEventListener('click', copyCurrentMenu);
+        document.getElementById('aiButton').addEventListener('click', toggleAIMenu);
+
+        document.getElementById('prevBtn').addEventListener('click', () => changeDay(-1));
+        document.getElementById('nextBtn').addEventListener('click', () => changeDay(1));
+        document.getElementById('todayQuickBtn').addEventListener('click', () => {
+            currentDate = new Date(today);
+            if (activeMobileTab !== 'menu' && window.innerWidth < 1024) {
+                setMobileTab('menu');
+            }
+            renderMenu(currentDate);
+        });
+
+        document.getElementById('calButton').addEventListener('click', toggleCalendar);
+
+        document.getElementById('calPrevMonthBtn').addEventListener('click', () => {
+            calRenderMonth--;
+            if (calRenderMonth < 0) {
+                calRenderMonth = 11;
+                calRenderYear--;
+            }
+            buildCalendarUI();
+        });
+
+        document.getElementById('calNextMonthBtn').addEventListener('click', () => {
+            calRenderMonth++;
+            if (calRenderMonth > 11) {
+                calRenderMonth = 0;
+                calRenderYear++;
+            }
+            buildCalendarUI();
+        });
+
+        document.querySelectorAll('.ai-choice-btn').forEach(btn => {
+            btn.addEventListener('click', () => askAI(btn.dataset.ai));
+        });
+
+        document.querySelectorAll('.cat-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                selectedCategory = chip.dataset.category;
+                document.querySelectorAll('.cat-chip').forEach(c => {
+                    c.removeAttribute('data-active');
+                    c.className = "cat-chip px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#07070a] text-textSecondary hover:text-white border border-white/[0.08] hover:border-white/[0.18] transition";
+                });
+                chip.setAttribute('data-active', 'true');
+                chip.className = "cat-chip px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white text-black border border-transparent transition";
+                renderAnnouncements();
+            });
+        });
+
+        document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+
+        document.getElementById('headerLogo').addEventListener('click', () => {
+            if (shareClickStreak >= 5) {
+                shareClickStreak = 0;
+                window.location.href = 'https://www.youtube.com/watch?v=w-H39fnZJeU';
+            }
+        });
+
+        document.getElementById('announcementSearchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value || "";
+            renderAnnouncements();
+        });
+
+        document.getElementById('mobileTabMenu').addEventListener('click', () => setMobileTab('menu'));
+        document.getElementById('mobileTabAnnouncements').addEventListener('click', () => setMobileTab('announcements'));
+
+        // Outside click closes anchored calendar and AI dropdown
+        document.addEventListener('click', (event) => {
             const aiButton = document.getElementById('aiButton');
             const aiMenu = document.getElementById('aiMenu');
             if (!aiButton.contains(event.target) && !aiMenu.contains(event.target)) {
@@ -425,47 +1870,26 @@
             if (!calButton.contains(event.target) && !calModal.contains(event.target)) {
                 closeCalendar();
             }
+
+            const copyBtn = document.getElementById('copyMenuBtn');
+            const logoEl = document.getElementById('headerLogo');
+            if (!copyBtn.contains(event.target) && !logoEl.contains(event.target)) {
+                shareClickStreak = 0;
+                logoEl.classList.remove('cursor-pointer');
+            }
         });
 
-        async function askAI(aiType) {
-            const dayOfWeek = currentDate.getDay();
-            if (dayOfWeek === 0 || dayOfWeek === 6) {
-                alert("Hafta sonu için değerlendirilecek menü bulunmamaktadır.");
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
                 closeAIMenu();
-                return;
+                closeCalendar();
             }
+            if (document.querySelector('dialog[open]') || document.activeElement?.tagName === 'INPUT') return;
+            if (e.key === 'ArrowLeft') changeDay(-1);
+            if (e.key === 'ArrowRight') changeDay(1);
+        });
 
-            const dateStr = formatDate(currentDate);
-            const dateData = mockDatabase[dateStr];
-            const menuData = dateData ? dateData[currentMeal] : null;
-            
-            if (!menuData || menuData.length === 0) {
-                alert("Değerlendirilecek menü bulunamadı.");
-                return;
-            }
-
-            const mealName = currentMeal === 'ogle' ? 'öğle' : 'akşam';
-            const foodNames = menuData.map(f => f.name).join(", ");
-            const totalCal = menuData.reduce((acc, curr) => acc + curr.cal, 0);
-            
-            const promptText = `Bugünün üniversite yemekhane ${mealName} yemeği menüsü şu şekilde: ${foodNames}. Toplam kalori: ${totalCal} kcal. Bir öğrenci için bu menüyü diyet, besleyicilik, makro dengesi ve doyuruculuk açısından detaylıca değerlendirir misin?`;
-
-            try {
-                await navigator.clipboard.writeText(promptText);
-            } catch (err) {
-                console.error("Panoya kopyalanamadı: ", err);
-            }
-
-            closeAIMenu();
-
-            if (aiType === 'chatgpt') window.open(`https://chatgpt.com/?q=${encodeURIComponent(promptText)}`, '_blank');
-            else if (aiType === 'claude') window.open('https://claude.ai/new', '_blank');
-            else if (aiType === 'gemini') window.open('https://gemini.google.com/app', '_blank');
-        }
-
-        window.onload = () => {
-            initializeApp();
-        }
+        initializeApp();
     </script>
 </body>
 </html>
