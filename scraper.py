@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from urllib.parse import urljoin, unquote, urlparse
 import re
 import base64
+import hashlib
 
 # SSL sertifika uyarılarını gizle
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -390,7 +391,62 @@ def fetch_and_combine_menus():
         if isinstance(k, str) and len(k) >= 10 and k[:10] in valid_retention_dates and isinstance(v, list)
     }
 
-    reserved_author_re = re.compile(r'\b(admin|y[öo]netici|rekt[öo]rl[üu]k|moderat[öo]r|sks\s*daire|sistem|resmi\s*hesap)\b', re.IGNORECASE)
+    # ECDSA P-256 (secp256r1) Yönetici İmza Doğrulayıcı (Sıfır ek paket, saf Python)
+    P256_P = 0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff
+    P256_N = 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551
+    P256_A = P256_P - 3
+    P256_G = (
+        0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296,
+        0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5
+    )
+    P256_Q = (
+        int.from_bytes(base64.urlsafe_b64decode('3ga6Y33aSC2Umxrb7jkts7vTnavw8SuScP_MQa2P708='), 'big'),
+        int.from_bytes(base64.urlsafe_b64decode('xhScBPA2HRfkakF_ogre4OtptGkZKwYb54N5sqK5fdQ='), 'big')
+    )
+
+    def ec_pt_add(p1, p2):
+        if p1 is None:
+            return p2
+        if p2 is None:
+            return p1
+        x1, y1 = p1
+        x2, y2 = p2
+        if x1 == x2 and (y1 + y2) % P256_P == 0:
+            return None
+        if p1 == p2:
+            lam = ((3 * x1 * x1 + P256_A) * pow(2 * y1, -1, P256_P)) % P256_P
+        else:
+            lam = ((y2 - y1) * pow(x2 - x1, -1, P256_P)) % P256_P
+        x3 = (lam * lam - x1 - x2) % P256_P
+        return (x3, (lam * (x1 - x3) - y1) % P256_P)
+
+    def ec_pt_mul(k, pt):
+        res = None
+        addend = pt
+        while k:
+            if k & 1:
+                res = ec_pt_add(res, addend)
+            addend = ec_pt_add(addend, addend)
+            k >>= 1
+        return res
+
+    def verify_admin_sig(msg_str, sig_b64):
+        if not sig_b64 or not isinstance(sig_b64, str):
+            return False
+        try:
+            raw = base64.b64decode(sig_b64)
+            if len(raw) != 64:
+                return False
+            r = int.from_bytes(raw[:32], 'big')
+            s = int.from_bytes(raw[32:], 'big')
+            if not (1 <= r < P256_N and 1 <= s < P256_N):
+                return False
+            z = int.from_bytes(hashlib.sha256(msg_str.encode('utf-8')).digest(), 'big')
+            w = pow(s, -1, P256_N)
+            pt = ec_pt_add(ec_pt_mul((z * w) % P256_N, P256_G), ec_pt_mul((r * w) % P256_N, P256_Q))
+            return pt is not None and (pt[0] % P256_N) == r
+        except Exception:
+            return False
 
     def detect_valid_image_mime(raw_bytes):
         if not raw_bytes or len(raw_bytes) > 75000:
@@ -409,7 +465,7 @@ def fetch_and_combine_menus():
         for meal_key in ("ogle", "aksam"):
             slot_key = f"{c_date}_{meal_key}"
             topic = f"yuyemekhane_c_{c_date.replace('-', '_')}_{meal_key}"
-            existing_list = [item for item in comments_archive.get(slot_key, []) if isinstance(item, dict)]
+            existing_list = [item for item in comments_archive.get(slot_key, []) if isinstance(item, dict) and item.get("sig")]
             seen_ids = {str(item.get("id")) for item in existing_list if item.get("id")}
             seen_content = {
                 f"{str(item.get('author', '')).lower()}|{str(item.get('text', '')).lower()}"
@@ -419,6 +475,7 @@ def fetch_and_combine_menus():
             for item in existing_list:
                 a_key = str(item.get("author", "")).strip().lower()
                 author_counts[a_key] = author_counts.get(a_key, 0) + 1
+            deleted_ids = set()
 
             try:
                 resp = session.get(f"https://ntfy.sh/{topic}/json?poll=1&since=all", timeout=6)
@@ -435,13 +492,23 @@ def fetch_and_combine_menus():
                             if not isinstance(c_obj, dict):
                                 continue
 
+                            # Yönetici yorum silme komutu
+                            if c_obj.get("action") == "delete" and c_obj.get("targetId") and c_obj.get("sig"):
+                                target_id = str(c_obj.get("targetId"))
+                                if verify_admin_sig(f"DELETE|{slot_key}|{target_id}", c_obj.get("sig")):
+                                    deleted_ids.add(target_id)
+                                continue
+
                             c_id = str(c_obj.get("id") or ev.get("id") or "").strip()[:64]
                             if not c_id or c_id in seen_ids:
                                 continue
 
-                            # Yazar adı doğrulaması ve taklit (impersonation) filtresi
+                            sig_val = str(c_obj.get("sig") or "").strip()
+                            if not sig_val:
+                                continue
+
                             author = re.sub(r'[\x00-\x1f\x7f]', '', str(c_obj.get("author") or "")).strip()[:28]
-                            if len(author) < 2 or reserved_author_re.search(author):
+                            if len(author) < 2:
                                 continue
 
                             author_key = author.lower()
@@ -458,6 +525,11 @@ def fetch_and_combine_menus():
                                     clean_rating = r_val
                             except Exception:
                                 clean_rating = None
+
+                            # Yönetici ECDSA imza doğrulaması (onaysız hiçbir yorum arşive giremez)
+                            approval_payload = f"APPROVE|{slot_key}|{c_id}|{author}|{clean_rating or ''}|{text}"
+                            if not verify_admin_sig(approval_payload, sig_val):
+                                continue
 
                             # Görsel doğrulaması (Magic-byte + boyut kontrolü)
                             clean_img = ""
@@ -490,7 +562,6 @@ def fetch_and_combine_menus():
                             if content_sig in seen_content:
                                 continue
 
-                            # Zaman damgası doğrulaması (gelecek tarihli sahte ts ile sıralama manipülasyonunu engelle)
                             try:
                                 raw_ts = int(float(c_obj.get("ts", now_ms)))
                                 if raw_ts < now_ms - 45 * 86400000 or raw_ts > now_ms + 600000:
@@ -510,7 +581,8 @@ def fetch_and_combine_menus():
                                 "text": text,
                                 "img": clean_img,
                                 "time": clean_time,
-                                "ts": clean_ts
+                                "ts": clean_ts,
+                                "sig": sig_val
                             }
 
                             existing_list.append(sanitized_entry)
@@ -522,9 +594,14 @@ def fetch_and_combine_menus():
             except Exception:
                 pass
 
+            if deleted_ids:
+                existing_list = [it for it in existing_list if str(it.get("id")) not in deleted_ids]
+
             if existing_list:
                 existing_list.sort(key=lambda x: x.get("ts", 0))
                 comments_archive[slot_key] = existing_list[-50:]
+            elif slot_key in comments_archive:
+                del comments_archive[slot_key]
 
     guncel_zaman = datetime.now().strftime("%d.%m.%Y")
 

@@ -338,12 +338,18 @@
         html[data-theme="light"] #commentAuthorInput,
         html[data-theme="light"] #commentTextInput,
         html[data-theme="light"] #commentImageLabel,
-        html[data-theme="light"] #commentStarGroup {
+        html[data-theme="light"] #commentStarGroup,
+        html[data-theme="light"] #adminPassInput {
             background: rgba(255, 255, 255, 0.72) !important;
             border-color: rgba(15, 23, 42, 0.14) !important;
             color: #0f172a !important;
         }
-        html[data-theme="light"] #submitCommentBtn {
+        html[data-theme="light"] #adminLoginBar {
+            background: rgba(255, 255, 255, 0.75) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+        html[data-theme="light"] #submitCommentBtn,
+        html[data-theme="light"] #adminLoginBtn {
             background: #0f172a !important;
             color: #ffffff !important;
         }
@@ -964,14 +970,26 @@
                             <i class="fa-solid fa-star text-[9px] text-amber-400" aria-hidden="true"></i>
                             <span id="commentsDialogAvgText">0.0 / 5</span>
                         </span>
+                        <button type="button" id="adminActiveBadgeBtn" title="Yönetici modundan çık" class="hidden items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 transition">
+                            <i class="fa-solid fa-shield-halved text-[9px]" aria-hidden="true"></i>
+                            <span>Yönetici (Çıkış)</span>
+                        </button>
                     </div>
-                    <h2 id="commentsDialogTitle" class="text-sm sm:text-lg font-bold text-white leading-snug">Öğün Yorumları</h2>
+                    <h2 id="commentsDialogTitle" class="text-sm sm:text-lg font-bold text-white leading-snug select-none cursor-pointer">Öğün Yorumları</h2>
                 </div>
                 <form method="dialog" class="shrink-0">
                     <button type="submit" aria-label="Yorum penceresini kapat" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.07] hover:bg-white/[0.14] text-textSecondary hover:text-white flex items-center justify-center transition">
                         <i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
                     </button>
                 </form>
+            </div>
+
+            <!-- Hidden Admin Password Bar (Toggled by tapping "Öğün Yorumları" 5 times) -->
+            <div id="adminLoginBar" class="hidden px-4 sm:px-6 py-2.5 border-b border-white/[0.08] bg-[#07070c] items-center justify-between gap-2 shrink-0">
+                <input type="password" id="adminPassInput" placeholder="Yönetici şifresi..." autocomplete="current-password" class="flex-1 px-3 py-1.5 rounded-full bg-[#030305] border border-white/[0.12] text-xs text-white focus:outline-none">
+                <button type="button" id="adminLoginBtn" class="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white text-black hover:bg-zinc-200 transition shrink-0">
+                    Giriş
+                </button>
             </div>
 
             <!-- Scrollable Comments Feed -->
@@ -1070,6 +1088,12 @@
         let announcementsData = [];
         let commentsArchive = {};
         let liveCommentsCache = {};
+        let pendingCommentsCache = {};
+        let deletedCommentIdsCache = {};
+        let dismissedPendingIdsCache = {};
+        let adminPrivateKey = null;
+        let adminPublicKey = null;
+        let adminTitleTapStreak = 0;
         let pendingMemeBlob = null;
         let pendingMemeDataUrl = "";
         let selectedCommentRating = 5;
@@ -1946,8 +1970,151 @@
             }
         }
 
-        // --- Anonymous Meal Comments System (Real-time ntfy.sh + GitHub Actions Archive) ---
+        // --- Anonymous Meal Comments System with Cryptographic Admin Moderation (ECDSA P-256) ---
         const RESERVED_AUTHOR_PATTERN = /\b(admin|y[öo]netici|rekt[öo]rl[üu]k|moderat[öo]r|sks\s*daire|sistem|resmi\s*hesap)\b/i;
+
+        const ADMIN_CRYPTO_CONFIG = {
+            pubJwk: {
+                key_ops: ["verify"],
+                ext: true,
+                kty: "EC",
+                x: "3ga6Y33aSC2Umxrb7jkts7vTnavw8SuScP_MQa2P708",
+                y: "xhScBPA2HRfkakF_ogre4OtptGkZKwYb54N5sqK5fdQ",
+                crv: "P-256"
+            },
+            saltB64: "t1EcsqqgAZZi1ykjyRA9gQ==",
+            ivB64: "xiwFK1sKJKGO1pdt",
+            ctB64: "Qt2iMlURd2dpPYPxcfAjIYas3MqUxNmPMUsJyvMu2gVimnYRHT6jM2YeH6nL5Gjf9fkRoxFgX+mxKpAO5v2h0cK9bSVlNXEd2PquhL57TCImrw63iFWrVEFl4ZydXPSMXQPw3bDnA41OsjDxm8l3wkPropqK+Pwlsr8QLZ3vuhP1P7bWgXsO/cCMkK/CH94mt0+CY3PfR8GONA=="
+        };
+
+        function b64ToBytes(b64) {
+            const bin = atob(b64);
+            const arr = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+            return arr;
+        }
+
+        function bytesToB64(bytes) {
+            let bin = "";
+            const arr = new Uint8Array(bytes);
+            for (let i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+            return btoa(bin);
+        }
+
+        async function getAdminPublicKey() {
+            if (adminPublicKey) return adminPublicKey;
+            adminPublicKey = await crypto.subtle.importKey(
+                "jwk",
+                ADMIN_CRYPTO_CONFIG.pubJwk,
+                { name: "ECDSA", namedCurve: "P-256" },
+                false,
+                ["verify"]
+            );
+            return adminPublicKey;
+        }
+
+        function buildApprovalPayload(slotKey, item) {
+            return `APPROVE|${slotKey}|${item.id}|${item.author}|${item.rating || ''}|${item.text || ''}`;
+        }
+
+        async function verifyAdminSignature(payloadStr, sigB64) {
+            if (!sigB64 || typeof sigB64 !== "string") return false;
+            try {
+                const pubKey = await getAdminPublicKey();
+                const sigBytes = b64ToBytes(sigB64);
+                const dataBytes = new TextEncoder().encode(payloadStr);
+                return await crypto.subtle.verify(
+                    { name: "ECDSA", hash: "SHA-256" },
+                    pubKey,
+                    sigBytes,
+                    dataBytes
+                );
+            } catch (e) {
+                return false;
+            }
+        }
+
+        async function signAdminPayload(payloadStr) {
+            if (!adminPrivateKey) throw new Error("Yönetici oturumu açık değil");
+            const dataBytes = new TextEncoder().encode(payloadStr);
+            const sigBuf = await crypto.subtle.sign(
+                { name: "ECDSA", hash: "SHA-256" },
+                adminPrivateKey,
+                dataBytes
+            );
+            return bytesToB64(sigBuf);
+        }
+
+        function syncAdminUIState() {
+            const badgeBtn = document.getElementById('adminActiveBadgeBtn');
+            const loginBar = document.getElementById('adminLoginBar');
+            if (!badgeBtn || !loginBar) return;
+            if (adminPrivateKey) {
+                badgeBtn.classList.remove('hidden');
+                badgeBtn.classList.add('inline-flex');
+                loginBar.classList.add('hidden');
+                loginBar.classList.remove('flex');
+            } else {
+                badgeBtn.classList.add('hidden');
+                badgeBtn.classList.remove('inline-flex');
+            }
+        }
+
+        async function restoreAdminSession() {
+            try {
+                const savedPkcs8 = localStorage.getItem('yuyemekhane_admin_pkcs8');
+                if (!savedPkcs8) return;
+                const pkcs8Bytes = b64ToBytes(savedPkcs8);
+                adminPrivateKey = await crypto.subtle.importKey(
+                    "pkcs8",
+                    pkcs8Bytes,
+                    { name: "ECDSA", namedCurve: "P-256" },
+                    false,
+                    ["sign"]
+                );
+                syncAdminUIState();
+            } catch (e) {
+                adminPrivateKey = null;
+            }
+        }
+
+        async function unlockAdminWithPassword(password) {
+            const passBytes = new TextEncoder().encode((password || "").trim());
+            const salt = b64ToBytes(ADMIN_CRYPTO_CONFIG.saltB64);
+            const iv = b64ToBytes(ADMIN_CRYPTO_CONFIG.ivB64);
+            const ct = b64ToBytes(ADMIN_CRYPTO_CONFIG.ctB64);
+
+            const baseKey = await crypto.subtle.importKey("raw", passBytes, "PBKDF2", false, ["deriveKey"]);
+            const aesKey = await crypto.subtle.deriveKey(
+                { name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" },
+                baseKey,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["decrypt"]
+            );
+            const pkcs8Buf = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, aesKey, ct);
+            adminPrivateKey = await crypto.subtle.importKey(
+                "pkcs8",
+                pkcs8Buf,
+                { name: "ECDSA", namedCurve: "P-256" },
+                false,
+                ["sign"]
+            );
+            try {
+                localStorage.setItem('yuyemekhane_admin_pkcs8', bytesToB64(pkcs8Buf));
+            } catch (e) {}
+            syncAdminUIState();
+        }
+
+        function logoutAdmin() {
+            adminPrivateKey = null;
+            try {
+                localStorage.removeItem('yuyemekhane_admin_pkcs8');
+            } catch (e) {}
+            syncAdminUIState();
+            renderCommentsModalList(getCurrentCommentSlotKey());
+            showToast("Yönetici modundan çıkıldı");
+        }
 
         function isValidCommentImageSrc(src) {
             if (!src || typeof src !== 'string' || src.length > 110000) return false;
@@ -1956,13 +2123,14 @@
             return false;
         }
 
-        function sanitizeCommentObject(raw) {
+        function sanitizeCommentObject(raw, allowAdminName = false) {
             if (!raw || typeof raw !== 'object') return null;
             const cleanAuthor = String(raw.author || '')
                 .replace(/[\u0000-\u001F\u007F]/g, '')
                 .trim()
                 .slice(0, 28);
-            if (cleanAuthor.length < 2 || RESERVED_AUTHOR_PATTERN.test(cleanAuthor)) return null;
+            if (cleanAuthor.length < 2) return null;
+            if (!allowAdminName && RESERVED_AUTHOR_PATTERN.test(cleanAuthor)) return null;
 
             const cleanText = String(raw.text || '')
                 .replace(/[\u0000-\u001F\u007F]/g, '')
@@ -1993,7 +2161,8 @@
                 text: cleanText,
                 img: cleanImg,
                 time: cleanTime,
-                ts: cleanTs
+                ts: cleanTs,
+                sig: typeof raw.sig === 'string' ? raw.sig : ''
             };
         }
 
@@ -2007,23 +2176,25 @@
             return `yuyemekhane_c_${dateStr}_${currentMeal}`;
         }
 
+        function getCurrentPendingTopic() {
+            const dateStr = formatDate(currentDate).replace(/-/g, '_');
+            return `yuyemekhane_p_${dateStr}_${currentMeal}`;
+        }
+
         function getMergedCommentsForSlot(slotKey) {
             const archived = Array.isArray(commentsArchive[slotKey]) ? commentsArchive[slotKey] : [];
             const live = Array.isArray(liveCommentsCache[slotKey]) ? liveCommentsCache[slotKey] : [];
-            let localSaved = [];
-            try {
-                const rawLocal = localStorage.getItem(`yuyemekhane_local_c_${slotKey}`);
-                if (rawLocal) localSaved = JSON.parse(rawLocal) || [];
-            } catch (e) {}
+            const deletedSet = deletedCommentIdsCache[slotKey] instanceof Set ? deletedCommentIdsCache[slotKey] : new Set();
 
             const seenIds = new Set();
             const seenContent = new Set();
             const authorCounts = new Map();
             const merged = [];
 
-            for (const rawItem of [...archived, ...live, ...localSaved]) {
-                const item = sanitizeCommentObject(rawItem);
-                if (!item) continue;
+            for (const rawItem of [...archived, ...live]) {
+                const item = sanitizeCommentObject(rawItem, true);
+                if (!item || !item.sig) continue;
+                if (deletedSet.has(item.id)) continue;
 
                 const contentSig = `${item.author.toLocaleLowerCase('tr-TR')}|${item.text.toLocaleLowerCase('tr-TR')}|${item.img ? item.img.slice(-32) : ''}`;
                 if (seenIds.has(item.id) || seenContent.has(contentSig)) continue;
@@ -2039,6 +2210,24 @@
             }
             merged.sort((a, b) => (a.ts || 0) - (b.ts || 0));
             return merged.slice(-50);
+        }
+
+        function getPendingCommentsForSlot(slotKey) {
+            const rawPending = Array.isArray(pendingCommentsCache[slotKey]) ? pendingCommentsCache[slotKey] : [];
+            const approvedIds = new Set(getMergedCommentsForSlot(slotKey).map(c => c.id));
+            const dismissedSet = dismissedPendingIdsCache[slotKey] instanceof Set ? dismissedPendingIdsCache[slotKey] : new Set();
+
+            const seenIds = new Set();
+            const result = [];
+            for (const rawItem of rawPending) {
+                const item = sanitizeCommentObject(rawItem, false);
+                if (!item) continue;
+                if (approvedIds.has(item.id) || dismissedSet.has(item.id) || seenIds.has(item.id)) continue;
+                seenIds.add(item.id);
+                result.push(item);
+            }
+            result.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+            return result;
         }
 
         function setSelectedCommentRating(stars) {
@@ -2093,108 +2282,238 @@
             }
         }
 
+        async function approvePendingComment(item) {
+            if (!adminPrivateKey) return;
+            const slotKey = getCurrentCommentSlotKey();
+            const approvedTopic = getCurrentCommentTopic();
+            const pendingTopic = getCurrentPendingTopic();
+
+            try {
+                const payload = buildApprovalPayload(slotKey, item);
+                const sig = await signAdminPayload(payload);
+                const approvedObj = { ...item, sig };
+
+                const postResp = await fetch(`https://ntfy.sh/${approvedTopic}`, {
+                    method: 'POST',
+                    body: JSON.stringify(approvedObj)
+                });
+                if (!postResp.ok) throw new Error("Onay gönderilemedi");
+
+                const dismissSig = await signAdminPayload(`DISMISS|${slotKey}|${item.id}`);
+                fetch(`https://ntfy.sh/${pendingTopic}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'dismiss', targetId: item.id, sig: dismissSig })
+                }).catch(() => {});
+
+                if (!dismissedPendingIdsCache[slotKey]) dismissedPendingIdsCache[slotKey] = new Set();
+                dismissedPendingIdsCache[slotKey].add(item.id);
+
+                if (!liveCommentsCache[slotKey]) liveCommentsCache[slotKey] = [];
+                liveCommentsCache[slotKey].push(approvedObj);
+
+                updateMenuCommentBarUI(slotKey);
+                renderCommentsModalList(slotKey);
+                showToast("Yorum onaylandı ve yayınlandı");
+            } catch (e) {
+                showToast("Onaylama sırasında hata oluştu");
+            }
+        }
+
+        async function dismissPendingComment(item) {
+            if (!adminPrivateKey) return;
+            const slotKey = getCurrentCommentSlotKey();
+            const pendingTopic = getCurrentPendingTopic();
+
+            try {
+                const dismissSig = await signAdminPayload(`DISMISS|${slotKey}|${item.id}`);
+                await fetch(`https://ntfy.sh/${pendingTopic}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'dismiss', targetId: item.id, sig: dismissSig })
+                });
+                if (!dismissedPendingIdsCache[slotKey]) dismissedPendingIdsCache[slotKey] = new Set();
+                dismissedPendingIdsCache[slotKey].add(item.id);
+                renderCommentsModalList(slotKey);
+                showToast("Yorum reddedildi");
+            } catch (e) {
+                showToast("Reddetme sırasında hata oluştu");
+            }
+        }
+
+        async function deleteApprovedComment(item) {
+            if (!adminPrivateKey) return;
+            const slotKey = getCurrentCommentSlotKey();
+            const approvedTopic = getCurrentCommentTopic();
+
+            try {
+                const delSig = await signAdminPayload(`DELETE|${slotKey}|${item.id}`);
+                await fetch(`https://ntfy.sh/${approvedTopic}`, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'delete', targetId: item.id, sig: delSig })
+                });
+                if (!deletedCommentIdsCache[slotKey]) deletedCommentIdsCache[slotKey] = new Set();
+                deletedCommentIdsCache[slotKey].add(item.id);
+                updateMenuCommentBarUI(slotKey);
+                renderCommentsModalList(slotKey);
+                showToast("Yorum silindi");
+            } catch (e) {
+                showToast("Silme sırasında hata oluştu");
+            }
+        }
+
+        function createCommentCardDOM(item, mode = 'approved') {
+            const card = document.createElement('article');
+            card.className = mode === 'pending'
+                ? "rounded-2xl bg-amber-500/[0.06] border border-amber-500/30 p-3.5 space-y-2 shrink-0"
+                : "rounded-2xl bg-[#050507] border border-white/[0.08] p-3.5 space-y-2 shrink-0";
+
+            const topRow = document.createElement('div');
+            topRow.className = "flex items-center justify-between gap-2";
+
+            const userWrap = document.createElement('div');
+            userWrap.className = "flex items-center gap-1.5 sm:gap-2 min-w-0";
+
+            const avatar = document.createElement('span');
+            avatar.className = "w-6 h-6 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[11px] font-bold flex items-center justify-center shrink-0 uppercase";
+            const authorName = (item.author || "Anonim").trim();
+            avatar.textContent = authorName.charAt(0) || "A";
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = "text-xs font-bold text-white truncate";
+            nameSpan.textContent = authorName;
+
+            userWrap.appendChild(avatar);
+            userWrap.appendChild(nameSpan);
+
+            const ratingNum = Number(item.rating);
+            if (Number.isFinite(ratingNum) && ratingNum >= 1 && ratingNum <= 5) {
+                const starBadge = document.createElement('span');
+                starBadge.className = "rating-badge-amber inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0";
+
+                const starIcon = document.createElement('i');
+                starIcon.className = "fa-solid fa-star text-[9px] text-amber-400";
+                starIcon.setAttribute('aria-hidden', 'true');
+
+                const scoreSpan = document.createElement('span');
+                scoreSpan.textContent = `${ratingNum}/5`;
+
+                starBadge.appendChild(starIcon);
+                starBadge.appendChild(scoreSpan);
+                userWrap.appendChild(starBadge);
+            }
+
+            const rightWrap = document.createElement('div');
+            rightWrap.className = "flex items-center gap-2 shrink-0";
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = "text-[10px] text-textMuted";
+            timeSpan.textContent = item.time || "";
+            rightWrap.appendChild(timeSpan);
+
+            if (mode === 'pending' && adminPrivateKey) {
+                const approveBtn = document.createElement('button');
+                approveBtn.type = "button";
+                approveBtn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 hover:bg-emerald-500/35 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1";
+                approveBtn.innerHTML = `<i class="fa-solid fa-check text-[9px]" aria-hidden="true"></i><span>Onayla</span>`;
+                approveBtn.addEventListener('click', () => approvePendingComment(item));
+
+                const rejectBtn = document.createElement('button');
+                rejectBtn.type = "button";
+                rejectBtn.className = "px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 border border-rose-500/40 transition flex items-center gap-1";
+                rejectBtn.innerHTML = `<i class="fa-solid fa-xmark text-[9px]" aria-hidden="true"></i><span>Reddet</span>`;
+                rejectBtn.addEventListener('click', () => dismissPendingComment(item));
+
+                rightWrap.appendChild(approveBtn);
+                rightWrap.appendChild(rejectBtn);
+            } else if (mode === 'approved' && adminPrivateKey) {
+                const delBtn = document.createElement('button');
+                delBtn.type = "button";
+                delBtn.title = "Bu yorumu sil";
+                delBtn.className = "px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/15 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 transition";
+                delBtn.textContent = "Sil";
+                delBtn.addEventListener('click', () => deleteApprovedComment(item));
+                rightWrap.appendChild(delBtn);
+            }
+
+            topRow.appendChild(userWrap);
+            topRow.appendChild(rightWrap);
+            card.appendChild(topRow);
+
+            if (item.text && item.text.trim()) {
+                const p = document.createElement('p');
+                p.className = "text-xs text-zinc-300 leading-relaxed break-words";
+                p.textContent = item.text;
+                card.appendChild(p);
+            }
+
+            if (isValidCommentImageSrc(item.img)) {
+                const imgWrap = document.createElement('div');
+                imgWrap.className = "mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-black/50 max-w-xs";
+
+                const imgEl = document.createElement('img');
+                imgEl.src = item.img;
+                imgEl.alt = `${authorName} tarafından paylaşılan görsel`;
+                imgEl.loading = "lazy";
+                imgEl.width = 400;
+                imgEl.height = 300;
+                imgEl.className = "w-full max-h-64 object-contain";
+
+                if (item.img.startsWith('https://ntfy.sh/file/')) {
+                    const imgLink = document.createElement('a');
+                    imgLink.href = item.img;
+                    imgLink.target = '_blank';
+                    imgLink.rel = 'noopener noreferrer';
+                    imgLink.className = "block";
+                    imgLink.appendChild(imgEl);
+                    imgWrap.appendChild(imgLink);
+                } else {
+                    imgWrap.appendChild(imgEl);
+                }
+                card.appendChild(imgWrap);
+            }
+
+            return card;
+        }
+
         function renderCommentsModalList(slotKey) {
             const container = document.getElementById('commentsListContainer');
             if (!container) return;
             const list = getMergedCommentsForSlot(slotKey);
+            const pendingList = adminPrivateKey ? getPendingCommentsForSlot(slotKey) : [];
 
             container.innerHTML = '';
+
+            const frag = document.createDocumentFragment();
+
+            if (adminPrivateKey && pendingList.length > 0) {
+                const pendingHeader = document.createElement('div');
+                pendingHeader.className = "text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5 pt-1";
+                pendingHeader.innerHTML = `<i class="fa-solid fa-clock text-[10px]" aria-hidden="true"></i><span>Onay Bekleyenler (${pendingList.length})</span>`;
+                frag.appendChild(pendingHeader);
+
+                pendingList.forEach(item => {
+                    frag.appendChild(createCommentCardDOM(item, 'pending'));
+                });
+
+                const divider = document.createElement('div');
+                divider.className = "border-b border-white/[0.08] my-1";
+                frag.appendChild(divider);
+            }
 
             if (list.length === 0) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = "py-12 px-4 rounded-2xl bg-[#050507] border border-white/[0.07] text-center flex flex-col items-center justify-center gap-2 my-auto";
                 emptyDiv.innerHTML = `
                     <i class="fa-regular fa-comment-dots text-xl text-textMuted" aria-hidden="true"></i>
-                    <div class="text-xs font-semibold text-white">Henüz yorum yapılmamış</div>
+                    <div class="text-xs font-semibold text-white">Henüz onaylanmış yorum yok</div>
                     <p class="text-[11px] text-textMuted max-w-xs">Bu öğün için ilk değerlendirmeyi aşağıdan ekleyebilirsiniz.</p>
                 `;
-                container.appendChild(emptyDiv);
+                frag.appendChild(emptyDiv);
+                container.appendChild(frag);
                 return;
             }
 
-            const frag = document.createDocumentFragment();
             list.forEach((item) => {
-                const card = document.createElement('article');
-                card.className = "rounded-2xl bg-[#050507] border border-white/[0.08] p-3.5 space-y-2 shrink-0";
-
-                const topRow = document.createElement('div');
-                topRow.className = "flex items-center justify-between gap-2";
-
-                const userWrap = document.createElement('div');
-                userWrap.className = "flex items-center gap-1.5 sm:gap-2 min-w-0";
-
-                const avatar = document.createElement('span');
-                avatar.className = "w-6 h-6 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[11px] font-bold flex items-center justify-center shrink-0 uppercase";
-                const authorName = (item.author || "Anonim").trim();
-                avatar.textContent = authorName.charAt(0) || "A";
-
-                const nameSpan = document.createElement('span');
-                nameSpan.className = "text-xs font-bold text-white truncate";
-                nameSpan.textContent = authorName;
-
-                userWrap.appendChild(avatar);
-                userWrap.appendChild(nameSpan);
-
-                // Small star icon + score out of 5 right next to the user's name
-                const ratingNum = Number(item.rating);
-                if (Number.isFinite(ratingNum) && ratingNum >= 1 && ratingNum <= 5) {
-                    const starBadge = document.createElement('span');
-                    starBadge.className = "rating-badge-amber inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 shrink-0";
-
-                    const starIcon = document.createElement('i');
-                    starIcon.className = "fa-solid fa-star text-[9px] text-amber-400";
-                    starIcon.setAttribute('aria-hidden', 'true');
-
-                    const scoreSpan = document.createElement('span');
-                    scoreSpan.textContent = `${ratingNum}/5`;
-
-                    starBadge.appendChild(starIcon);
-                    starBadge.appendChild(scoreSpan);
-                    userWrap.appendChild(starBadge);
-                }
-
-                const timeSpan = document.createElement('span');
-                timeSpan.className = "text-[10px] text-textMuted shrink-0";
-                timeSpan.textContent = item.time || "";
-
-                topRow.appendChild(userWrap);
-                topRow.appendChild(timeSpan);
-                card.appendChild(topRow);
-
-                if (item.text && item.text.trim()) {
-                    const p = document.createElement('p');
-                    p.className = "text-xs text-zinc-300 leading-relaxed break-words";
-                    p.textContent = item.text;
-                    card.appendChild(p);
-                }
-
-                if (isValidCommentImageSrc(item.img)) {
-                    const imgWrap = document.createElement('div');
-                    imgWrap.className = "mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-black/50 max-w-xs";
-
-                    const imgEl = document.createElement('img');
-                    imgEl.src = item.img;
-                    imgEl.alt = `${authorName} tarafından paylaşılan görsel`;
-                    imgEl.loading = "lazy";
-                    imgEl.width = 400;
-                    imgEl.height = 300;
-                    imgEl.className = "w-full max-h-64 object-contain";
-
-                    if (item.img.startsWith('https://ntfy.sh/file/')) {
-                        const imgLink = document.createElement('a');
-                        imgLink.href = item.img;
-                        imgLink.target = '_blank';
-                        imgLink.rel = 'noopener noreferrer';
-                        imgLink.className = "block";
-                        imgLink.appendChild(imgEl);
-                        imgWrap.appendChild(imgLink);
-                    } else {
-                        imgWrap.appendChild(imgEl);
-                    }
-                    card.appendChild(imgWrap);
-                }
-
-                frag.appendChild(card);
+                frag.appendChild(createCommentCardDOM(item, 'approved'));
             });
 
             container.appendChild(frag);
@@ -2208,30 +2527,80 @@
 
             try {
                 const resp = await fetch(`https://ntfy.sh/${topic}/json?poll=1&since=all`);
-                if (!resp.ok) return;
-                const text = await resp.text();
-                const parsed = [];
-                for (const line of text.split('\n')) {
-                    if (!line.trim()) continue;
-                    try {
-                        const ev = JSON.parse(line);
-                        if (ev.event !== 'message' || !ev.message) continue;
-                        const cObj = JSON.parse(ev.message);
-                        if (cObj && typeof cObj === 'object') {
+                if (resp.ok) {
+                    const text = await resp.text();
+                    const verifiedApproved = [];
+                    const deletedIds = new Set();
+
+                    for (const line of text.split('\n')) {
+                        if (!line.trim()) continue;
+                        try {
+                            const ev = JSON.parse(line);
+                            if (ev.event !== 'message' || !ev.message) continue;
+                            const cObj = JSON.parse(ev.message);
+                            if (!cObj || typeof cObj !== 'object') continue;
+
+                            if (cObj.action === 'delete' && cObj.targetId && cObj.sig) {
+                                const okDel = await verifyAdminSignature(`DELETE|${slotKey}|${cObj.targetId}`, cObj.sig);
+                                if (okDel) deletedIds.add(String(cObj.targetId));
+                                continue;
+                            }
+
                             cObj.id = cObj.id || ev.id;
-                            parsed.push(cObj);
-                        }
-                    } catch (err) {}
-                }
-                liveCommentsCache[slotKey] = parsed;
-                if (getCurrentCommentSlotKey() === slotKey) {
-                    updateMenuCommentBarUI(slotKey);
-                    const dialog = document.getElementById('commentsDialog');
-                    if (dialog && dialog.open) {
-                        renderCommentsModalList(slotKey);
+                            const cleanItem = sanitizeCommentObject(cObj, true);
+                            if (!cleanItem || !cleanItem.sig) continue;
+
+                            const okSig = await verifyAdminSignature(buildApprovalPayload(slotKey, cleanItem), cleanItem.sig);
+                            if (okSig) {
+                                verifiedApproved.push(cleanItem);
+                            }
+                        } catch (err) {}
                     }
+                    deletedCommentIdsCache[slotKey] = deletedIds;
+                    liveCommentsCache[slotKey] = verifiedApproved;
                 }
             } catch (e) {}
+
+            if (adminPrivateKey) {
+                const pendingTopic = getCurrentPendingTopic();
+                try {
+                    const pResp = await fetch(`https://ntfy.sh/${pendingTopic}/json?poll=1&since=all`);
+                    if (pResp.ok) {
+                        const pText = await pResp.text();
+                        const rawPending = [];
+                        const dismissedIds = new Set();
+
+                        for (const line of pText.split('\n')) {
+                            if (!line.trim()) continue;
+                            try {
+                                const ev = JSON.parse(line);
+                                if (ev.event !== 'message' || !ev.message) continue;
+                                const pObj = JSON.parse(ev.message);
+                                if (!pObj || typeof pObj !== 'object') continue;
+
+                                if (pObj.action === 'dismiss' && pObj.targetId && pObj.sig) {
+                                    const okDis = await verifyAdminSignature(`DISMISS|${slotKey}|${pObj.targetId}`, pObj.sig);
+                                    if (okDis) dismissedIds.add(String(pObj.targetId));
+                                    continue;
+                                }
+
+                                pObj.id = pObj.id || ev.id;
+                                rawPending.push(pObj);
+                            } catch (err) {}
+                        }
+                        dismissedPendingIdsCache[slotKey] = dismissedIds;
+                        pendingCommentsCache[slotKey] = rawPending;
+                    }
+                } catch (e) {}
+            }
+
+            if (getCurrentCommentSlotKey() === slotKey) {
+                updateMenuCommentBarUI(slotKey);
+                const dialog = document.getElementById('commentsDialog');
+                if (dialog && dialog.open) {
+                    renderCommentsModalList(slotKey);
+                }
+            }
         }
 
         function openCommentsModal() {
@@ -2324,7 +2693,7 @@
                 return;
             }
 
-            if (RESERVED_AUTHOR_PATTERN.test(author)) {
+            if (!adminPrivateKey && RESERVED_AUTHOR_PATTERN.test(author)) {
                 statusEl.textContent = "Bu isim kullanılamaz, lütfen başka bir isim seçin.";
                 authorInput.focus();
                 return;
@@ -2336,21 +2705,23 @@
                 return;
             }
 
-            // Anti-spam Cooldown (25 seconds between comments)
+            // Anti-spam Cooldown (25 seconds between comments for regular users)
             const nowMs = Date.now();
-            try {
-                const lastTs = parseInt(localStorage.getItem('yuyemekhane_last_comment_ts') || '0', 10);
-                const diffSec = Math.ceil((25000 - (nowMs - lastTs)) / 1000);
-                if (diffSec > 0) {
-                    statusEl.textContent = `Spam koruması: ${diffSec} sn bekleyin.`;
-                    return;
-                }
-                const lastText = localStorage.getItem('yuyemekhane_last_comment_txt') || '';
-                if (text && text === lastText && !pendingMemeBlob) {
-                    statusEl.textContent = "Aynı yorumu tekrar gönderemezsiniz.";
-                    return;
-                }
-            } catch (err) {}
+            if (!adminPrivateKey) {
+                try {
+                    const lastTs = parseInt(localStorage.getItem('yuyemekhane_last_comment_ts') || '0', 10);
+                    const diffSec = Math.ceil((25000 - (nowMs - lastTs)) / 1000);
+                    if (diffSec > 0) {
+                        statusEl.textContent = `Spam koruması: ${diffSec} sn bekleyin.`;
+                        return;
+                    }
+                    const lastText = localStorage.getItem('yuyemekhane_last_comment_txt') || '';
+                    if (text && text === lastText && !pendingMemeBlob) {
+                        statusEl.textContent = "Aynı yorumu tekrar gönderemezsiniz.";
+                        return;
+                    }
+                } catch (err) {}
+            }
 
             submitBtn.disabled = true;
             statusEl.textContent = "Gönderiliyor...";
@@ -2374,6 +2745,7 @@
                 }
 
                 const nowTimeStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                const slotKey = getCurrentCommentSlotKey();
                 const commentObj = {
                     id: `c_${nowMs}_${Math.random().toString(36).slice(2, 7)}`,
                     author,
@@ -2384,36 +2756,42 @@
                     ts: nowMs
                 };
 
-                const slotKey = getCurrentCommentSlotKey();
-                const topic = getCurrentCommentTopic();
+                if (adminPrivateKey) {
+                    // Admin comments are immediately signed and published to the Approved topic
+                    commentObj.sig = await signAdminPayload(buildApprovalPayload(slotKey, commentObj));
+                    const approvedTopic = getCurrentCommentTopic();
+                    const postResp = await fetch(`https://ntfy.sh/${approvedTopic}`, {
+                        method: 'POST',
+                        body: JSON.stringify(commentObj)
+                    });
+                    if (!postResp.ok) throw new Error("Gönderim başarısız");
 
-                const postResp = await fetch(`https://ntfy.sh/${topic}`, {
-                    method: 'POST',
-                    body: JSON.stringify(commentObj)
-                });
+                    if (!liveCommentsCache[slotKey]) liveCommentsCache[slotKey] = [];
+                    liveCommentsCache[slotKey].push(commentObj);
+                    updateMenuCommentBarUI(slotKey);
+                    renderCommentsModalList(slotKey);
+                    showToast("Yorumun doğrudan yayınlandı!");
+                } else {
+                    // Regular users send comments to the Pending moderation queue
+                    const pendingTopic = getCurrentPendingTopic();
+                    const postResp = await fetch(`https://ntfy.sh/${pendingTopic}`, {
+                        method: 'POST',
+                        body: JSON.stringify(commentObj)
+                    });
+                    if (!postResp.ok) throw new Error("Gönderim başarısız");
 
-                if (!postResp.ok) throw new Error("Gönderim başarısız");
+                    try {
+                        sessionStorage.setItem('yuyemekhane_nick', author);
+                        localStorage.setItem('yuyemekhane_last_comment_ts', String(nowMs));
+                        if (text) localStorage.setItem('yuyemekhane_last_comment_txt', text);
+                    } catch (err) {}
 
-                try {
-                    sessionStorage.setItem('yuyemekhane_nick', author);
-                    localStorage.setItem('yuyemekhane_last_comment_ts', String(nowMs));
-                    if (text) localStorage.setItem('yuyemekhane_last_comment_txt', text);
-
-                    const localKey = `yuyemekhane_local_c_${slotKey}`;
-                    const prevLocal = JSON.parse(localStorage.getItem(localKey) || '[]');
-                    prevLocal.push(commentObj);
-                    localStorage.setItem(localKey, JSON.stringify(prevLocal.slice(-20)));
-                } catch (err) {}
-
-                if (!liveCommentsCache[slotKey]) liveCommentsCache[slotKey] = [];
-                liveCommentsCache[slotKey].push(commentObj);
+                    showToast("Yorumun onaya gönderildi!");
+                }
 
                 textInput.value = "";
                 clearSelectedCommentImage();
                 statusEl.textContent = "";
-                updateMenuCommentBarUI(slotKey);
-                renderCommentsModalList(slotKey);
-                showToast("Yorumun paylaşıldı!");
             } catch (err) {
                 statusEl.textContent = "Bağlantı hatası, tekrar deneyin.";
             } finally {
@@ -2462,6 +2840,7 @@
             const initialTheme = document.documentElement.getAttribute('data-theme') || 'dark';
             applyTheme(initialTheme, false);
             syncMealUI(currentMeal);
+            await restoreAdminSession();
 
             if (window.__VERI_DATA__) {
                 applyPayload(window.__VERI_DATA__);
@@ -2563,6 +2942,40 @@
         document.getElementById('mobileTabAnnouncements').addEventListener('click', () => setMobileTab('announcements'));
 
         document.getElementById('openCommentsBtn').addEventListener('click', openCommentsModal);
+        document.getElementById('commentsDialogTitle').addEventListener('click', () => {
+            adminTitleTapStreak++;
+            if (adminTitleTapStreak >= 5) {
+                adminTitleTapStreak = 0;
+                if (adminPrivateKey) {
+                    logoutAdmin();
+                } else {
+                    const loginBar = document.getElementById('adminLoginBar');
+                    loginBar.classList.toggle('hidden');
+                    loginBar.classList.toggle('flex');
+                    if (loginBar.classList.contains('flex')) {
+                        document.getElementById('adminPassInput').focus();
+                    }
+                }
+            }
+        });
+        document.getElementById('adminActiveBadgeBtn').addEventListener('click', logoutAdmin);
+        document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+            const passInput = document.getElementById('adminPassInput');
+            try {
+                await unlockAdminWithPassword(passInput.value);
+                passInput.value = "";
+                showToast("Yönetici modu aktif!");
+                await syncCommentsForCurrentSlot();
+            } catch (e) {
+                showToast("Hatalı yönetici şifresi");
+            }
+        });
+        document.getElementById('adminPassInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('adminLoginBtn').click();
+            }
+        });
         document.querySelectorAll('.star-select-btn').forEach(btn => {
             btn.addEventListener('click', () => setSelectedCommentRating(btn.dataset.star));
         });
