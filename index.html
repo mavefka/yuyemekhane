@@ -90,6 +90,11 @@
             scrollbar-width: none;
         }
 
+        html, body {
+            max-width: 100%;
+            overflow-x: clip;
+        }
+
         body {
             background-color: #000000;
             background-image:
@@ -99,7 +104,6 @@
             background-size: cover;
             background-position: center center;
             -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
             transition: background-color 0.35s ease, color 0.25s ease;
         }
 
@@ -555,29 +559,26 @@
 
 <body class="text-textMain font-sans flex flex-col min-h-screen selection:bg-white selection:text-black">
 
-    <!-- Minimalist Top Header: Logo + Mobile Tab Switcher + Theme Toggle + GitHub Icon -->
+    <!-- Minimalist Top Header: Logo + Mobile Icon Tab Switcher + Theme Toggle + GitHub Icon -->
     <header id="topHeader" class="sticky top-0 z-30 border-b border-white/[0.08] bg-black/85 backdrop-blur-2xl">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex justify-between items-center gap-2">
-            <div class="flex items-center shrink-0">
+        <div class="max-w-6xl mx-auto px-3.5 sm:px-6 h-16 grid grid-cols-3 lg:flex lg:justify-between items-center">
+            <div class="flex items-center justify-self-start shrink-0">
                 <h1 class="sr-only">Yalova Üniversitesi Yemekhane ve Duyurular</h1>
-                <img id="headerLogo" src="logo.png" alt="Yalova Üniversitesi Logosu" width="48" height="48" fetchpriority="high" class="h-10 sm:h-11 w-auto object-contain transition-all duration-300" style="filter: brightness(0) invert(1);">
+                <img id="headerLogo" src="logo.png" alt="Yalova Üniversitesi Logosu" width="48" height="48" fetchpriority="high" class="h-9 sm:h-11 w-auto object-contain transition-all duration-300" style="filter: brightness(0) invert(1);">
             </div>
 
-            <!-- Mobile View Switcher (Pill Segmented Control) -->
-            <nav id="mobileNavBar" aria-label="Bölüm Seçici" class="flex lg:hidden items-center p-1 rounded-full bg-[#050507] border border-white/[0.1]">
-                <button type="button" id="mobileTabMenu" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center gap-1.5">
-                    <i class="fa-solid fa-utensils text-[10px]" aria-hidden="true"></i>
-                    <span>Menü</span>
+            <!-- Mobile View Switcher (Icon-Only Pill Segmented Control, Centered) -->
+            <nav id="mobileNavBar" aria-label="Bölüm Seçici" class="flex lg:hidden items-center justify-self-center p-1 rounded-full bg-[#050507] border border-white/[0.1]">
+                <button type="button" id="mobileTabMenu" aria-label="Yemek Menüsü" title="Yemek Menüsü" class="w-11 h-8 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center justify-center">
+                    <i class="fa-solid fa-utensils text-xs" aria-hidden="true"></i>
                 </button>
-                <button type="button" id="mobileTabAnnouncements" class="px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center gap-1.5">
-                    <i class="fa-solid fa-bullhorn text-[10px]" aria-hidden="true"></i>
-                    <span>Duyurular</span>
-                    <span id="mobileAnnouncementBadge" class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/10 text-white">0</span>
+                <button type="button" id="mobileTabAnnouncements" aria-label="Duyurular" title="Duyurular" class="w-11 h-8 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-bullhorn text-xs" aria-hidden="true"></i>
                 </button>
             </nav>
 
             <!-- Theme Toggle (Left of GitHub) + GitHub Icon -->
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center justify-self-end gap-1.5 sm:gap-2 shrink-0">
                 <button type="button" id="themeToggleBtn" aria-label="Gece / Gündüz Temasını Değiştir" title="Gece / Gündüz Teması" class="header-icon-btn w-9 h-9 rounded-full flex items-center justify-center text-textSecondary hover:text-white bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.09] transition active:scale-95">
                     <i id="themeToggleIcon" class="fa-solid fa-sun text-sm transition-transform duration-300" aria-hidden="true"></i>
                 </button>
@@ -619,7 +620,7 @@
                             </span>
                             <span class="text-[11px] sm:text-xs text-textMuted font-medium" id="fullDateSubtext">...</span>
                         </div>
-                        <h2 id="dayTitle" class="text-xl sm:text-2xl font-bold capitalize tracking-tight text-white leading-tight truncate">
+                        <h2 id="dayTitle" class="text-lg sm:text-2xl font-bold capitalize tracking-tight text-white leading-snug">
                             Yükleniyor...
                         </h2>
                     </div>
@@ -780,7 +781,7 @@
     </main>
 
     <!-- Floating Bottom Pill Dock + Anchored Responsive Calendar Popup -->
-    <footer class="fixed bottom-4 sm:bottom-5 left-0 right-0 z-40 pointer-events-none flex justify-center px-3">
+    <footer class="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom,1rem))] sm:bottom-5 inset-x-0 z-40 pointer-events-none flex justify-center px-3">
         <div id="bottomDockPill" class="relative pointer-events-auto flex items-center gap-1 sm:gap-1.5 p-1.5 rounded-full bg-black/90 backdrop-blur-2xl border border-white/[0.14] shadow-[0_20px_50px_rgba(0,0,0,0.95)]">
 
             <!-- Calendar Popup: Grows Responsively Upwards from the Bottom Date Text -->
@@ -1305,7 +1306,6 @@
             });
 
             document.getElementById('announcementCountBadge').innerText = `${announcementsData.length} duyuru`;
-            document.getElementById('mobileAnnouncementBadge').innerText = announcementsData.length;
 
             container.innerHTML = '';
 
@@ -1667,15 +1667,15 @@
                 menuSec.classList.add('flex');
                 annSec.classList.add('hidden');
                 annSec.classList.remove('flex');
-                btnMenu.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center gap-1.5";
-                btnAnn.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center gap-1.5";
+                btnMenu.className = "w-11 h-8 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center justify-center";
+                btnAnn.className = "w-11 h-8 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center justify-center";
             } else {
                 menuSec.classList.add('hidden');
                 menuSec.classList.remove('flex');
                 annSec.classList.remove('hidden');
                 annSec.classList.add('flex');
-                btnAnn.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center gap-1.5";
-                btnMenu.className = "px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center gap-1.5";
+                btnAnn.className = "w-11 h-8 rounded-full text-xs font-semibold transition-all duration-200 bg-white text-black shadow-sm flex items-center justify-center";
+                btnMenu.className = "w-11 h-8 rounded-full text-xs font-semibold transition-all duration-200 text-textSecondary hover:text-white flex items-center justify-center";
             }
         }
 
