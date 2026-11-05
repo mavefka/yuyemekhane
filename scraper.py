@@ -2,9 +2,10 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import urllib3
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import urljoin, unquote, urlparse
 import re
+import base64
 
 # SSL sertifika uyarılarını gizle
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -359,21 +360,73 @@ def fetch_and_combine_menus():
     # Üniversite duyurularını çek
     announcements_list = fetch_announcements(session)
 
-    # Eğer duyuru çekilemezse mevcut veri.json içindeki eski duyuruları koru (fallback)
+    # Mevcut veri.json dosyasını oku (eski duyuru ve arşivlenmiş yorumları korumak için)
+    old_data = {}
+    try:
+        with open('veri.json', 'r', encoding='utf-8') as old_f:
+            old_data = json.load(old_f)
+    except Exception:
+        old_data = {}
+
     if not announcements_list:
-        try:
-            with open('veri.json', 'r', encoding='utf-8') as old_f:
-                old_data = json.load(old_f)
-                announcements_list = old_data.get('announcements', [])
-        except Exception:
-            pass
+        announcements_list = old_data.get('announcements', [])
+
+    # Yorumları senkronize et ve kalıcı olarak arşivle (bugün + gelecek 8 gün)
+    comments_archive = old_data.get('comments', {}) if isinstance(old_data.get('comments'), dict) else {}
+    now_dt = datetime.now()
+    target_comment_dates = [(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-1, 9)]
+
+    for c_date in target_comment_dates:
+        for meal_key in ("ogle", "aksam"):
+            slot_key = f"{c_date}_{meal_key}"
+            topic = f"yuyemekhane_c_{c_date.replace('-', '_')}_{meal_key}"
+            existing_list = comments_archive.get(slot_key, [])
+            seen_ids = {item.get("id") for item in existing_list if isinstance(item, dict) and item.get("id")}
+
+            try:
+                resp = session.get(f"https://ntfy.sh/{topic}/json?poll=1&since=all", timeout=6)
+                if resp.status_code == 200 and resp.text.strip():
+                    for line in resp.text.strip().splitlines():
+                        try:
+                            ev = json.loads(line)
+                            if ev.get("event") != "message":
+                                continue
+                            msg_raw = ev.get("message", "")
+                            c_obj = json.loads(msg_raw)
+                            if not isinstance(c_obj, dict):
+                                continue
+                            c_id = c_obj.get("id") or ev.get("id")
+                            if not c_id or c_id in seen_ids:
+                                continue
+
+                            img_val = c_obj.get("img", "")
+                            if isinstance(img_val, str) and img_val.startswith("https://ntfy.sh/file/"):
+                                try:
+                                    img_resp = session.get(img_val, timeout=6)
+                                    if img_resp.status_code == 200 and len(img_resp.content) < 90000:
+                                        b64_str = base64.b64encode(img_resp.content).decode('ascii')
+                                        c_obj["img"] = f"data:image/webp;base64,{b64_str}"
+                                except Exception:
+                                    pass
+
+                            c_obj["id"] = c_id
+                            existing_list.append(c_obj)
+                            seen_ids.add(c_id)
+                        except Exception:
+                            continue
+            except Exception:
+                pass
+
+            if existing_list:
+                comments_archive[slot_key] = existing_list[-50:]
 
     guncel_zaman = datetime.now().strftime("%d.%m.%Y")
 
     final_output = {
         "last_updated": guncel_zaman,
         "menus": combined_database,
-        "announcements": announcements_list
+        "announcements": announcements_list,
+        "comments": comments_archive
     }
 
     with open('veri.json', 'w', encoding='utf-8') as f:

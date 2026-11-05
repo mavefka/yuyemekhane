@@ -91,6 +91,18 @@
             scrollbar-width: none;
         }
 
+        .visually-hidden {
+            position: absolute;
+            clip-path: inset(50%);
+            overflow: hidden;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+            white-space: nowrap;
+        }
+
         html, body {
             max-width: 100%;
             overflow-x: clip;
@@ -291,7 +303,8 @@
 
         html[data-theme="light"] #calendarModal,
         html[data-theme="light"] #aiMenu,
-        html[data-theme="light"] #announcementDialog {
+        html[data-theme="light"] #announcementDialog,
+        html[data-theme="light"] #commentsDialog {
             background: linear-gradient(145deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 251, 255, 0.78) 100%) !important;
             backdrop-filter: blur(36px) saturate(200%) !important;
             -webkit-backdrop-filter: blur(36px) saturate(200%) !important;
@@ -303,9 +316,34 @@
         }
 
         html[data-theme="light"] #annDialogHeader,
-        html[data-theme="light"] #annDialogFooter {
+        html[data-theme="light"] #annDialogFooter,
+        html[data-theme="light"] #commentsDialogHeader,
+        html[data-theme="light"] #commentForm {
             background: rgba(255, 255, 255, 0.65) !important;
             border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+
+        html[data-theme="light"] #openCommentsBtn,
+        html[data-theme="light"] #commentsListContainer > article,
+        html[data-theme="light"] #commentsListContainer > div {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.48) 100%) !important;
+            border-color: rgba(255, 255, 255, 0.86) !important;
+            box-shadow: inset 0 1px 0 #ffffff, 0 4px 14px -2px rgba(15, 23, 42, 0.06);
+        }
+        html[data-theme="light"] #openCommentsBtn:hover {
+            background: rgba(255, 255, 255, 0.88) !important;
+        }
+        html[data-theme="light"] #commentAuthorInput,
+        html[data-theme="light"] #commentTextInput,
+        html[data-theme="light"] #commentImageLabel {
+            background: rgba(255, 255, 255, 0.72) !important;
+            border-color: rgba(15, 23, 42, 0.14) !important;
+            color: #0f172a !important;
+        }
+        html[data-theme="light"] #submitCommentBtn,
+        html[data-theme="light"] #openCommentsActionPill {
+            background: #0f172a !important;
+            color: #ffffff !important;
         }
 
         html[data-theme="light"] dialog[open]:where(:not([data-closing]))::backdrop {
@@ -740,6 +778,26 @@
                         </div>
                     </div>
 
+                    <!-- Interactive Meal Comments & Meme Trigger Bar -->
+                    <button type="button" id="openCommentsBtn" class="mt-4 w-full text-left p-3 sm:p-3.5 rounded-[18px] bg-[#050507] hover:bg-[#0c0c12] border border-white/[0.08] hover:border-white/[0.16] transition flex items-center justify-between gap-3 group">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-9 h-9 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-300 flex items-center justify-center shrink-0">
+                                <i class="fa-regular fa-comments text-xs sm:text-sm" aria-hidden="true"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-semibold text-xs sm:text-sm text-white">Öğün Yorumları & Meme'ler</span>
+                                    <span id="menuCommentsCountBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/[0.08] text-textSecondary">0</span>
+                                </div>
+                                <p id="latestCommentPreview" class="text-[11px] text-textMuted truncate mt-0.5">Bu öğün için ilk yorumu veya meme'i sen bırak!</p>
+                            </div>
+                        </div>
+                        <span id="openCommentsActionPill" class="shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-white text-black group-hover:scale-105 transition flex items-center gap-1.5">
+                            <span>Yorum Yap</span>
+                            <i class="fa-solid fa-chevron-right text-[9px]" aria-hidden="true"></i>
+                        </span>
+                    </button>
+
                     <div class="mt-3 flex flex-wrap justify-between items-center gap-2 text-[11px] text-textMuted">
                         <span><i class="fa-regular fa-clock mr-1" aria-hidden="true"></i>Son Güncelleme: <strong id="lastUpdateSpan" class="text-textSecondary font-medium">Güncelleniyor...</strong></span>
                         <span class="hidden sm:inline">İçindekiler için yemeğe dokunun</span>
@@ -889,6 +947,82 @@
         </div>
     </dialog>
 
+    <!-- Native Modal Dialog: Anonymous Meal Comments & Memes -->
+    <dialog id="commentsDialog" closedby="any" aria-labelledby="commentsDialogTitle" class="m-auto w-[calc(100%-1.25rem)] max-w-xl max-h-[88dvh] rounded-[24px] sm:rounded-[28px] bg-[#030305] text-textMain border border-white/[0.14] shadow-2xl p-0 overflow-hidden">
+        <div class="flex flex-col max-h-[88dvh]">
+            <!-- Sticky Header -->
+            <div id="commentsDialogHeader" class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-white/[0.08] bg-black/90 backdrop-blur-xl flex items-start justify-between gap-3 shrink-0">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <span id="commentsDialogMealBadge" class="px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">Öğle Yemeği</span>
+                        <span id="commentsDialogDateText" class="text-[11px] sm:text-xs text-textMuted">...</span>
+                    </div>
+                    <h2 id="commentsDialogTitle" class="text-sm sm:text-lg font-bold text-white leading-snug">Öğün Yorumları & Meme'ler</h2>
+                </div>
+                <form method="dialog" class="shrink-0">
+                    <button type="submit" aria-label="Yorum penceresini kapat" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/[0.07] hover:bg-white/[0.14] text-textSecondary hover:text-white flex items-center justify-center transition">
+                        <i class="fa-solid fa-xmark text-sm" aria-hidden="true"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Scrollable Comments Feed -->
+            <div id="commentsListContainer" class="px-4 sm:px-6 py-4 overflow-y-auto flex-1 flex flex-col gap-3 min-h-[200px]">
+                <div class="py-10 text-center text-xs text-textMuted">Yorumlar yükleniyor...</div>
+            </div>
+
+            <!-- Sticky Comment & Meme Submission Form -->
+            <form id="commentForm" action="#commentsDialog" method="POST" class="px-4 sm:px-6 py-3.5 border-t border-white/[0.08] bg-black/95 shrink-0 space-y-2.5">
+                <!-- Anti-spam Honeypot -->
+                <input type="text" name="website_url" id="commentHoneypot" class="visually-hidden" tabindex="-1" autocomplete="off">
+
+                <!-- Selected Image / Meme Preview -->
+                <div id="commentImagePreviewWrap" class="hidden items-center justify-between gap-2 p-2 rounded-2xl bg-white/[0.05] border border-white/[0.09]">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <img id="commentImagePreviewEl" src="" alt="Yüklenecek görsel önizlemesi" width="44" height="44" class="w-11 h-11 rounded-xl object-cover border border-white/10 shrink-0">
+                        <div class="min-w-0">
+                            <div class="text-xs font-semibold text-white truncate">Görsel / Meme Eklendi</div>
+                            <div id="commentImageSizeText" class="text-[10px] text-textMuted">Otomatik WebP sıkıştırıldı</div>
+                        </div>
+                    </div>
+                    <button type="button" id="removeCommentImageBtn" aria-label="Görseli kaldır" class="w-7 h-7 rounded-full bg-white/[0.08] hover:bg-white/[0.15] text-textSecondary hover:text-white flex items-center justify-center shrink-0 transition">
+                        <i class="fa-solid fa-xmark text-xs" aria-hidden="true"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <div class="sm:col-span-4">
+                        <label for="commentAuthorInput" class="block text-[10px] font-semibold uppercase tracking-wider text-textMuted mb-1">İsim / Rumuz</label>
+                        <input type="text" id="commentAuthorInput" name="author" required maxlength="28" placeholder="Örn: GurmeÖğrenci" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="next" class="w-full px-3.5 py-2 rounded-2xl bg-[#07070a] border border-white/[0.1] focus:border-white/[0.28] focus:outline-none text-base sm:text-xs text-white placeholder:text-textMuted transition">
+                    </div>
+
+                    <div class="sm:col-span-8">
+                        <label for="commentTextInput" class="block text-[10px] font-semibold uppercase tracking-wider text-textMuted mb-1">Yorumun (veya Meme Açıklaması)</label>
+                        <input type="text" id="commentTextInput" name="comment" maxlength="240" placeholder="Yemekler nasıl? Fikrini yaz..." enterkeyhint="send" class="w-full px-3.5 py-2 rounded-2xl bg-[#07070a] border border-white/[0.1] focus:border-white/[0.28] focus:outline-none text-base sm:text-xs text-white placeholder:text-textMuted transition">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-2 pt-0.5">
+                    <div>
+                        <input type="file" id="commentImageInput" name="meme" accept="image/*" class="visually-hidden">
+                        <label for="commentImageInput" id="commentImageLabel" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-[#07070a] hover:bg-[#121218] border border-white/[0.1] text-xs font-medium text-textSecondary hover:text-white cursor-pointer transition active:scale-95">
+                            <i class="fa-regular fa-image text-xs text-emerald-400" aria-hidden="true"></i>
+                            <span>Resim / Meme Ekle</span>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span id="commentStatusText" aria-live="polite" class="text-[11px] text-textMuted"></span>
+                        <button type="submit" id="submitCommentBtn" class="px-4 py-2 rounded-full text-xs font-semibold bg-white text-black hover:bg-zinc-200 transition flex items-center gap-1.5 active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
+                            <span>Gönder</span>
+                            <i class="fa-solid fa-paper-plane text-[10px]" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
     <!-- Subtle Toast Notification -->
     <div id="toastNotice" role="status" aria-live="polite" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-white text-black font-semibold text-xs shadow-2xl transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none flex items-center gap-2 whitespace-nowrap">
         <i class="fa-solid fa-circle-check text-emerald-600" aria-hidden="true"></i>
@@ -904,6 +1038,10 @@
 
         let mockDatabase = {};
         let announcementsData = [];
+        let commentsArchive = {};
+        let liveCommentsCache = {};
+        let pendingMemeBlob = null;
+        let pendingMemeDataUrl = "";
         let selectedCategory = "all";
         let searchQuery = "";
         let activeMobileTab = "menu";
@@ -1317,6 +1455,8 @@
             const dailyPercent = Math.min(100, Math.round((totalCal / 2000) * 100));
             document.getElementById('calorieContextText').innerText = `• Günlük 2000 kcal referansının %${dailyPercent}'i`;
             document.getElementById('calorieBar').style.width = `${dailyPercent}%`;
+
+            syncCommentsForCurrentSlot();
         }
 
         // --- Category Badge Styling ---
@@ -1736,6 +1876,358 @@
             if (Array.isArray(jsonData.announcements)) {
                 announcementsData = jsonData.announcements;
             }
+
+            if (jsonData.comments && typeof jsonData.comments === 'object') {
+                commentsArchive = jsonData.comments;
+            }
+        }
+
+        // --- Anonymous Meal Comments & Meme System (Real-time ntfy.sh + GitHub Actions Archive) ---
+        function getCurrentCommentSlotKey() {
+            const dateStr = formatDate(currentDate);
+            return `${dateStr}_${currentMeal}`;
+        }
+
+        function getCurrentCommentTopic() {
+            const dateStr = formatDate(currentDate).replace(/-/g, '_');
+            return `yuyemekhane_c_${dateStr}_${currentMeal}`;
+        }
+
+        function getMergedCommentsForSlot(slotKey) {
+            const archived = Array.isArray(commentsArchive[slotKey]) ? commentsArchive[slotKey] : [];
+            const live = Array.isArray(liveCommentsCache[slotKey]) ? liveCommentsCache[slotKey] : [];
+            let localSaved = [];
+            try {
+                const rawLocal = localStorage.getItem(`yuyemekhane_local_c_${slotKey}`);
+                if (rawLocal) localSaved = JSON.parse(rawLocal) || [];
+            } catch (e) {}
+
+            const seen = new Set();
+            const merged = [];
+            for (const item of [...archived, ...live, ...localSaved]) {
+                if (!item || typeof item !== 'object') continue;
+                const cid = item.id || `${item.author}_${item.ts || item.time}_${item.text}`;
+                if (seen.has(cid)) continue;
+                seen.add(cid);
+                merged.push(item);
+            }
+            merged.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+            return merged;
+        }
+
+        function updateMenuCommentBarUI(slotKey) {
+            const list = getMergedCommentsForSlot(slotKey);
+            const badgeEl = document.getElementById('menuCommentsCountBadge');
+            const previewEl = document.getElementById('latestCommentPreview');
+            if (!badgeEl || !previewEl) return;
+
+            badgeEl.textContent = `${list.length}`;
+            if (list.length === 0) {
+                previewEl.textContent = "Bu öğün için ilk yorumu veya meme'i sen bırak!";
+            } else {
+                const last = list[list.length - 1];
+                const author = last.author || "Anonim";
+                const snippet = last.text
+                    ? `${author}: ${last.text}`
+                    : `${author} bir meme / görsel paylaştı 🖼️`;
+                previewEl.textContent = snippet;
+            }
+        }
+
+        function renderCommentsModalList(slotKey) {
+            const container = document.getElementById('commentsListContainer');
+            if (!container) return;
+            const list = getMergedCommentsForSlot(slotKey);
+
+            container.innerHTML = '';
+
+            if (list.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = "py-12 px-4 rounded-2xl bg-[#050507] border border-white/[0.07] text-center flex flex-col items-center justify-center gap-2 my-auto";
+                emptyDiv.innerHTML = `
+                    <i class="fa-regular fa-comment-dots text-xl text-textMuted" aria-hidden="true"></i>
+                    <div class="text-xs font-semibold text-white">Henüz yorum yapılmamış</div>
+                    <p class="text-[11px] text-textMuted max-w-xs">Bu günün menüsü hakkında ilk yorumu veya komik meme'i aşağıdan sen paylaşabilirsin.</p>
+                `;
+                container.appendChild(emptyDiv);
+                return;
+            }
+
+            const frag = document.createDocumentFragment();
+            list.forEach((item) => {
+                const card = document.createElement('article');
+                card.className = "rounded-2xl bg-[#050507] border border-white/[0.08] p-3.5 space-y-2 shrink-0";
+
+                const topRow = document.createElement('div');
+                topRow.className = "flex items-center justify-between gap-2";
+
+                const userWrap = document.createElement('div');
+                userWrap.className = "flex items-center gap-2 min-w-0";
+
+                const avatar = document.createElement('span');
+                avatar.className = "w-6 h-6 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[11px] font-bold flex items-center justify-center shrink-0 uppercase";
+                const authorName = (item.author || "Anonim").trim();
+                avatar.textContent = authorName.charAt(0) || "A";
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = "text-xs font-bold text-white truncate";
+                nameSpan.textContent = authorName;
+
+                userWrap.appendChild(avatar);
+                userWrap.appendChild(nameSpan);
+
+                const timeSpan = document.createElement('span');
+                timeSpan.className = "text-[10px] text-textMuted shrink-0";
+                timeSpan.textContent = item.time || "";
+
+                topRow.appendChild(userWrap);
+                topRow.appendChild(timeSpan);
+                card.appendChild(topRow);
+
+                if (item.text && item.text.trim()) {
+                    const p = document.createElement('p');
+                    p.className = "text-xs text-zinc-300 leading-relaxed break-words";
+                    p.textContent = item.text;
+                    card.appendChild(p);
+                }
+
+                if (item.img && typeof item.img === 'string' && (item.img.startsWith('https://ntfy.sh/file/') || item.img.startsWith('data:image/'))) {
+                    const imgLink = document.createElement('a');
+                    imgLink.href = item.img;
+                    imgLink.target = '_blank';
+                    imgLink.rel = 'noopener noreferrer';
+                    imgLink.className = "block mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-black/50 max-w-xs";
+
+                    const imgEl = document.createElement('img');
+                    imgEl.src = item.img;
+                    imgEl.alt = `${authorName} tarafından paylaşılan görsel`;
+                    imgEl.loading = "lazy";
+                    imgEl.width = 400;
+                    imgEl.height = 300;
+                    imgEl.className = "w-full max-h-64 object-contain";
+
+                    imgLink.appendChild(imgEl);
+                    card.appendChild(imgLink);
+                }
+
+                frag.appendChild(card);
+            });
+
+            container.appendChild(frag);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function syncCommentsForCurrentSlot() {
+            const slotKey = getCurrentCommentSlotKey();
+            const topic = getCurrentCommentTopic();
+            updateMenuCommentBarUI(slotKey);
+
+            try {
+                const resp = await fetch(`https://ntfy.sh/${topic}/json?poll=1&since=all`);
+                if (!resp.ok) return;
+                const text = await resp.text();
+                const parsed = [];
+                for (const line of text.split('\n')) {
+                    if (!line.trim()) continue;
+                    try {
+                        const ev = JSON.parse(line);
+                        if (ev.event !== 'message' || !ev.message) continue;
+                        const cObj = JSON.parse(ev.message);
+                        if (cObj && typeof cObj === 'object') {
+                            cObj.id = cObj.id || ev.id;
+                            parsed.push(cObj);
+                        }
+                    } catch (err) {}
+                }
+                liveCommentsCache[slotKey] = parsed;
+                if (getCurrentCommentSlotKey() === slotKey) {
+                    updateMenuCommentBarUI(slotKey);
+                    const dialog = document.getElementById('commentsDialog');
+                    if (dialog && dialog.open) {
+                        renderCommentsModalList(slotKey);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function openCommentsModal() {
+            const dialog = document.getElementById('commentsDialog');
+            const slotKey = getCurrentCommentSlotKey();
+            const mealLabel = currentMeal === 'ogle' ? 'Öğle Yemeği' : 'Akşam Yemeği';
+
+            document.getElementById('commentsDialogMealBadge').textContent = mealLabel;
+            document.getElementById('commentsDialogDateText').textContent = formatDisplayDate(currentDate);
+
+            try {
+                const savedNick = sessionStorage.getItem('yuyemekhane_nick');
+                const authorInput = document.getElementById('commentAuthorInput');
+                if (savedNick && !authorInput.value) {
+                    authorInput.value = savedNick;
+                }
+            } catch (e) {}
+
+            renderCommentsModalList(slotKey);
+            dialog.showModal();
+            syncCommentsForCurrentSlot();
+        }
+
+        function compressImageToWebP(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error("Dosya okunamadı"));
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error("Görsel yüklenemedi"));
+                    img.onload = () => {
+                        const maxDim = 580;
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) {
+                                h = Math.round((h * maxDim) / w);
+                                w = maxDim;
+                            } else {
+                                w = Math.round((w * maxDim) / h);
+                                h = maxDim;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        const fallbackDataUrl = canvas.toDataURL('image/webp', 0.55);
+                        canvas.toBlob((blob) => {
+                            resolve({ blob, dataUrl: fallbackDataUrl });
+                        }, 'image/webp', 0.72);
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function clearSelectedCommentImage() {
+            pendingMemeBlob = null;
+            pendingMemeDataUrl = "";
+            const fileInput = document.getElementById('commentImageInput');
+            if (fileInput) fileInput.value = "";
+            const previewWrap = document.getElementById('commentImagePreviewWrap');
+            if (previewWrap) {
+                previewWrap.classList.add('hidden');
+                previewWrap.classList.remove('flex');
+            }
+        }
+
+        async function submitMealComment(e) {
+            e.preventDefault();
+
+            const honeypot = document.getElementById('commentHoneypot');
+            if (honeypot && honeypot.value) return;
+
+            const statusEl = document.getElementById('commentStatusText');
+            const submitBtn = document.getElementById('submitCommentBtn');
+            const authorInput = document.getElementById('commentAuthorInput');
+            const textInput = document.getElementById('commentTextInput');
+
+            const author = (authorInput.value || "").trim().slice(0, 28);
+            const text = (textInput.value || "").trim().slice(0, 240);
+
+            if (!author || author.length < 2) {
+                statusEl.textContent = "Lütfen en az 2 harfli bir isim yazın.";
+                authorInput.focus();
+                return;
+            }
+
+            if (!text && !pendingMemeBlob && !pendingMemeDataUrl) {
+                statusEl.textContent = "Lütfen bir yorum yazın veya meme ekleyin.";
+                textInput.focus();
+                return;
+            }
+
+            // Anti-spam Cooldown (25 seconds between comments)
+            const nowMs = Date.now();
+            try {
+                const lastTs = parseInt(localStorage.getItem('yuyemekhane_last_comment_ts') || '0', 10);
+                const diffSec = Math.ceil((25000 - (nowMs - lastTs)) / 1000);
+                if (diffSec > 0) {
+                    statusEl.textContent = `Spam koruması: ${diffSec} sn bekleyin.`;
+                    return;
+                }
+                const lastText = localStorage.getItem('yuyemekhane_last_comment_txt') || '';
+                if (text && text === lastText && !pendingMemeBlob) {
+                    statusEl.textContent = "Aynı yorumu tekrar gönderemezsiniz.";
+                    return;
+                }
+            } catch (err) {}
+
+            submitBtn.disabled = true;
+            statusEl.textContent = "Gönderiliyor...";
+
+            let finalImgUrl = "";
+            try {
+                if (pendingMemeBlob) {
+                    const uploadResp = await fetch('https://ntfy.sh/yuyemekhane_img_v1?filename=meme.webp', {
+                        method: 'PUT',
+                        body: pendingMemeBlob
+                    });
+                    if (uploadResp.ok) {
+                        const uploadJson = await uploadResp.json();
+                        if (uploadJson.attachment && uploadJson.attachment.url) {
+                            finalImgUrl = uploadJson.attachment.url;
+                        }
+                    }
+                    if (!finalImgUrl && pendingMemeDataUrl && pendingMemeDataUrl.length < 3500) {
+                        finalImgUrl = pendingMemeDataUrl;
+                    }
+                }
+
+                const nowTimeStr = new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                const commentObj = {
+                    id: `c_${nowMs}_${Math.random().toString(36).slice(2, 7)}`,
+                    author,
+                    text,
+                    img: finalImgUrl,
+                    time: nowTimeStr,
+                    ts: nowMs
+                };
+
+                const slotKey = getCurrentCommentSlotKey();
+                const topic = getCurrentCommentTopic();
+
+                const postResp = await fetch(`https://ntfy.sh/${topic}`, {
+                    method: 'POST',
+                    body: JSON.stringify(commentObj)
+                });
+
+                if (!postResp.ok) throw new Error("Gönderim başarısız");
+
+                try {
+                    sessionStorage.setItem('yuyemekhane_nick', author);
+                    localStorage.setItem('yuyemekhane_last_comment_ts', String(nowMs));
+                    if (text) localStorage.setItem('yuyemekhane_last_comment_txt', text);
+
+                    const localKey = `yuyemekhane_local_c_${slotKey}`;
+                    const prevLocal = JSON.parse(localStorage.getItem(localKey) || '[]');
+                    prevLocal.push(commentObj);
+                    localStorage.setItem(localKey, JSON.stringify(prevLocal.slice(-20)));
+                } catch (err) {}
+
+                if (!liveCommentsCache[slotKey]) liveCommentsCache[slotKey] = [];
+                liveCommentsCache[slotKey].push(commentObj);
+
+                textInput.value = "";
+                clearSelectedCommentImage();
+                statusEl.textContent = "";
+                updateMenuCommentBarUI(slotKey);
+                renderCommentsModalList(slotKey);
+                showToast("Yorumun paylaşıldı!");
+            } catch (err) {
+                statusEl.textContent = "Bağlantı hatası, tekrar deneyin.";
+            } finally {
+                submitBtn.disabled = false;
+            }
         }
 
         // --- Theme Management (Default: AMOLED Dark, Toggle: Apple Liquid Glass Light) ---
@@ -1878,6 +2370,35 @@
 
         document.getElementById('mobileTabMenu').addEventListener('click', () => setMobileTab('menu'));
         document.getElementById('mobileTabAnnouncements').addEventListener('click', () => setMobileTab('announcements'));
+
+        document.getElementById('openCommentsBtn').addEventListener('click', openCommentsModal);
+        document.getElementById('commentForm').addEventListener('submit', submitMealComment);
+        document.getElementById('removeCommentImageBtn').addEventListener('click', clearSelectedCommentImage);
+        document.getElementById('commentImageInput').addEventListener('change', async (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const statusEl = document.getElementById('commentStatusText');
+            statusEl.textContent = "Görsel hazırlanıyor...";
+            try {
+                const { blob, dataUrl } = await compressImageToWebP(file);
+                pendingMemeBlob = blob;
+                pendingMemeDataUrl = dataUrl;
+                document.getElementById('commentImagePreviewEl').src = dataUrl;
+                const kb = blob ? Math.max(1, Math.round(blob.size / 1024)) : 15;
+                document.getElementById('commentImageSizeText').textContent = `Hazır (${kb} KB WebP)`;
+                const previewWrap = document.getElementById('commentImagePreviewWrap');
+                previewWrap.classList.remove('hidden');
+                previewWrap.classList.add('flex');
+                statusEl.textContent = "";
+            } catch (err) {
+                statusEl.textContent = "Görsel işlenemedi.";
+            }
+        });
+        document.querySelectorAll('#commentAuthorInput, #commentTextInput').forEach(inp => {
+            inp.addEventListener('input', () => {
+                document.getElementById('commentStatusText').textContent = "";
+            });
+        });
 
         // Outside click closes anchored calendar and AI dropdown
         document.addEventListener('click', (event) => {
