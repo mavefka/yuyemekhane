@@ -959,7 +959,13 @@
 
     <!-- Native Modal Dialog: Anonymous Meal Comments -->
     <dialog id="commentsDialog" closedby="any" aria-labelledby="commentsDialogTitle" class="m-auto w-[calc(100%-1.25rem)] max-w-xl max-h-[88dvh] rounded-[24px] sm:rounded-[28px] bg-[#030305] text-textMain border border-white/[0.14] shadow-2xl p-0 overflow-hidden">
-        <div class="flex flex-col max-h-[88dvh]">
+        <div class="relative flex flex-col max-h-[88dvh]">
+            <!-- In-Dialog Toast Notification (Visible in Browser Top Layer) -->
+            <div id="dialogToastNotice" role="status" aria-live="polite" class="pointer-events-none absolute top-3.5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-white text-black font-semibold text-xs shadow-2xl transition-all duration-300 opacity-0 -translate-y-2 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-circle-check text-emerald-600" aria-hidden="true"></i>
+                <span id="dialogToastText">Bilgi</span>
+            </div>
+
             <!-- Sticky Header -->
             <div id="commentsDialogHeader" class="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-white/[0.08] bg-black/90 backdrop-blur-xl flex items-start justify-between gap-3 shrink-0">
                 <div class="min-w-0">
@@ -1091,6 +1097,7 @@
         let pendingCommentsCache = {};
         let deletedCommentIdsCache = {};
         let dismissedPendingIdsCache = {};
+        let resolvedImagesCache = {};
         let adminPrivateKey = null;
         let adminPublicKey = null;
         let adminTitleTapStreak = 0;
@@ -1253,15 +1260,34 @@
             });
         }
 
+        let toastHideTimer = null;
         function showToast(message) {
+            clearTimeout(toastHideTimer);
             const toast = document.getElementById('toastNotice');
-            document.getElementById('toastText').innerText = message;
-            toast.classList.remove('opacity-0', '-translate-y-2');
-            toast.classList.add('opacity-100', 'translate-y-0');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', '-translate-y-2');
-                toast.classList.remove('opacity-100', 'translate-y-0');
-            }, 2200);
+            const dlgToast = document.getElementById('dialogToastNotice');
+            const commentsDlg = document.getElementById('commentsDialog');
+
+            if (toast) {
+                document.getElementById('toastText').innerText = message;
+                toast.classList.remove('opacity-0', '-translate-y-2');
+                toast.classList.add('opacity-100', 'translate-y-0');
+            }
+            if (dlgToast && commentsDlg && commentsDlg.open) {
+                document.getElementById('dialogToastText').innerText = message;
+                dlgToast.classList.remove('opacity-0', '-translate-y-2');
+                dlgToast.classList.add('opacity-100', 'translate-y-0');
+            }
+
+            toastHideTimer = setTimeout(() => {
+                if (toast) {
+                    toast.classList.add('opacity-0', '-translate-y-2');
+                    toast.classList.remove('opacity-100', 'translate-y-0');
+                }
+                if (dlgToast) {
+                    dlgToast.classList.add('opacity-0', '-translate-y-2');
+                    dlgToast.classList.remove('opacity-100', 'translate-y-0');
+                }
+            }, 2600);
         }
 
         // --- Turkish Title Case & Ingredient Parser ---
@@ -1982,9 +2008,9 @@
                 y: "xhScBPA2HRfkakF_ogre4OtptGkZKwYb54N5sqK5fdQ",
                 crv: "P-256"
             },
-            saltB64: "pu+LDk86DR9cAxxpXUJ+Cw==",
-            ivB64: "fxGAnlArK32mj2Ul",
-            ctB64: "ad1dZBQcs2BOdoOJcKXEglvVsELehNxWvOBrn2sYKdKRES1c/n9MuEwos4/Mq4Mxa6K6jj43sc3Qh2jHFD28D42f11ZYdsLgahY7KuvI+vAug1awvEdJywNL4an6gA6Wqo+xsAzyJfGjzbw6uUmhWr7mnshrvwkKJ4lck7jZpN8YA6LY33oyw/fogBgqfNOQkBxh2rI3ONizVw=="
+            saltB64: "D15U7yW88eDxS5USqpjqIw==",
+            ivB64: "/rivtVMoQxIw4Dgt",
+            ctB64: "RaCec3MTyFx4Zz93zEeTb5BSZKvuwoAQCatNqcOHkvs04zihnt9nxhF9LAA6nlgLKpegRm5qLqJ2GNwwXwtaHn1yjgQ9PKh3JJjkdbxkUBcKSuuyfQL9plEk6hV/QOwHzMhz6P2siOISWoPh8VGZFD+O0g4D7QUOpMKLDyIHtt9ep0mKnsdNVZCHkDGWzzxiqscl+8St8nDR1g=="
         };
 
         function sliceCodePoints(str, maxLen) {
@@ -2117,8 +2143,73 @@
         function isValidCommentImageSrc(src) {
             if (!src || typeof src !== 'string' || src.length > 110000) return false;
             if (/^https:\/\/ntfy\.sh\/file\/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+)?$/.test(src)) return true;
+            if (/^https:\/\/ntfy\.sh\/yuyemekhane_i_[A-Za-z0-9_-]{6,40}$/.test(src)) return true;
             if (/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(src)) return true;
             return false;
+        }
+
+        async function uploadWebPDataUrlToNtfy(dataUrl) {
+            if (!dataUrl || typeof dataUrl !== 'string') return "";
+            if (dataUrl.length <= 3200) {
+                return dataUrl;
+            }
+            const imgId = `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+            const topicUrl = `https://ntfy.sh/yuyemekhane_i_${imgId}`;
+            const chunkSize = 3500;
+            const chunks = [];
+            for (let i = 0; i < dataUrl.length; i += chunkSize) {
+                chunks.push(dataUrl.slice(i, i + chunkSize));
+            }
+            if (chunks.length > 12) {
+                throw new Error("Görsel boyutu çok büyük");
+            }
+            for (let idx = 0; idx < chunks.length; idx++) {
+                const resp = await fetch(topicUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ i: idx, n: chunks.length, c: chunks[idx] })
+                });
+                if (!resp.ok) throw new Error("Görsel parçası yüklenemedi");
+            }
+            resolvedImagesCache[topicUrl] = dataUrl;
+            return topicUrl;
+        }
+
+        async function fetchChunkedNtfyImageDataUrl(topicUrl) {
+            if (!topicUrl) return "";
+            if (topicUrl.startsWith('data:image/')) return topicUrl;
+            if (resolvedImagesCache[topicUrl]) return resolvedImagesCache[topicUrl];
+            if (!/^https:\/\/ntfy\.sh\/yuyemekhane_i_[A-Za-z0-9_-]{6,40}$/.test(topicUrl)) return "";
+
+            try {
+                const resp = await fetch(`${topicUrl}/json?poll=1&since=all`);
+                if (!resp.ok) return "";
+                const text = await resp.text();
+                const lines = text.split('\n').filter(l => l.trim());
+                const parts = {};
+                let total = 0;
+                for (const ln of lines) {
+                    try {
+                        const ev = JSON.parse(ln);
+                        if (ev.event !== 'message' || !ev.message) continue;
+                        const obj = JSON.parse(ev.message);
+                        const idx = Number(obj.i);
+                        const n = Number(obj.n);
+                        if (Number.isInteger(idx) && idx >= 0 && n > 0 && n <= 12 && typeof obj.c === 'string') {
+                            parts[idx] = obj.c;
+                            total = n;
+                        }
+                    } catch (e) {}
+                }
+                if (total > 0 && Object.keys(parts).length === total) {
+                    let full = "";
+                    for (let i = 0; i < total; i++) full += parts[i];
+                    if (/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(full) && full.length <= 110000) {
+                        resolvedImagesCache[topicUrl] = full;
+                        return full;
+                    }
+                }
+            } catch (e) {}
+            return "";
         }
 
         function sanitizeCommentObject(raw, allowAdminName = false) {
@@ -2235,6 +2326,69 @@
             return result.slice(-30);
         }
 
+        function saveMyPendingCommentForSlot(slotKey, commentObj, localDataUrl = "") {
+            try {
+                const storageKey = `yuyemekhane_my_pending_${slotKey}`;
+                const existingRaw = localStorage.getItem(storageKey);
+                const arr = existingRaw ? JSON.parse(existingRaw) : [];
+                const cleanArr = Array.isArray(arr) ? arr.filter(x => x && x.id !== commentObj.id) : [];
+                const storedEntry = { ...commentObj };
+                if (localDataUrl && commentObj.img) {
+                    resolvedImagesCache[commentObj.img] = localDataUrl;
+                    if (localDataUrl.length <= 32000) {
+                        storedEntry.localDataUrl = localDataUrl;
+                    }
+                }
+                cleanArr.push(storedEntry);
+                localStorage.setItem(storageKey, JSON.stringify(cleanArr.slice(-5)));
+            } catch (e) {}
+        }
+
+        function getMyPendingCommentsForSlot(slotKey) {
+            try {
+                const storageKey = `yuyemekhane_my_pending_${slotKey}`;
+                const existingRaw = localStorage.getItem(storageKey);
+                if (!existingRaw) return [];
+                const arr = JSON.parse(existingRaw);
+                if (!Array.isArray(arr) || arr.length === 0) return [];
+
+                const approvedList = getMergedCommentsForSlot(slotKey);
+                const approvedIds = new Set(approvedList.map(c => c.id));
+                const dismissedSet = dismissedPendingIdsCache[slotKey] instanceof Set ? dismissedPendingIdsCache[slotKey] : new Set();
+                const deletedSet = deletedCommentIdsCache[slotKey] instanceof Set ? deletedCommentIdsCache[slotKey] : new Set();
+
+                const activeMine = [];
+                let changed = false;
+                for (const rawItem of arr) {
+                    if (!rawItem || typeof rawItem !== 'object') {
+                        changed = true;
+                        continue;
+                    }
+                    if (rawItem.localDataUrl && rawItem.img && !resolvedImagesCache[rawItem.img]) {
+                        resolvedImagesCache[rawItem.img] = rawItem.localDataUrl;
+                    }
+                    const item = sanitizeCommentObject(rawItem, false);
+                    if (!item || approvedIds.has(item.id) || dismissedSet.has(item.id) || deletedSet.has(item.id)) {
+                        changed = true;
+                        continue;
+                    }
+                    activeMine.push(rawItem);
+                }
+
+                if (changed) {
+                    if (activeMine.length > 0) {
+                        localStorage.setItem(storageKey, JSON.stringify(activeMine));
+                    } else {
+                        localStorage.removeItem(storageKey);
+                    }
+                }
+
+                return activeMine.map(x => sanitizeCommentObject(x, false)).filter(Boolean);
+            } catch (e) {
+                return [];
+            }
+        }
+
         function setSelectedCommentRating(stars) {
             const r = Math.min(5, Math.max(1, parseInt(stars, 10) || 5));
             selectedCommentRating = r;
@@ -2294,9 +2448,19 @@
             const pendingTopic = getCurrentPendingTopic();
 
             try {
-                const payload = buildApprovalPayload(slotKey, item);
+                let refreshedImg = item.img || "";
+                if (refreshedImg && refreshedImg.startsWith('https://ntfy.sh/yuyemekhane_i_')) {
+                    const dUrl = await fetchChunkedNtfyImageDataUrl(refreshedImg);
+                    if (dUrl) {
+                        try {
+                            refreshedImg = await uploadWebPDataUrlToNtfy(dUrl);
+                        } catch (imgErr) {}
+                    }
+                }
+                const itemToApprove = { ...item, img: refreshedImg };
+                const payload = buildApprovalPayload(slotKey, itemToApprove);
                 const sig = await signAdminPayload(payload);
-                const approvedObj = { ...item, sig };
+                const approvedObj = { ...itemToApprove, sig };
 
                 const postResp = await fetch(`https://ntfy.sh/${approvedTopic}`, {
                     method: 'POST',
@@ -2367,7 +2531,7 @@
 
         function createCommentCardDOM(item, mode = 'approved') {
             const card = document.createElement('article');
-            card.className = mode === 'pending'
+            card.className = (mode === 'pending' || mode === 'my-pending')
                 ? "rounded-2xl bg-amber-500/[0.06] border border-amber-500/30 p-3.5 space-y-2 shrink-0"
                 : "rounded-2xl bg-[#050507] border border-white/[0.08] p-3.5 space-y-2 shrink-0";
 
@@ -2429,6 +2593,11 @@
 
                 rightWrap.appendChild(approveBtn);
                 rightWrap.appendChild(rejectBtn);
+            } else if (mode === 'my-pending') {
+                const pendingBadge = document.createElement('span');
+                pendingBadge.className = "rating-badge-amber inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30";
+                pendingBadge.innerHTML = `<i class="fa-solid fa-clock text-[9px]" aria-hidden="true"></i><span>Onay Bekliyor</span>`;
+                rightWrap.appendChild(pendingBadge);
             } else if (mode === 'approved' && adminPrivateKey) {
                 const delBtn = document.createElement('button');
                 delBtn.type = "button";
@@ -2455,14 +2624,23 @@
                 imgWrap.className = "mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-black/50 max-w-xs";
 
                 const imgEl = document.createElement('img');
-                imgEl.src = item.img;
                 imgEl.alt = `${authorName} tarafından paylaşılan görsel`;
                 imgEl.loading = "lazy";
                 imgEl.width = 400;
                 imgEl.height = 300;
                 imgEl.className = "w-full max-h-64 object-contain";
 
-                if (item.img.startsWith('https://ntfy.sh/file/')) {
+                if (item.img.startsWith('https://ntfy.sh/yuyemekhane_i_')) {
+                    if (resolvedImagesCache[item.img]) {
+                        imgEl.src = resolvedImagesCache[item.img];
+                    } else {
+                        fetchChunkedNtfyImageDataUrl(item.img).then(dUrl => {
+                            if (dUrl) imgEl.src = dUrl;
+                        });
+                    }
+                    imgWrap.appendChild(imgEl);
+                } else if (item.img.startsWith('https://ntfy.sh/file/')) {
+                    imgEl.src = item.img;
                     const imgLink = document.createElement('a');
                     imgLink.href = item.img;
                     imgLink.target = '_blank';
@@ -2471,9 +2649,17 @@
                     imgLink.appendChild(imgEl);
                     imgWrap.appendChild(imgLink);
                 } else {
+                    imgEl.src = item.img;
                     imgWrap.appendChild(imgEl);
                 }
                 card.appendChild(imgWrap);
+            }
+
+            if (mode === 'my-pending') {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = "text-[10px] text-amber-300/85 flex items-center gap-1.5 pt-1.5 border-t border-amber-500/20";
+                noteDiv.innerHTML = `<i class="fa-solid fa-circle-info text-[10px] shrink-0" aria-hidden="true"></i><span>Yorumun yönetici onayına gönderildi. Onaylandığında herkese görünür olacak.</span>`;
+                card.appendChild(noteDiv);
             }
 
             return card;
@@ -2484,6 +2670,7 @@
             if (!container) return;
             const list = getMergedCommentsForSlot(slotKey);
             const pendingList = adminPrivateKey ? getPendingCommentsForSlot(slotKey) : [];
+            const myPendingList = !adminPrivateKey ? getMyPendingCommentsForSlot(slotKey) : [];
 
             container.innerHTML = '';
 
@@ -2502,9 +2689,24 @@
                 const divider = document.createElement('div');
                 divider.className = "border-b border-white/[0.08] my-1";
                 frag.appendChild(divider);
+            } else if (!adminPrivateKey && myPendingList.length > 0) {
+                const myHeader = document.createElement('div');
+                myHeader.className = "text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5 pt-1";
+                myHeader.innerHTML = `<i class="fa-solid fa-clock text-[10px]" aria-hidden="true"></i><span>Gönderdiğin Yorum (${myPendingList.length})</span>`;
+                frag.appendChild(myHeader);
+
+                myPendingList.forEach(item => {
+                    frag.appendChild(createCommentCardDOM(item, 'my-pending'));
+                });
+
+                if (list.length > 0) {
+                    const divider = document.createElement('div');
+                    divider.className = "border-b border-white/[0.08] my-1";
+                    frag.appendChild(divider);
+                }
             }
 
-            if (list.length === 0) {
+            if (list.length === 0 && myPendingList.length === 0) {
                 const emptyDiv = document.createElement('div');
                 emptyDiv.className = "py-12 px-4 rounded-2xl bg-[#050507] border border-white/[0.07] text-center flex flex-col items-center justify-center gap-2 my-auto";
                 emptyDiv.innerHTML = `
@@ -2566,7 +2768,12 @@
                 }
             } catch (e) {}
 
-            if (adminPrivateKey) {
+            let hasLocalPending = false;
+            try {
+                hasLocalPending = Boolean(localStorage.getItem(`yuyemekhane_my_pending_${slotKey}`));
+            } catch (e) {}
+
+            if (adminPrivateKey || hasLocalPending) {
                 const pendingTopic = getCurrentPendingTopic();
                 try {
                     const pResp = await fetch(`https://ntfy.sh/${pendingTopic}/json?poll=1&since=all`);
@@ -2637,7 +2844,7 @@
                     const img = new Image();
                     img.onerror = () => reject(new Error("Görsel yüklenemedi"));
                     img.onload = () => {
-                        const maxDim = 580;
+                        let maxDim = 500;
                         let w = img.width;
                         let h = img.height;
                         if (w > maxDim || h > maxDim) {
@@ -2655,10 +2862,22 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, w, h);
 
-                        const fallbackDataUrl = canvas.toDataURL('image/webp', 0.55);
+                        let quality = 0.68;
+                        let dataUrl = canvas.toDataURL('image/webp', quality);
+                        while (dataUrl.length > 27500 && quality > 0.38) {
+                            quality -= 0.08;
+                            dataUrl = canvas.toDataURL('image/webp', quality);
+                        }
+                        if (dataUrl.length > 27500) {
+                            const scale = 0.75;
+                            canvas.width = Math.max(160, Math.round(w * scale));
+                            canvas.height = Math.max(120, Math.round(h * scale));
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            dataUrl = canvas.toDataURL('image/webp', 0.55);
+                        }
                         canvas.toBlob((blob) => {
-                            resolve({ blob, dataUrl: fallbackDataUrl });
-                        }, 'image/webp', 0.72);
+                            resolve({ blob, dataUrl });
+                        }, 'image/webp', quality);
                     };
                     img.src = ev.target.result;
                 };
@@ -2692,6 +2911,8 @@
             const author = (authorInput.value || "").trim().slice(0, 28);
             const text = (textInput.value || "").trim().slice(0, 240);
 
+            statusEl.className = "text-[11px] text-textMuted";
+
             if (!author || author.length < 2) {
                 statusEl.textContent = "Lütfen en az 2 harfli bir isim yazın.";
                 authorInput.focus();
@@ -2721,7 +2942,7 @@
                         return;
                     }
                     const lastText = localStorage.getItem('yuyemekhane_last_comment_txt') || '';
-                    if (text && text === lastText && !pendingMemeBlob) {
+                    if (text && text === lastText && !pendingMemeBlob && !pendingMemeDataUrl) {
                         statusEl.textContent = "Aynı yorumu tekrar gönderemezsiniz.";
                         return;
                     }
@@ -2732,20 +2953,24 @@
             statusEl.textContent = "Gönderiliyor...";
 
             let finalImgUrl = "";
+            const submittedLocalDataUrl = pendingMemeDataUrl;
             try {
-                if (pendingMemeBlob) {
-                    const uploadResp = await fetch('https://ntfy.sh/yuyemekhane_img_v1?filename=meme.webp', {
-                        method: 'PUT',
-                        body: pendingMemeBlob
-                    });
-                    if (uploadResp.ok) {
-                        const uploadJson = await uploadResp.json();
-                        if (uploadJson.attachment && uploadJson.attachment.url) {
-                            finalImgUrl = uploadJson.attachment.url;
+                if (pendingMemeDataUrl) {
+                    try {
+                        finalImgUrl = await uploadWebPDataUrlToNtfy(pendingMemeDataUrl);
+                    } catch (chunkErr) {
+                        if (pendingMemeBlob) {
+                            const uploadResp = await fetch('https://ntfy.sh/yuyemekhane_img_v1?filename=meme.webp', {
+                                method: 'PUT',
+                                body: pendingMemeBlob
+                            });
+                            if (uploadResp.ok) {
+                                const uploadJson = await uploadResp.json();
+                                if (uploadJson.attachment && uploadJson.attachment.url) {
+                                    finalImgUrl = uploadJson.attachment.url;
+                                }
+                            }
                         }
-                    }
-                    if (!finalImgUrl && pendingMemeDataUrl && pendingMemeDataUrl.length < 3500) {
-                        finalImgUrl = pendingMemeDataUrl;
                     }
                 }
 
@@ -2775,6 +3000,10 @@
                     liveCommentsCache[slotKey].push(commentObj);
                     updateMenuCommentBarUI(slotKey);
                     renderCommentsModalList(slotKey);
+                    textInput.value = "";
+                    clearSelectedCommentImage();
+                    statusEl.className = "text-[11px] font-semibold text-emerald-400";
+                    statusEl.textContent = "✓ Yorumun yayınlandı!";
                     showToast("Yorumun doğrudan yayınlandı!");
                 } else {
                     // Regular users send comments to the Pending moderation queue
@@ -2791,13 +3020,16 @@
                         if (text) localStorage.setItem('yuyemekhane_last_comment_txt', text);
                     } catch (err) {}
 
-                    showToast("Yorumun onaya gönderildi!");
+                    saveMyPendingCommentForSlot(slotKey, commentObj, submittedLocalDataUrl);
+                    renderCommentsModalList(slotKey);
+                    textInput.value = "";
+                    clearSelectedCommentImage();
+                    statusEl.className = "text-[11px] font-semibold text-emerald-400";
+                    statusEl.textContent = "✓ Yorumun yönetici onayına gönderildi!";
+                    showToast("Yorumun yönetici onayına gönderildi!");
                 }
-
-                textInput.value = "";
-                clearSelectedCommentImage();
-                statusEl.textContent = "";
             } catch (err) {
+                statusEl.className = "text-[11px] text-rose-400";
                 statusEl.textContent = "Bağlantı hatası, tekrar deneyin.";
             } finally {
                 submitBtn.disabled = false;

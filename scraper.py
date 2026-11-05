@@ -459,6 +459,58 @@ def fetch_and_combine_menus():
             return 'image/jpeg'
         return None
 
+    def resolve_and_validate_image(img_val):
+        if not isinstance(img_val, str) or not img_val.strip():
+            return ""
+        img_val = img_val.strip()
+        if re.match(r'^https://ntfy\.sh/yuyemekhane_i_[A-Za-z0-9_-]{6,40}$', img_val):
+            try:
+                c_resp = session.get(f"{img_val}/json?poll=1&since=all", timeout=6)
+                if c_resp.status_code == 200 and c_resp.text.strip():
+                    chunks = {}
+                    total_n = 0
+                    for ln in c_resp.text.strip().splitlines():
+                        if not ln.strip():
+                            continue
+                        ev_c = json.loads(ln)
+                        if ev_c.get("event") != "message" or not ev_c.get("message"):
+                            continue
+                        obj_c = json.loads(ev_c.get("message"))
+                        idx = int(obj_c.get("i", -1))
+                        tot = int(obj_c.get("n", 0))
+                        part = str(obj_c.get("c", ""))
+                        if 0 <= idx < tot <= 12 and part:
+                            chunks[idx] = part
+                            total_n = tot
+                    if total_n > 0 and len(chunks) == total_n:
+                        full_data_url = "".join(chunks[i] for i in range(total_n))
+                        if re.match(r'^data:image/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$', full_data_url) and len(full_data_url) <= 95000:
+                            b64_part = full_data_url.split(',', 1)[1]
+                            raw_bytes = base64.b64decode(b64_part, validate=True)
+                            if detect_valid_image_mime(raw_bytes):
+                                return full_data_url
+            except Exception:
+                return ""
+        elif re.match(r'^https://ntfy\.sh/file/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+)?$', img_val):
+            try:
+                img_resp = session.get(img_val, timeout=6)
+                if img_resp.status_code == 200:
+                    mime = detect_valid_image_mime(img_resp.content)
+                    if mime:
+                        b64_str = base64.b64encode(img_resp.content).decode('ascii')
+                        return f"data:{mime};base64,{b64_str}"
+            except Exception:
+                return ""
+        elif re.match(r'^data:image/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$', img_val) and len(img_val) <= 95000:
+            try:
+                b64_part = img_val.split(',', 1)[1]
+                raw_bytes = base64.b64decode(b64_part, validate=True)
+                if detect_valid_image_mime(raw_bytes):
+                    return img_val
+            except Exception:
+                return ""
+        return ""
+
     target_comment_dates = [(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-7, 15)]
 
     for c_date in target_comment_dates:
@@ -466,6 +518,13 @@ def fetch_and_combine_menus():
             slot_key = f"{c_date}_{meal_key}"
             topic = f"yuyemekhane_c_{c_date.replace('-', '_')}_{meal_key}"
             existing_list = [item for item in comments_archive.get(slot_key, []) if isinstance(item, dict) and item.get("sig")]
+            # Mevcut arşivde ntfy bağlantısı olarak kalmış görsel varsa kalıcı base64'e dönüştür
+            for ex_item in existing_list:
+                ex_img = ex_item.get("img", "")
+                if isinstance(ex_img, str) and ex_img.startswith("https://ntfy.sh/"):
+                    resolved_ex = resolve_and_validate_image(ex_img)
+                    if resolved_ex:
+                        ex_item["img"] = resolved_ex
             seen_ids = {str(item.get("id")) for item in existing_list if item.get("id")}
             seen_content = {
                 f"{str(item.get('author', '')).lower()}|{str(item.get('text', '')).lower()}"
@@ -544,28 +603,8 @@ def fetch_and_combine_menus():
                             if not verify_admin_sig(approval_payload, sig_val):
                                 continue
 
-                            # Görsel doğrulaması (Magic-byte + boyut kontrolü)
-                            clean_img = ""
-                            if isinstance(img_val, str):
-                                if re.match(r'^https://ntfy\.sh/file/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+)?$', img_val):
-                                    try:
-                                        img_resp = session.get(img_val, timeout=6)
-                                        if img_resp.status_code == 200:
-                                            mime = detect_valid_image_mime(img_resp.content)
-                                            if mime:
-                                                b64_str = base64.b64encode(img_resp.content).decode('ascii')
-                                                clean_img = f"data:{mime};base64,{b64_str}"
-                                    except Exception:
-                                        clean_img = ""
-                                elif re.match(r'^data:image/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$', img_val) and len(img_val) <= 95000:
-                                    try:
-                                        b64_part = img_val.split(',', 1)[1]
-                                        raw_bytes = base64.b64decode(b64_part, validate=True)
-                                        mime = detect_valid_image_mime(raw_bytes)
-                                        if mime:
-                                            clean_img = img_val
-                                    except Exception:
-                                        clean_img = ""
+                            # Görsel doğrulaması (Parçalı ntfy.sh konusu, dosya veya veri URL'si + Magic-byte kontrolü)
+                            clean_img = resolve_and_validate_image(img_val)
 
                             if not text and not clean_img:
                                 continue
@@ -605,6 +644,53 @@ def fetch_and_combine_menus():
                 comments_archive[slot_key] = existing_list[-50:]
             elif slot_key in comments_archive:
                 del comments_archive[slot_key]
+
+            # Onay bekleyen yorumların ve parçalı görsellerinin ntfy önbellek süresi (12 saat) dolmadan canlı tutulması
+            if c_date >= (now_dt - timedelta(days=2)).strftime("%Y-%m-%d"):
+                pending_topic = f"yuyemekhane_p_{c_date.replace('-', '_')}_{meal_key}"
+                try:
+                    p_resp = session.get(f"https://ntfy.sh/{pending_topic}/json?poll=1&since=all", timeout=5)
+                    if p_resp.status_code == 200 and p_resp.text.strip():
+                        p_lines = [ln for ln in p_resp.text.strip().splitlines() if ln.strip()][-60:]
+                        dismissed_p_ids = set()
+                        latest_pending_by_id = {}
+                        now_sec = int(now_ms // 1000)
+                        for p_ln in p_lines:
+                            try:
+                                p_ev = json.loads(p_ln)
+                                if p_ev.get("event") != "message" or not p_ev.get("message"):
+                                    continue
+                                p_obj = json.loads(p_ev.get("message"))
+                                if not isinstance(p_obj, dict):
+                                    continue
+                                if p_obj.get("action") == "dismiss" and p_obj.get("targetId") and p_obj.get("sig"):
+                                    t_id = str(p_obj.get("targetId"))
+                                    if verify_admin_sig(f"DISMISS|{slot_key}|{t_id}", p_obj.get("sig")):
+                                        dismissed_p_ids.add(t_id)
+                                    continue
+                                p_id = str(p_obj.get("id") or p_ev.get("id") or "").strip()[:64]
+                                if not p_id or p_id in seen_ids or p_id in deleted_ids:
+                                    continue
+                                latest_pending_by_id[p_id] = (int(p_ev.get("time", now_sec)), p_obj)
+                            except Exception:
+                                continue
+
+                        for p_id, (ev_time_sec, p_obj) in list(latest_pending_by_id.items())[-15:]:
+                            if p_id in dismissed_p_ids or p_id in seen_ids:
+                                continue
+                            # 5 saatten eski bekleyen yorumları ve görsellerini tazele (12 saatlik ntfy önbelleğinde kaybolmasın)
+                            if now_sec - ev_time_sec >= 18000:
+                                p_img = str(p_obj.get("img") or "").strip()
+                                if re.match(r'^https://ntfy\.sh/yuyemekhane_i_[A-Za-z0-9_-]{6,40}$', p_img):
+                                    full_durl = resolve_and_validate_image(p_img)
+                                    if full_durl:
+                                        chunk_size = 3500
+                                        parts = [full_durl[i:i + chunk_size] for i in range(0, len(full_durl), chunk_size)]
+                                        for idx_c, part_c in enumerate(parts):
+                                            session.post(p_img, data=json.dumps({"i": idx_c, "n": len(parts), "c": part_c}).encode('utf-8'), timeout=5)
+                                session.post(f"https://ntfy.sh/{pending_topic}", data=json.dumps(p_obj).encode('utf-8'), timeout=5)
+                except Exception:
+                    pass
 
     guncel_zaman = datetime.now().strftime("%d.%m.%Y")
 
