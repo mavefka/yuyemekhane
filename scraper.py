@@ -379,16 +379,46 @@ def fetch_and_combine_menus():
         announcements_list = old_data.get('announcements', [])
 
     # Yorumları senkronize et ve kalıcı olarak arşivle (geçmiş 7 gün + gelecek 14 gün)
-    comments_archive = old_data.get('comments', {}) if isinstance(old_data.get('comments'), dict) else {}
+    raw_archive = old_data.get('comments', {}) if isinstance(old_data.get('comments'), dict) else {}
     now_dt = datetime.now()
+    now_ms = int(now_dt.timestamp() * 1000)
+    valid_retention_dates = {(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-14, 16)}
+
+    # 14 günden eski yorum anahtarlarını temizle (veri.json şişmesini önler)
+    comments_archive = {
+        k: v for k, v in raw_archive.items()
+        if isinstance(k, str) and len(k) >= 10 and k[:10] in valid_retention_dates and isinstance(v, list)
+    }
+
+    reserved_author_re = re.compile(r'\b(admin|y[öo]netici|rekt[öo]rl[üu]k|moderat[öo]r|sks\s*daire|sistem|resmi\s*hesap)\b', re.IGNORECASE)
+
+    def detect_valid_image_mime(raw_bytes):
+        if not raw_bytes or len(raw_bytes) > 75000:
+            return None
+        if len(raw_bytes) >= 12 and raw_bytes[:4] == b'RIFF' and raw_bytes[8:12] == b'WEBP':
+            return 'image/webp'
+        if raw_bytes.startswith(b'\x89PNG\r\n\x1a\n'):
+            return 'image/png'
+        if raw_bytes.startswith(b'\xff\xd8\xff'):
+            return 'image/jpeg'
+        return None
+
     target_comment_dates = [(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-7, 15)]
 
     for c_date in target_comment_dates:
         for meal_key in ("ogle", "aksam"):
             slot_key = f"{c_date}_{meal_key}"
             topic = f"yuyemekhane_c_{c_date.replace('-', '_')}_{meal_key}"
-            existing_list = comments_archive.get(slot_key, [])
-            seen_ids = {item.get("id") for item in existing_list if isinstance(item, dict) and item.get("id")}
+            existing_list = [item for item in comments_archive.get(slot_key, []) if isinstance(item, dict)]
+            seen_ids = {str(item.get("id")) for item in existing_list if item.get("id")}
+            seen_content = {
+                f"{str(item.get('author', '')).lower()}|{str(item.get('text', '')).lower()}"
+                for item in existing_list
+            }
+            author_counts = {}
+            for item in existing_list:
+                a_key = str(item.get("author", "")).strip().lower()
+                author_counts[a_key] = author_counts.get(a_key, 0) + 1
 
             try:
                 resp = session.get(f"https://ntfy.sh/{topic}/json?poll=1&since=all", timeout=6)
@@ -399,32 +429,101 @@ def fetch_and_combine_menus():
                             if ev.get("event") != "message":
                                 continue
                             msg_raw = ev.get("message", "")
+                            if not isinstance(msg_raw, str) or len(msg_raw) > 95000:
+                                continue
                             c_obj = json.loads(msg_raw)
                             if not isinstance(c_obj, dict):
                                 continue
-                            c_id = c_obj.get("id") or ev.get("id")
+
+                            c_id = str(c_obj.get("id") or ev.get("id") or "").strip()[:64]
                             if not c_id or c_id in seen_ids:
                                 continue
 
-                            img_val = c_obj.get("img", "")
-                            if isinstance(img_val, str) and img_val.startswith("https://ntfy.sh/file/"):
-                                try:
-                                    img_resp = session.get(img_val, timeout=6)
-                                    if img_resp.status_code == 200 and len(img_resp.content) < 90000:
-                                        b64_str = base64.b64encode(img_resp.content).decode('ascii')
-                                        c_obj["img"] = f"data:image/webp;base64,{b64_str}"
-                                except Exception:
-                                    pass
+                            # Yazar adı doğrulaması ve taklit (impersonation) filtresi
+                            author = re.sub(r'[\x00-\x1f\x7f]', '', str(c_obj.get("author") or "")).strip()[:28]
+                            if len(author) < 2 or reserved_author_re.search(author):
+                                continue
 
-                            c_obj["id"] = c_id
-                            existing_list.append(c_obj)
+                            author_key = author.lower()
+                            if author_counts.get(author_key, 0) >= 4:
+                                continue
+
+                            text = re.sub(r'[\x00-\x1f\x7f]', '', str(c_obj.get("text") or "")).strip()[:240]
+
+                            # Puan doğrulaması (1-5 arası tam sayı)
+                            clean_rating = None
+                            try:
+                                r_val = int(round(float(c_obj.get("rating"))))
+                                if 1 <= r_val <= 5:
+                                    clean_rating = r_val
+                            except Exception:
+                                clean_rating = None
+
+                            # Görsel doğrulaması (Magic-byte + boyut kontrolü)
+                            clean_img = ""
+                            img_val = c_obj.get("img", "")
+                            if isinstance(img_val, str):
+                                if re.match(r'^https://ntfy\.sh/file/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+)?$', img_val):
+                                    try:
+                                        img_resp = session.get(img_val, timeout=6)
+                                        if img_resp.status_code == 200:
+                                            mime = detect_valid_image_mime(img_resp.content)
+                                            if mime:
+                                                b64_str = base64.b64encode(img_resp.content).decode('ascii')
+                                                clean_img = f"data:{mime};base64,{b64_str}"
+                                    except Exception:
+                                        clean_img = ""
+                                elif re.match(r'^data:image/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$', img_val) and len(img_val) <= 95000:
+                                    try:
+                                        b64_part = img_val.split(',', 1)[1]
+                                        raw_bytes = base64.b64decode(b64_part, validate=True)
+                                        mime = detect_valid_image_mime(raw_bytes)
+                                        if mime:
+                                            clean_img = img_val
+                                    except Exception:
+                                        clean_img = ""
+
+                            if not text and not clean_img:
+                                continue
+
+                            content_sig = f"{author_key}|{text.lower()}"
+                            if content_sig in seen_content:
+                                continue
+
+                            # Zaman damgası doğrulaması (gelecek tarihli sahte ts ile sıralama manipülasyonunu engelle)
+                            try:
+                                raw_ts = int(float(c_obj.get("ts", now_ms)))
+                                if raw_ts < now_ms - 45 * 86400000 or raw_ts > now_ms + 600000:
+                                    clean_ts = now_ms
+                                else:
+                                    clean_ts = raw_ts
+                            except Exception:
+                                clean_ts = now_ms
+
+                            raw_time = str(c_obj.get("time") or "").strip()
+                            clean_time = raw_time if re.match(r'^\d{2}:\d{2}$', raw_time) else now_dt.strftime("%H:%M")
+
+                            sanitized_entry = {
+                                "id": c_id,
+                                "author": author,
+                                "rating": clean_rating,
+                                "text": text,
+                                "img": clean_img,
+                                "time": clean_time,
+                                "ts": clean_ts
+                            }
+
+                            existing_list.append(sanitized_entry)
                             seen_ids.add(c_id)
+                            seen_content.add(content_sig)
+                            author_counts[author_key] = author_counts.get(author_key, 0) + 1
                         except Exception:
                             continue
             except Exception:
                 pass
 
             if existing_list:
+                existing_list.sort(key=lambda x: x.get("ts", 0))
                 comments_archive[slot_key] = existing_list[-50:]
 
     guncel_zaman = datetime.now().strftime("%d.%m.%Y")

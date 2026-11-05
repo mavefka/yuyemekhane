@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#000000" id="themeColorMeta">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <script>
         try {
-            const savedTheme = localStorage.getItem('yuyemekhane_theme') || 'dark';
+            const rawTheme = localStorage.getItem('yuyemekhane_theme');
+            const savedTheme = rawTheme === 'light' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
             document.querySelector('meta[name="color-scheme"]').content = savedTheme;
             document.getElementById('themeColorMeta').content = savedTheme === 'light' ? '#eef2f7' : '#000000';
@@ -25,8 +27,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.7/purify.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.7/purify.min.js" integrity="sha512-BdRNuI8/lsyxkKQVxK1lVtfZshggfXPAwEP+JAOJEKx6Y8SLfcBSRdaWyXQmMxo+wG180uFqXYGjGRL0mh4/Jw==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 
     <script>
         tailwind.config = {
@@ -1046,6 +1048,7 @@
                         </button>
                     </div>
                 </div>
+                <p class="text-[10px] text-textMuted text-center pt-0.5">Yorumlar herkese açıktır; lütfen kişisel bilgi paylaşmayın.</p>
             </form>
         </div>
     </dialog>
@@ -1175,7 +1178,28 @@
             });
         }
 
-        // --- Modern Web Guidance: Sanitizer API with DOMPurify fallback ---
+        // --- Modern Web Guidance: HTML Escape, Safe URL & Sanitizer API with DOMPurify fallback ---
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function sanitizeHttpUrl(rawUrl, fallback = "https://yalova.edu.tr/tr/duyuru") {
+            if (!rawUrl || typeof rawUrl !== "string") return fallback;
+            try {
+                const parsed = new URL(rawUrl.trim(), window.location.origin);
+                if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+                    return parsed.href;
+                }
+            } catch (e) {}
+            return fallback;
+        }
+
         function safeSetHTML(el, html) {
             const elements = [
                 'p', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li',
@@ -1197,6 +1221,12 @@
             } else {
                 el.textContent = html.replace(/<[^>]+>/g, ' ');
             }
+
+            el.querySelectorAll('a').forEach(a => {
+                a.href = sanitizeHttpUrl(a.getAttribute('href'), '#');
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+            });
         }
 
         function showToast(message) {
@@ -1405,9 +1435,10 @@
 
                 if (menuData && menuData.length > 0) {
                     menuData.forEach((food, index) => {
-                        totalCal += food.cal;
-                        const visuals = getDishVisuals(food.name, index);
-                        const formattedName = toTurkishTitleCase(food.name);
+                        const safeCal = Number(food.cal) || 0;
+                        totalCal += safeCal;
+                        const visuals = getDishVisuals(food.name || '', index);
+                        const formattedName = escapeHTML(toTurkishTitleCase(food.name || ''));
                         const ingredientItems = parseIngredientsList(food.ingredients);
                         const hasIngredients = ingredientItems.length > 0;
 
@@ -1416,7 +1447,7 @@
                         li.className = "animate-item group rounded-[18px] sm:rounded-[20px] bg-[#050507] hover:bg-[#0c0c12] border border-white/[0.08] hover:border-white/[0.15] p-3.5 sm:p-4 transition-colors duration-200";
 
                         const ingredientPillsHTML = ingredientItems
-                            .map(ing => `<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/[0.05] text-zinc-300 border border-white/[0.08]">${ing}</span>`)
+                            .map(ing => `<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-white/[0.05] text-zinc-300 border border-white/[0.08]">${escapeHTML(ing)}</span>`)
                             .join('');
 
                         li.innerHTML = `
@@ -1440,7 +1471,7 @@
                                 </div>
                                 <div class="shrink-0 text-right">
                                     <span class="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-white/[0.06] text-white border border-white/[0.08] whitespace-nowrap">
-                                        ${food.cal} kcal
+                                        ${safeCal} kcal
                                     </span>
                                 </div>
                             </div>
@@ -1566,17 +1597,17 @@
                     <div class="flex items-center justify-between gap-2 mb-2">
                         <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${catStyle.cls}">
                             <i class="fa-solid ${catStyle.icon} text-[9px]" aria-hidden="true"></i>
-                            <span>${ann.category || 'Duyuru'}</span>
+                            <span>${escapeHTML(ann.category || 'Duyuru')}</span>
                         </span>
-                        <span class="text-[10px] sm:text-[11px] text-textMuted font-medium truncate">${ann.date || ''}</span>
+                        <span class="text-[10px] sm:text-[11px] text-textMuted font-medium truncate">${escapeHTML(ann.date || '')}</span>
                     </div>
 
                     <h3 class="text-xs sm:text-sm font-bold text-white group-hover:text-zinc-100 leading-snug line-clamp-2 mb-1.5">
-                        ${ann.title}
+                        ${escapeHTML(ann.title || '')}
                     </h3>
 
                     <p class="text-[11px] sm:text-xs text-textSecondary line-clamp-2 leading-relaxed mb-3">
-                        ${ann.summary || ''}
+                        ${escapeHTML(ann.summary || '')}
                     </p>
 
                     <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-white/[0.06]">
@@ -1613,26 +1644,28 @@
 
             const catBadge = document.getElementById('annDialogCategory');
             catBadge.className = `inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold border ${catStyle.cls}`;
-            catBadge.innerHTML = `<i class="fa-solid ${catStyle.icon} text-[9px]" aria-hidden="true"></i><span>${ann.category || 'Duyuru'}</span>`;
+            catBadge.innerHTML = `<i class="fa-solid ${catStyle.icon} text-[9px]" aria-hidden="true"></i><span>${escapeHTML(ann.category || 'Duyuru')}</span>`;
 
             document.getElementById('annDialogDate').innerText = ann.date || '';
             document.getElementById('annDialogTitle').innerText = ann.title || '';
-            document.getElementById('annDialogExternalLink').href = ann.url || ann.original_url || 'https://yalova.edu.tr/tr/duyuru';
+            document.getElementById('annDialogExternalLink').href = sanitizeHttpUrl(ann.url || ann.original_url, 'https://yalova.edu.tr/tr/duyuru');
 
             const imgWrap = document.getElementById('annDialogImages');
             imgWrap.innerHTML = '';
             if (ann.images && ann.images.length > 0) {
                 imgWrap.classList.remove('hidden');
                 ann.images.forEach(imgUrl => {
+                    const safeImgUrl = sanitizeHttpUrl(imgUrl, '');
+                    if (!safeImgUrl) return;
                     const link = document.createElement('a');
-                    link.href = imgUrl;
+                    link.href = safeImgUrl;
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer';
                     link.className = "relative block group rounded-2xl overflow-hidden border border-white/[0.08] bg-black";
 
                     const img = document.createElement('img');
-                    img.src = imgUrl;
-                    img.alt = ann.title;
+                    img.src = safeImgUrl;
+                    img.alt = ann.title || 'Duyuru görseli';
                     img.loading = "lazy";
                     img.width = 800;
                     img.height = 450;
@@ -1677,8 +1710,11 @@
                         badgeColor = 'text-blue-400 bg-blue-500/10 border-blue-500/20';
                     }
 
+                    const safeAttUrl = sanitizeHttpUrl(att.url, '');
+                    if (!safeAttUrl) return;
+
                     const a = document.createElement('a');
-                    a.href = att.url;
+                    a.href = safeAttUrl;
                     a.target = '_blank';
                     a.rel = 'noopener noreferrer';
                     a.className = "flex items-center justify-between gap-2.5 p-3 rounded-2xl bg-[#08080c] hover:bg-[#12121a] border border-white/[0.08] hover:border-white/[0.18] transition group";
@@ -1687,7 +1723,7 @@
                             <span class="w-8 h-8 rounded-xl border flex items-center justify-center shrink-0 ${badgeColor}">
                                 <i class="fa-solid ${icon} text-xs" aria-hidden="true"></i>
                             </span>
-                            <span class="text-xs font-semibold text-white truncate">${att.label}</span>
+                            <span class="text-xs font-semibold text-white truncate">${escapeHTML(att.label || 'Bağlantı')}</span>
                         </div>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-textMuted group-hover:text-white shrink-0" aria-hidden="true"></i>
                     `;
@@ -1861,9 +1897,9 @@
                 console.error("Panoya kopyalanamadı: ", err);
             }
 
-            if (aiType === 'chatgpt') window.open(`https://chatgpt.com/?q=${encodeURIComponent(promptText)}`, '_blank');
-            else if (aiType === 'claude') window.open('https://claude.ai/new', '_blank');
-            else if (aiType === 'gemini') window.open('https://gemini.google.com/app', '_blank');
+            if (aiType === 'chatgpt') window.open(`https://chatgpt.com/?q=${encodeURIComponent(promptText)}`, '_blank', 'noopener,noreferrer');
+            else if (aiType === 'claude') window.open('https://claude.ai/new', '_blank', 'noopener,noreferrer');
+            else if (aiType === 'gemini') window.open('https://gemini.google.com/app', '_blank', 'noopener,noreferrer');
         }
 
         // --- Mobile Section Switching ---
@@ -1910,7 +1946,57 @@
             }
         }
 
-        // --- Anonymous Meal Comments & Meme System (Real-time ntfy.sh + GitHub Actions Archive) ---
+        // --- Anonymous Meal Comments System (Real-time ntfy.sh + GitHub Actions Archive) ---
+        const RESERVED_AUTHOR_PATTERN = /\b(admin|y[öo]netici|rekt[öo]rl[üu]k|moderat[öo]r|sks\s*daire|sistem|resmi\s*hesap)\b/i;
+
+        function isValidCommentImageSrc(src) {
+            if (!src || typeof src !== 'string' || src.length > 110000) return false;
+            if (/^https:\/\/ntfy\.sh\/file\/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+)?$/.test(src)) return true;
+            if (/^data:image\/(webp|png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(src)) return true;
+            return false;
+        }
+
+        function sanitizeCommentObject(raw) {
+            if (!raw || typeof raw !== 'object') return null;
+            const cleanAuthor = String(raw.author || '')
+                .replace(/[\u0000-\u001F\u007F]/g, '')
+                .trim()
+                .slice(0, 28);
+            if (cleanAuthor.length < 2 || RESERVED_AUTHOR_PATTERN.test(cleanAuthor)) return null;
+
+            const cleanText = String(raw.text || '')
+                .replace(/[\u0000-\u001F\u007F]/g, '')
+                .trim()
+                .slice(0, 240);
+
+            const cleanImg = isValidCommentImageSrc(raw.img) ? raw.img : "";
+            if (!cleanText && !cleanImg) return null;
+
+            const rNum = Math.round(Number(raw.rating));
+            const cleanRating = (Number.isFinite(rNum) && rNum >= 1 && rNum <= 5) ? rNum : null;
+
+            const nowMs = Date.now();
+            const rawTs = Number(raw.ts);
+            const cleanTs = (Number.isFinite(rawTs) && rawTs > nowMs - 45 * 86400000 && rawTs <= nowMs + 600000)
+                ? Math.floor(rawTs)
+                : nowMs;
+
+            const rawTime = String(raw.time || '').trim();
+            const cleanTime = /^\d{2}:\d{2}$/.test(rawTime) ? rawTime : "";
+
+            const cleanId = String(raw.id || `${cleanAuthor}_${cleanTs}_${cleanText.slice(0, 24)}`).slice(0, 64);
+
+            return {
+                id: cleanId,
+                author: cleanAuthor,
+                rating: cleanRating,
+                text: cleanText,
+                img: cleanImg,
+                time: cleanTime,
+                ts: cleanTs
+            };
+        }
+
         function getCurrentCommentSlotKey() {
             const dateStr = formatDate(currentDate);
             return `${dateStr}_${currentMeal}`;
@@ -1930,17 +2016,29 @@
                 if (rawLocal) localSaved = JSON.parse(rawLocal) || [];
             } catch (e) {}
 
-            const seen = new Set();
+            const seenIds = new Set();
+            const seenContent = new Set();
+            const authorCounts = new Map();
             const merged = [];
-            for (const item of [...archived, ...live, ...localSaved]) {
-                if (!item || typeof item !== 'object') continue;
-                const cid = item.id || `${item.author}_${item.ts || item.time}_${item.text}`;
-                if (seen.has(cid)) continue;
-                seen.add(cid);
+
+            for (const rawItem of [...archived, ...live, ...localSaved]) {
+                const item = sanitizeCommentObject(rawItem);
+                if (!item) continue;
+
+                const contentSig = `${item.author.toLocaleLowerCase('tr-TR')}|${item.text.toLocaleLowerCase('tr-TR')}|${item.img ? item.img.slice(-32) : ''}`;
+                if (seenIds.has(item.id) || seenContent.has(contentSig)) continue;
+
+                const authorKey = item.author.toLocaleLowerCase('tr-TR');
+                const prevAuthorCount = authorCounts.get(authorKey) || 0;
+                if (prevAuthorCount >= 4) continue;
+
+                seenIds.add(item.id);
+                seenContent.add(contentSig);
+                authorCounts.set(authorKey, prevAuthorCount + 1);
                 merged.push(item);
             }
             merged.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-            return merged;
+            return merged.slice(-50);
         }
 
         function setSelectedCommentRating(stars) {
@@ -2070,12 +2168,9 @@
                     card.appendChild(p);
                 }
 
-                if (item.img && typeof item.img === 'string' && (item.img.startsWith('https://ntfy.sh/file/') || item.img.startsWith('data:image/'))) {
-                    const imgLink = document.createElement('a');
-                    imgLink.href = item.img;
-                    imgLink.target = '_blank';
-                    imgLink.rel = 'noopener noreferrer';
-                    imgLink.className = "block mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-black/50 max-w-xs";
+                if (isValidCommentImageSrc(item.img)) {
+                    const imgWrap = document.createElement('div');
+                    imgWrap.className = "mt-2 rounded-xl overflow-hidden border border-white/[0.08] bg-black/50 max-w-xs";
 
                     const imgEl = document.createElement('img');
                     imgEl.src = item.img;
@@ -2085,8 +2180,18 @@
                     imgEl.height = 300;
                     imgEl.className = "w-full max-h-64 object-contain";
 
-                    imgLink.appendChild(imgEl);
-                    card.appendChild(imgLink);
+                    if (item.img.startsWith('https://ntfy.sh/file/')) {
+                        const imgLink = document.createElement('a');
+                        imgLink.href = item.img;
+                        imgLink.target = '_blank';
+                        imgLink.rel = 'noopener noreferrer';
+                        imgLink.className = "block";
+                        imgLink.appendChild(imgEl);
+                        imgWrap.appendChild(imgLink);
+                    } else {
+                        imgWrap.appendChild(imgEl);
+                    }
+                    card.appendChild(imgWrap);
                 }
 
                 frag.appendChild(card);
@@ -2215,6 +2320,12 @@
 
             if (!author || author.length < 2) {
                 statusEl.textContent = "Lütfen en az 2 harfli bir isim yazın.";
+                authorInput.focus();
+                return;
+            }
+
+            if (RESERVED_AUTHOR_PATTERN.test(author)) {
+                statusEl.textContent = "Bu isim kullanılamaz, lütfen başka bir isim seçin.";
                 authorInput.focus();
                 return;
             }
