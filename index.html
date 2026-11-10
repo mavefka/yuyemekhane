@@ -1102,13 +1102,16 @@
                         </button>
                     </div>
 
-                    <!-- Borderless Comment Input -->
-                    <label for="commentTextInput" class="sr-only">Yorum</label>
-                    <input type="text" id="commentTextInput" name="comment" maxlength="200" placeholder="Bugünkü yemekler nasıldı? Yorumunuzu yazın..." enterkeyhint="send" class="w-full bg-transparent px-0.5 py-1 text-base sm:text-[13px] text-white placeholder:text-zinc-500 focus:outline-none">
+                    <!-- Borderless Comment Input + Live Character Counter -->
+                    <div class="flex items-center justify-between gap-2">
+                        <label for="commentTextInput" class="sr-only">Yorum</label>
+                        <input type="text" id="commentTextInput" name="comment" maxlength="200" placeholder="Bugünkü yemekler nasıldı? Yorumunuzu yazın..." enterkeyhint="send" class="w-full min-w-0 bg-transparent px-0.5 py-1 text-base sm:text-[13px] text-white placeholder:text-zinc-500 focus:outline-none">
+                        <span id="commentCharCount" class="text-[11px] text-zinc-500 font-medium tabular-nums select-none shrink-0">0/200</span>
+                    </div>
 
-                    <!-- Bottom Toolbar: [📎 Resim yükle] [★★★★★ 5/5] ... [0/200] [Gönder] -->
-                    <div class="flex items-center justify-between gap-1.5 pt-1">
-                        <div class="flex items-center gap-1.5 min-w-0">
+                    <!-- Bottom Toolbar: [📎 Resim yükle] [★★★★★] ... [Gönder] -->
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pt-1">
+                        <div class="flex items-center gap-1.5 shrink-0">
                             <input type="file" id="commentImageInput" name="meme" accept="image/*" class="visually-hidden">
                             <label for="commentImageInput" id="commentImageLabel" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.14] text-[11px] sm:text-xs font-medium text-zinc-300 hover:text-white cursor-pointer transition select-none active:scale-95 shrink-0">
                                 <i class="fa-solid fa-paperclip text-[11px] text-zinc-400" aria-hidden="true"></i>
@@ -1117,31 +1120,28 @@
 
                             <!-- 5-Star Selector Right Next to Image Button -->
                             <div id="commentStarGroup" role="radiogroup" aria-label="Öğün puanı (5 üzerinden)" class="inline-flex items-center gap-0.5 px-2 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.12] shrink-0">
-                                <button type="button" data-star="1" role="radio" aria-checked="false" aria-label="1 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                <button type="button" data-star="1" role="radio" aria-checked="false" aria-label="1 Yıldız" class="star-select-btn w-4 h-4 p-0 flex items-center justify-center text-amber-400 hover:scale-110 transition">
                                     <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="2" role="radio" aria-checked="false" aria-label="2 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                <button type="button" data-star="2" role="radio" aria-checked="false" aria-label="2 Yıldız" class="star-select-btn w-4 h-4 p-0 flex items-center justify-center text-amber-400 hover:scale-110 transition">
                                     <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="3" role="radio" aria-checked="false" aria-label="3 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                <button type="button" data-star="3" role="radio" aria-checked="false" aria-label="3 Yıldız" class="star-select-btn w-4 h-4 p-0 flex items-center justify-center text-amber-400 hover:scale-110 transition">
                                     <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="4" role="radio" aria-checked="false" aria-label="4 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                <button type="button" data-star="4" role="radio" aria-checked="false" aria-label="4 Yıldız" class="star-select-btn w-4 h-4 p-0 flex items-center justify-center text-amber-400 hover:scale-110 transition">
                                     <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="5" role="radio" aria-checked="true" aria-label="5 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                <button type="button" data-star="5" role="radio" aria-checked="true" aria-label="5 Yıldız" class="star-select-btn w-4 h-4 p-0 flex items-center justify-center text-amber-400 hover:scale-110 transition">
                                     <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <span id="selectedRatingLabel" class="ml-0.5 text-[10px] font-bold text-amber-300 hidden xs:inline sm:inline">5/5</span>
+                                <span id="selectedRatingLabel" class="ml-0.5 text-[10px] font-bold text-amber-300 hidden sm:inline">5/5</span>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                            <span id="commentCharCount" class="text-[11px] sm:text-xs text-zinc-500 font-medium tabular-nums select-none">0/200</span>
-                            <button type="button" id="openAuthorStepBtn" class="px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/80 hover:bg-white text-black transition active:scale-95">
-                                Gönder
-                            </button>
-                        </div>
+                        <button type="button" id="openAuthorStepBtn" class="px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/80 hover:bg-white text-black transition active:scale-95 shrink-0 ml-auto">
+                            Gönder
+                        </button>
                     </div>
                 </div>
 
@@ -2528,8 +2528,8 @@
                 const active = btnVal <= r;
                 btn.setAttribute('aria-checked', String(btnVal === r));
                 btn.className = active
-                    ? "star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition"
-                    : "star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-zinc-600 hover:text-amber-300 hover:scale-110 transition";
+                    ? "star-select-btn w-4 h-4 p-0 flex items-center justify-center text-amber-400 hover:scale-110 transition"
+                    : "star-select-btn w-4 h-4 p-0 flex items-center justify-center text-zinc-600 hover:text-amber-300 hover:scale-110 transition";
             });
         }
 
@@ -2955,8 +2955,8 @@
             if (openBtn) {
                 const hasContent = Boolean((textInput && textInput.value.trim()) || pendingMemeBlob || pendingMemeDataUrl);
                 openBtn.className = hasContent
-                    ? "px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition active:scale-95 shadow-sm"
-                    : "px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/75 hover:bg-zinc-300 text-black transition active:scale-95";
+                    ? "px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition active:scale-95 shadow-sm shrink-0 ml-auto"
+                    : "px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/75 hover:bg-zinc-300 text-black transition active:scale-95 shrink-0 ml-auto";
             }
         }
 
