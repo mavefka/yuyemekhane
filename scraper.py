@@ -259,10 +259,17 @@ def fetch_and_combine_menus():
     print("Siteye bağlanılıyor ve tarih bilgileri ayarlanıyor...")
 
     now = datetime.now()
-    # Çekilecek hedefler listesi: Önce bulunduğumuz ay
-    hedef_tarihler = [
-        (str(now.year), str(now.month))
-    ]
+    hedef_tarihler = []
+
+    # Ayın ilk 4 günündeysek geçmiş 3 gün özelliği için bir önceki ayı da çek
+    if now.day <= 4:
+        if now.month == 1:
+            hedef_tarihler.append((str(now.year - 1), "12"))
+        else:
+            hedef_tarihler.append((str(now.year), str(now.month - 1)))
+
+    # Bulunduğumuz ay
+    hedef_tarihler.append((str(now.year), str(now.month)))
 
     # Sonraki ayı da listeye ekle (Eğer Aralık ayındaysak sonraki yılın Ocağına geçer)
     if now.month == 12:
@@ -373,16 +380,25 @@ def fetch_and_combine_menus():
     except Exception:
         old_data = {}
 
-    if not combined_database and isinstance(old_data.get('menus'), dict):
-        combined_database = old_data.get('menus', {})
+    now_dt = datetime.now()
+    now_ms = int(now_dt.timestamp() * 1000)
+
+    # Geçmiş günlerin menülerini (son 14 gün + gelecek 45 gün) mevcut veri.json'dan koru
+    valid_menu_dates = {(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-14, 45)}
+    if isinstance(old_data.get('menus'), dict):
+        if not combined_database:
+            combined_database = old_data.get('menus', {})
+        else:
+            for m_date, m_val in old_data['menus'].items():
+                if m_date in valid_menu_dates and isinstance(m_val, dict):
+                    if m_date not in combined_database or (not combined_database[m_date].get('ogle') and not combined_database[m_date].get('aksam')):
+                        combined_database[m_date] = m_val
 
     if not announcements_list:
         announcements_list = old_data.get('announcements', [])
 
     # Yorumları senkronize et ve kalıcı olarak arşivle (geçmiş 7 gün + gelecek 14 gün)
     raw_archive = old_data.get('comments', {}) if isinstance(old_data.get('comments'), dict) else {}
-    now_dt = datetime.now()
-    now_ms = int(now_dt.timestamp() * 1000)
     valid_retention_dates = {(now_dt + timedelta(days=d)).strftime("%Y-%m-%d") for d in range(-14, 16)}
 
     # 14 günden eski yorum anahtarlarını temizle (veri.json şişmesini önler)
@@ -646,7 +662,7 @@ def fetch_and_combine_menus():
                 del comments_archive[slot_key]
 
             # Onay bekleyen yorumların ve parçalı görsellerinin ntfy önbellek süresi (12 saat) dolmadan canlı tutulması
-            if c_date >= (now_dt - timedelta(days=2)).strftime("%Y-%m-%d"):
+            if c_date >= (now_dt - timedelta(days=4)).strftime("%Y-%m-%d"):
                 pending_topic = f"yuyemekhane_p_{c_date.replace('-', '_')}_{meal_key}"
                 try:
                     p_resp = session.get(f"https://ntfy.sh/{pending_topic}/json?poll=1&since=all", timeout=5)
