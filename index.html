@@ -428,6 +428,9 @@
             background-color: rgba(15, 23, 42, 0.35);
             backdrop-filter: blur(12px);
         }
+        html[data-theme="light"] #authorPromptOverlay {
+            background-color: rgba(15, 23, 42, 0.32) !important;
+        }
 
         /* Typography & Border Adaptations inside Liquid Glass Mode */
         html[data-theme="light"] .text-white,
@@ -1147,15 +1150,15 @@
                     <span class="text-[10px] text-textMuted shrink-0 ml-auto">Kişisel bilgi paylaşmayın</span>
                 </div>
 
-                <!-- Pop-up Modal: "Adınız nasıl gözükecek?" (Opened when clicking Gönder) -->
-                <div id="authorPromptOverlay" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md items-center justify-center p-4">
-                    <div id="authorPromptCard" class="relative w-full max-w-[320px] rounded-[26px] bg-[#0b0b10] border border-white/[0.14] p-6 flex flex-col items-center text-center gap-3.5 shadow-2xl">
+                <!-- Pop-up Modal: "Adınız nasıl gözükecek?" (Opened with smooth spring animation when clicking Gönder) -->
+                <div id="authorPromptOverlay" aria-hidden="true" class="flex fixed inset-0 z-50 bg-black/75 backdrop-blur-md items-center justify-center p-4 transition-all duration-200 ease-out opacity-0 pointer-events-none">
+                    <div id="authorPromptCard" class="relative w-full max-w-[320px] rounded-[26px] bg-[#0b0b10] border border-white/[0.14] p-6 flex flex-col items-center text-center gap-3.5 shadow-2xl transition-all duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] opacity-0 scale-95 translate-y-3">
                         <button type="button" id="closeAuthorPopupBtn" aria-label="Kapat" class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.14] text-textSecondary hover:text-white flex items-center justify-center transition">
                             <i class="fa-solid fa-xmark text-xs" aria-hidden="true"></i>
                         </button>
 
                         <!-- User Logo Avatar -->
-                        <div id="authorPopupAvatar" class="w-14 h-14 rounded-full bg-white/[0.06] border border-white/[0.14] flex items-center justify-center text-white shadow-inner">
+                        <div id="authorPopupAvatar" class="w-14 h-14 rounded-full bg-white/[0.06] border border-white/[0.14] flex items-center justify-center text-white shadow-inner transition-transform duration-300 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] scale-90">
                             <i class="fa-regular fa-user text-xl" aria-hidden="true"></i>
                         </div>
 
@@ -2959,10 +2962,21 @@
 
         function showComposeStep() {
             const overlay = document.getElementById('authorPromptOverlay');
+            const card = document.getElementById('authorPromptCard');
+            const avatar = document.getElementById('authorPopupAvatar');
             const popupErr = document.getElementById('authorPopupErrorText');
             if (overlay) {
-                overlay.classList.add('hidden');
-                overlay.classList.remove('flex');
+                overlay.setAttribute('aria-hidden', 'true');
+                overlay.classList.remove('opacity-100', 'pointer-events-auto');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+            }
+            if (card) {
+                card.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+                card.classList.add('opacity-0', 'scale-95', 'translate-y-3');
+            }
+            if (avatar) {
+                avatar.classList.remove('scale-100');
+                avatar.classList.add('scale-90');
             }
             if (popupErr) {
                 popupErr.textContent = "";
@@ -3004,14 +3018,25 @@
 
             statusEl.textContent = "";
             const overlay = document.getElementById('authorPromptOverlay');
+            const card = document.getElementById('authorPromptCard');
+            const avatar = document.getElementById('authorPopupAvatar');
             const popupErr = document.getElementById('authorPopupErrorText');
             if (popupErr) {
                 popupErr.textContent = "";
                 popupErr.classList.add('hidden');
             }
             if (overlay) {
-                overlay.classList.remove('hidden');
-                overlay.classList.add('flex');
+                overlay.setAttribute('aria-hidden', 'false');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                overlay.classList.add('opacity-100', 'pointer-events-auto');
+            }
+            if (card) {
+                card.classList.remove('opacity-0', 'scale-95', 'translate-y-3');
+                card.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+            }
+            if (avatar) {
+                avatar.classList.remove('scale-90');
+                avatar.classList.add('scale-100');
             }
 
             try {
@@ -3022,8 +3047,10 @@
             } catch (e) {}
 
             if (authorInput) {
-                authorInput.focus();
-                authorInput.select();
+                setTimeout(() => {
+                    authorInput.focus();
+                    authorInput.select();
+                }, 40);
             }
         }
 
@@ -3120,7 +3147,7 @@
             if (honeypot && honeypot.value) return;
 
             const overlay = document.getElementById('authorPromptOverlay');
-            if (overlay && overlay.classList.contains('hidden')) {
+            if (overlay && overlay.classList.contains('pointer-events-none')) {
                 openAuthorStep();
                 return;
             }
@@ -3471,6 +3498,13 @@
         });
         document.getElementById('authorPromptOverlay').addEventListener('click', (e) => {
             if (e.target.id === 'authorPromptOverlay') {
+                showComposeStep();
+            }
+        });
+        document.getElementById('commentsDialog').addEventListener('cancel', (e) => {
+            const overlay = document.getElementById('authorPromptOverlay');
+            if (overlay && !overlay.classList.contains('pointer-events-none')) {
+                e.preventDefault();
                 showComposeStep();
             }
         });
