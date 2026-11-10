@@ -386,16 +386,17 @@
         html[data-theme="light"] #openCommentsBtn:hover {
             background: rgba(255, 255, 255, 0.88) !important;
         }
-        html[data-theme="light"] #commentComposerBox {
-            background: rgba(255, 255, 255, 0.84) !important;
+        html[data-theme="light"] #commentComposerBox,
+        html[data-theme="light"] #authorPromptCard {
+            background: rgba(255, 255, 255, 0.94) !important;
             border-color: rgba(15, 23, 42, 0.14) !important;
-            box-shadow: inset 0 1px 0 #ffffff, 0 6px 20px -4px rgba(15, 23, 42, 0.08) !important;
+            box-shadow: inset 0 1px 0 #ffffff, 0 12px 32px -4px rgba(15, 23, 42, 0.14) !important;
         }
         html[data-theme="light"] #commentAuthorPill,
+        html[data-theme="light"] #authorPopupAvatar,
         html[data-theme="light"] #commentImageLabel,
         html[data-theme="light"] #commentStarGroup,
         html[data-theme="light"] #commentImagePreviewWrap,
-        html[data-theme="light"] #fillAnonBtn,
         html[data-theme="light"] #adminPassInput {
             background: rgba(15, 23, 42, 0.05) !important;
             border-color: rgba(15, 23, 42, 0.12) !important;
@@ -1078,98 +1079,64 @@
                 <div class="comment-empty-state py-10 text-center text-xs text-textMuted">Yorumlar yükleniyor...</div>
             </div>
 
-            <!-- Unified Two-Step Comment Composer (Step 1: Message & Image, Step 2: Name & Rating) -->
+            <!-- Unified Comment Composer + Pop-up Name Prompt -->
             <form id="commentForm" action="#commentsDialog" method="POST" class="px-3 sm:px-5 py-2.5 sm:py-3 border-t border-white/[0.08] bg-black/95 shrink-0">
                 <!-- Anti-spam Honeypot -->
                 <input type="text" name="website_url" id="commentHoneypot" class="visually-hidden" tabindex="-1" autocomplete="off">
 
-                <div id="commentComposerBox" class="rounded-[20px] bg-[#0c0c10] border border-white/[0.1] focus-within:border-white/[0.24] p-3 sm:p-3.5 flex flex-col gap-2.5 shadow-xl transition">
-                    <!-- STEP 1: Clean Message + Image Upload Composer (Matches Screenshot) -->
-                    <div id="commentStepCompose" class="flex flex-col gap-3">
-                        <!-- Compact Inline Image Preview Chip -->
-                        <div id="commentImagePreviewWrap" class="hidden items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.06] border border-white/[0.1]">
-                            <div class="flex items-center gap-2 min-w-0">
-                                <img id="commentImagePreviewEl" src="" alt="Yüklenecek görsel önizlemesi" width="32" height="32" class="w-8 h-8 rounded-lg object-cover border border-white/10 shrink-0">
-                                <div class="min-w-0">
-                                    <div class="text-[11px] font-semibold text-white truncate">Görsel Eklendi</div>
-                                    <div id="commentImageSizeText" class="text-[10px] text-textMuted truncate">Otomatik WebP sıkıştırıldı</div>
-                                </div>
-                            </div>
-                            <button type="button" id="removeCommentImageBtn" aria-label="Görseli kaldır" class="w-6 h-6 rounded-full bg-white/[0.08] hover:bg-white/[0.18] text-textSecondary hover:text-white flex items-center justify-center shrink-0 transition">
-                                <i class="fa-solid fa-xmark text-[11px]" aria-hidden="true"></i>
-                            </button>
-                        </div>
-
-                        <!-- Borderless Message Input -->
-                        <label for="commentTextInput" class="sr-only">Yorum</label>
-                        <input type="text" id="commentTextInput" name="comment" maxlength="200" placeholder="Mesajınızı yazınız..." enterkeyhint="send" class="w-full bg-transparent px-0.5 py-1 text-base sm:text-[13px] text-white placeholder:text-zinc-500 focus:outline-none">
-
-                        <!-- Bottom Toolbar: [📎 Resim yükle] ... [0/200] [Gönder] -->
-                        <div class="flex items-center justify-between gap-2 pt-1">
-                            <div>
-                                <input type="file" id="commentImageInput" name="meme" accept="image/*" class="visually-hidden">
-                                <label for="commentImageInput" id="commentImageLabel" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.14] text-xs font-medium text-zinc-300 hover:text-white cursor-pointer transition select-none active:scale-95">
-                                    <i class="fa-solid fa-paperclip text-xs text-zinc-400" aria-hidden="true"></i>
-                                    <span id="commentImageBtnText">Resim yükle</span>
-                                </label>
-                            </div>
-
-                            <div class="flex items-center gap-3">
-                                <span id="commentCharCount" class="text-xs text-zinc-500 font-medium tabular-nums select-none">0/200</span>
-                                <button type="button" id="openAuthorStepBtn" class="px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/80 hover:bg-white text-black transition active:scale-95">
-                                    Gönder
-                                </button>
+                <div id="commentComposerBox" class="rounded-[20px] bg-[#0c0c10] border border-white/[0.1] focus-within:border-white/[0.24] p-3 sm:p-3.5 flex flex-col gap-3 shadow-xl transition">
+                    <!-- Compact Inline Image Preview Chip -->
+                    <div id="commentImagePreviewWrap" class="hidden items-center justify-between gap-2 px-2.5 py-1.5 rounded-xl bg-white/[0.06] border border-white/[0.1]">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <img id="commentImagePreviewEl" src="" alt="Yüklenecek görsel önizlemesi" width="32" height="32" class="w-8 h-8 rounded-lg object-cover border border-white/10 shrink-0">
+                            <div class="min-w-0">
+                                <div class="text-[11px] font-semibold text-white truncate">Görsel Eklendi</div>
+                                <div id="commentImageSizeText" class="text-[10px] text-textMuted truncate">Otomatik WebP sıkıştırıldı</div>
                             </div>
                         </div>
+                        <button type="button" id="removeCommentImageBtn" aria-label="Görseli kaldır" class="w-6 h-6 rounded-full bg-white/[0.08] hover:bg-white/[0.18] text-textSecondary hover:text-white flex items-center justify-center shrink-0 transition">
+                            <i class="fa-solid fa-xmark text-[11px]" aria-hidden="true"></i>
+                        </button>
                     </div>
 
-                    <!-- STEP 2: Asked After Clicking "Gönder" ("İsminiz nasıl gözüksün?" + Meal Rating) -->
-                    <div id="commentStepIdentity" class="hidden flex-col gap-2.5">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-xs font-semibold text-white flex items-center gap-1.5">
-                                <i class="fa-regular fa-id-badge text-sky-400" aria-hidden="true"></i>
-                                <span>İsminiz nasıl gözüksün?</span>
-                            </span>
-                            <button type="button" id="backToComposeStepBtn" class="text-[11px] font-medium text-textMuted hover:text-white flex items-center gap-1 transition">
-                                <i class="fa-solid fa-arrow-left text-[10px]" aria-hidden="true"></i>
-                                <span>Mesaja dön</span>
-                            </button>
-                        </div>
+                    <!-- Borderless Comment Input -->
+                    <label for="commentTextInput" class="sr-only">Yorum</label>
+                    <input type="text" id="commentTextInput" name="comment" maxlength="200" placeholder="Bugünkü yemekler nasıldı? Yorumunuzu yazın..." enterkeyhint="send" class="w-full bg-transparent px-0.5 py-1 text-base sm:text-[13px] text-white placeholder:text-zinc-500 focus:outline-none">
 
-                        <div id="commentAuthorPill" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/[0.12] focus-within:border-white/[0.28] transition">
-                            <i class="fa-regular fa-user text-xs text-textMuted shrink-0" aria-hidden="true"></i>
-                            <label for="commentAuthorInput" class="sr-only">İsim</label>
-                            <input type="text" id="commentAuthorInput" name="author" maxlength="28" placeholder="Adınız veya rumuzunuz..." autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" class="w-full min-w-0 bg-transparent text-base sm:text-xs text-white placeholder:text-zinc-500 focus:outline-none">
-                            <button type="button" id="fillAnonBtn" class="px-2 py-0.5 rounded-lg bg-white/[0.08] hover:bg-white/[0.15] border border-white/[0.1] text-[10px] font-semibold text-zinc-300 hover:text-white shrink-0 transition">
-                                Anonim
-                            </button>
-                        </div>
+                    <!-- Bottom Toolbar: [📎 Resim yükle] [★★★★★ 5/5] ... [0/200] [Gönder] -->
+                    <div class="flex items-center justify-between gap-1.5 pt-1">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <input type="file" id="commentImageInput" name="meme" accept="image/*" class="visually-hidden">
+                            <label for="commentImageInput" id="commentImageLabel" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.14] text-[11px] sm:text-xs font-medium text-zinc-300 hover:text-white cursor-pointer transition select-none active:scale-95 shrink-0">
+                                <i class="fa-solid fa-paperclip text-[11px] text-zinc-400" aria-hidden="true"></i>
+                                <span id="commentImageBtnText">Resim yükle</span>
+                            </label>
 
-                        <div class="flex items-center justify-between gap-2 pt-0.5">
-                            <!-- 5-Star Selector Pill -->
-                            <div id="commentStarGroup" role="radiogroup" aria-label="Öğün puanı (5 üzerinden)" class="inline-flex items-center gap-0.5 px-2.5 h-8 rounded-xl bg-white/[0.05] border border-white/[0.09] shrink-0">
-                                <span class="text-[10px] text-textMuted mr-1 hidden sm:inline">Puan:</span>
-                                <button type="button" data-star="1" role="radio" aria-checked="false" aria-label="1 Yıldız" class="star-select-btn w-4.5 h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
-                                    <i class="fa-solid fa-star text-[11px]" aria-hidden="true"></i>
+                            <!-- 5-Star Selector Right Next to Image Button -->
+                            <div id="commentStarGroup" role="radiogroup" aria-label="Öğün puanı (5 üzerinden)" class="inline-flex items-center gap-0.5 px-2 py-1.5 rounded-xl bg-white/[0.03] border border-white/[0.12] shrink-0">
+                                <button type="button" data-star="1" role="radio" aria-checked="false" aria-label="1 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                    <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="2" role="radio" aria-checked="false" aria-label="2 Yıldız" class="star-select-btn w-4.5 h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
-                                    <i class="fa-solid fa-star text-[11px]" aria-hidden="true"></i>
+                                <button type="button" data-star="2" role="radio" aria-checked="false" aria-label="2 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                    <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="3" role="radio" aria-checked="false" aria-label="3 Yıldız" class="star-select-btn w-4.5 h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
-                                    <i class="fa-solid fa-star text-[11px]" aria-hidden="true"></i>
+                                <button type="button" data-star="3" role="radio" aria-checked="false" aria-label="3 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                    <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="4" role="radio" aria-checked="false" aria-label="4 Yıldız" class="star-select-btn w-4.5 h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
-                                    <i class="fa-solid fa-star text-[11px]" aria-hidden="true"></i>
+                                <button type="button" data-star="4" role="radio" aria-checked="false" aria-label="4 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                    <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" data-star="5" role="radio" aria-checked="true" aria-label="5 Yıldız" class="star-select-btn w-4.5 h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
-                                    <i class="fa-solid fa-star text-[11px]" aria-hidden="true"></i>
+                                <button type="button" data-star="5" role="radio" aria-checked="true" aria-label="5 Yıldız" class="star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition">
+                                    <i class="fa-solid fa-star text-[10px] sm:text-[11px]" aria-hidden="true"></i>
                                 </button>
-                                <span id="selectedRatingLabel" class="ml-1 text-[10px] font-bold text-amber-300">5/5</span>
+                                <span id="selectedRatingLabel" class="ml-0.5 text-[10px] font-bold text-amber-300 hidden xs:inline sm:inline">5/5</span>
                             </div>
+                        </div>
 
-                            <button type="submit" id="submitCommentBtn" class="px-4 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition flex items-center gap-1.5 shrink-0 active:scale-95 disabled:opacity-40 disabled:pointer-events-none shadow-md">
-                                <span>Paylaş</span>
-                                <i class="fa-solid fa-paper-plane text-[10px]" aria-hidden="true"></i>
+                        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                            <span id="commentCharCount" class="text-[11px] sm:text-xs text-zinc-500 font-medium tabular-nums select-none">0/200</span>
+                            <button type="button" id="openAuthorStepBtn" class="px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/80 hover:bg-white text-black transition active:scale-95">
+                                Gönder
                             </button>
                         </div>
                     </div>
@@ -1178,6 +1145,37 @@
                 <div class="flex items-center justify-between gap-2 px-1 pt-1">
                     <span id="commentStatusText" aria-live="polite" class="text-[11px] text-textMuted truncate"></span>
                     <span class="text-[10px] text-textMuted shrink-0 ml-auto">Kişisel bilgi paylaşmayın</span>
+                </div>
+
+                <!-- Pop-up Modal: "Adınız nasıl gözükecek?" (Opened when clicking Gönder) -->
+                <div id="authorPromptOverlay" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-md items-center justify-center p-4">
+                    <div id="authorPromptCard" class="relative w-full max-w-[320px] rounded-[26px] bg-[#0b0b10] border border-white/[0.14] p-6 flex flex-col items-center text-center gap-3.5 shadow-2xl">
+                        <button type="button" id="closeAuthorPopupBtn" aria-label="Kapat" class="absolute top-3.5 right-3.5 w-7 h-7 rounded-full bg-white/[0.06] hover:bg-white/[0.14] text-textSecondary hover:text-white flex items-center justify-center transition">
+                            <i class="fa-solid fa-xmark text-xs" aria-hidden="true"></i>
+                        </button>
+
+                        <!-- User Logo Avatar -->
+                        <div id="authorPopupAvatar" class="w-14 h-14 rounded-full bg-white/[0.06] border border-white/[0.14] flex items-center justify-center text-white shadow-inner">
+                            <i class="fa-regular fa-user text-xl" aria-hidden="true"></i>
+                        </div>
+
+                        <div class="space-y-1">
+                            <h3 class="text-base font-bold text-white tracking-tight">Adınız nasıl gözükecek?</h3>
+                            <p class="text-[11px] text-textMuted">Yorumunuzda görünecek ismi belirleyin</p>
+                        </div>
+
+                        <div id="commentAuthorPill" class="w-full flex items-center px-3.5 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.12] focus-within:border-white/[0.28] transition">
+                            <label for="commentAuthorInput" class="sr-only">Adınız</label>
+                            <input type="text" id="commentAuthorInput" name="author" maxlength="28" placeholder="Adınızı giriniz..." autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" class="w-full bg-transparent text-center text-base sm:text-xs font-medium text-white placeholder:text-zinc-500 focus:outline-none">
+                        </div>
+
+                        <span id="authorPopupErrorText" class="hidden text-[11px] text-rose-400 font-medium"></span>
+
+                        <button type="submit" id="submitCommentBtn" class="w-full py-2.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none shadow-lg">
+                            <span>Gönder</span>
+                            <i class="fa-solid fa-paper-plane text-[10px]" aria-hidden="true"></i>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -2527,8 +2525,8 @@
                 const active = btnVal <= r;
                 btn.setAttribute('aria-checked', String(btnVal === r));
                 btn.className = active
-                    ? "star-select-btn w-4.5 h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition"
-                    : "star-select-btn w-4.5 h-4.5 flex items-center justify-center text-zinc-600 hover:text-amber-300 hover:scale-110 transition";
+                    ? "star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-amber-400 hover:scale-110 transition"
+                    : "star-select-btn w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center text-zinc-600 hover:text-amber-300 hover:scale-110 transition";
             });
         }
 
@@ -2954,21 +2952,21 @@
             if (openBtn) {
                 const hasContent = Boolean((textInput && textInput.value.trim()) || pendingMemeBlob || pendingMemeDataUrl);
                 openBtn.className = hasContent
-                    ? "px-4 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition active:scale-95 shadow-sm"
-                    : "px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/75 hover:bg-zinc-300 text-black transition active:scale-95";
+                    ? "px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-zinc-200 text-black transition active:scale-95 shadow-sm"
+                    : "px-3.5 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-400/75 hover:bg-zinc-300 text-black transition active:scale-95";
             }
         }
 
         function showComposeStep() {
-            const stepCompose = document.getElementById('commentStepCompose');
-            const stepIdentity = document.getElementById('commentStepIdentity');
-            if (stepCompose) {
-                stepCompose.classList.remove('hidden');
-                stepCompose.classList.add('flex');
+            const overlay = document.getElementById('authorPromptOverlay');
+            const popupErr = document.getElementById('authorPopupErrorText');
+            if (overlay) {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
             }
-            if (stepIdentity) {
-                stepIdentity.classList.add('hidden');
-                stepIdentity.classList.remove('flex');
+            if (popupErr) {
+                popupErr.textContent = "";
+                popupErr.classList.add('hidden');
             }
             updateCommentComposerState();
         }
@@ -2982,7 +2980,7 @@
             statusEl.className = "text-[11px] text-textMuted truncate";
 
             if (!text && !pendingMemeBlob && !pendingMemeDataUrl) {
-                statusEl.textContent = "Lütfen bir mesaj yazın veya resim yükleyin.";
+                statusEl.textContent = "Lütfen bir yorum yazın veya resim yükleyin.";
                 textInput.focus();
                 return;
             }
@@ -3005,15 +3003,15 @@
             }
 
             statusEl.textContent = "";
-            const stepCompose = document.getElementById('commentStepCompose');
-            const stepIdentity = document.getElementById('commentStepIdentity');
-            if (stepCompose) {
-                stepCompose.classList.add('hidden');
-                stepCompose.classList.remove('flex');
+            const overlay = document.getElementById('authorPromptOverlay');
+            const popupErr = document.getElementById('authorPopupErrorText');
+            if (popupErr) {
+                popupErr.textContent = "";
+                popupErr.classList.add('hidden');
             }
-            if (stepIdentity) {
-                stepIdentity.classList.remove('hidden');
-                stepIdentity.classList.add('flex');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
             }
 
             try {
@@ -3121,13 +3119,14 @@
             const honeypot = document.getElementById('commentHoneypot');
             if (honeypot && honeypot.value) return;
 
-            const stepIdentity = document.getElementById('commentStepIdentity');
-            if (stepIdentity && stepIdentity.classList.contains('hidden')) {
+            const overlay = document.getElementById('authorPromptOverlay');
+            if (overlay && overlay.classList.contains('hidden')) {
                 openAuthorStep();
                 return;
             }
 
             const statusEl = document.getElementById('commentStatusText');
+            const popupErrEl = document.getElementById('authorPopupErrorText');
             const submitBtn = document.getElementById('submitCommentBtn');
             const authorInput = document.getElementById('commentAuthorInput');
             const textInput = document.getElementById('commentTextInput');
@@ -3136,22 +3135,32 @@
             const text = (textInput.value || "").trim().slice(0, 200);
 
             statusEl.className = "text-[11px] text-textMuted truncate";
+            if (popupErrEl) {
+                popupErrEl.textContent = "";
+                popupErrEl.classList.add('hidden');
+            }
 
             if (!author || author.length < 2) {
-                statusEl.textContent = "Lütfen en az 2 harfli bir isim yazın (veya Anonim seçin).";
+                if (popupErrEl) {
+                    popupErrEl.textContent = "Lütfen en az 2 harfli bir isim giriniz.";
+                    popupErrEl.classList.remove('hidden');
+                }
                 authorInput.focus();
                 return;
             }
 
             if (!adminPrivateKey && RESERVED_AUTHOR_PATTERN.test(author)) {
-                statusEl.textContent = "Bu isim kullanılamaz, lütfen başka bir isim seçin.";
+                if (popupErrEl) {
+                    popupErrEl.textContent = "Bu isim kullanılamaz, lütfen başka bir isim seçin.";
+                    popupErrEl.classList.remove('hidden');
+                }
                 authorInput.focus();
                 return;
             }
 
             if (!text && !pendingMemeBlob && !pendingMemeDataUrl) {
                 showComposeStep();
-                statusEl.textContent = "Lütfen bir mesaj yazın veya resim yükleyin.";
+                statusEl.textContent = "Lütfen bir yorum yazın veya resim yükleyin.";
                 textInput.focus();
                 return;
             }
@@ -3163,11 +3172,13 @@
                     const lastTs = parseInt(localStorage.getItem('yuyemekhane_last_comment_ts') || '0', 10);
                     const diffSec = Math.ceil((25000 - (nowMs - lastTs)) / 1000);
                     if (diffSec > 0) {
+                        showComposeStep();
                         statusEl.textContent = `Spam koruması: ${diffSec} sn bekleyin.`;
                         return;
                     }
                     const lastText = localStorage.getItem('yuyemekhane_last_comment_txt') || '';
                     if (text && text === lastText && !pendingMemeBlob && !pendingMemeDataUrl) {
+                        showComposeStep();
                         statusEl.textContent = "Aynı yorumu tekrar gönderemezsiniz.";
                         return;
                     }
@@ -3256,6 +3267,10 @@
                     showToast("Yorumun yönetici onayına gönderildi!");
                 }
             } catch (err) {
+                if (popupErrEl) {
+                    popupErrEl.textContent = "Bağlantı hatası, tekrar deneyin.";
+                    popupErrEl.classList.remove('hidden');
+                }
                 statusEl.className = "text-[11px] text-rose-400";
                 statusEl.textContent = "Bağlantı hatası, tekrar deneyin.";
             } finally {
@@ -3450,15 +3465,14 @@
             btn.addEventListener('click', () => setSelectedCommentRating(btn.dataset.star));
         });
         document.getElementById('openAuthorStepBtn').addEventListener('click', openAuthorStep);
-        document.getElementById('backToComposeStepBtn').addEventListener('click', () => {
+        document.getElementById('closeAuthorPopupBtn').addEventListener('click', () => {
             showComposeStep();
             document.getElementById('commentTextInput').focus();
         });
-        document.getElementById('fillAnonBtn').addEventListener('click', () => {
-            const authorInput = document.getElementById('commentAuthorInput');
-            authorInput.value = "Anonim";
-            document.getElementById('commentStatusText').textContent = "";
-            document.getElementById('submitCommentBtn').focus();
+        document.getElementById('authorPromptOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'authorPromptOverlay') {
+                showComposeStep();
+            }
         });
         document.getElementById('commentTextInput').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -3494,6 +3508,11 @@
         document.querySelectorAll('#commentAuthorInput, #commentTextInput').forEach(inp => {
             inp.addEventListener('input', () => {
                 document.getElementById('commentStatusText').textContent = "";
+                const popupErrEl = document.getElementById('authorPopupErrorText');
+                if (popupErrEl) {
+                    popupErrEl.textContent = "";
+                    popupErrEl.classList.add('hidden');
+                }
                 updateCommentComposerState();
             });
         });
