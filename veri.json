@@ -1,7 +1,7 @@
 {
     "last_updated": "12.11.2026",
     "menus": {
-        "2026-11-24": {
+        "2026-11-02": {
             "ogle": [
                 {
                     "name": "MERCİMEK ÇORBA",
@@ -9,19 +9,19 @@
                     "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
                 },
                 {
-                    "name": "KÖFTE  PATATES",
-                    "cal": 150,
-                    "ingredients": "köfte, patates, yağ, tuz"
+                    "name": "TAVUK DÖNER",
+                    "cal": 149,
+                    "ingredients": "Tavuk eti, salça, sıvı yağ, karabiber , tuz"
                 },
                 {
-                    "name": "BULGUR PİLAVI",
-                    "cal": 169,
-                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
                 },
                 {
-                    "name": "SALATA",
-                    "cal": 90,
-                    "ingredients": "Marul,havuç,z.y,tuz,limon"
+                    "name": "AYRAN",
+                    "cal": 56,
+                    "ingredients": "Yoğurt,tuz,su"
                 }
             ],
             "aksam": [
@@ -31,14 +31,14 @@
                     "ingredients": "Un, salça, yağ, tuz, süt, kaşar peyniri"
                 },
                 {
-                    "name": "ELBASAN TAVA (TAVUK)",
-                    "cal": 306,
-                    "ingredients": "TAVUK GÖĞÜS, UN, SÜT, YUMURTA, YAĞ, TUZ, KARABİBER"
+                    "name": "KURU FASULYE",
+                    "cal": 267,
+                    "ingredients": "Kuru fasülye,et,k.soğan,salça,tuz,yağ"
                 },
                 {
-                    "name": "MISIRLI PİLAV",
-                    "cal": 336,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, MISIR, TUZ"
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
                 },
                 {
                     "name": "MEYVE",
@@ -47,34 +47,58 @@
                 }
             ]
         },
-        "2026-11-26": {
+        "2026-11-27": {
             "ogle": [
                 {
-                    "name": "YAYLA ÇORBA",
-                    "cal": 98,
-                    "ingredients": "Yoğurt, Pirinç, Yumurta, Un, Yağ, Nane, Tuz"
+                    "name": "PRENSES ÇORBA",
+                    "cal": 122,
+                    "ingredients": "tavuk göğsü, kuru soğan,un ,yumurta,havuç, tuz, karabiber, limon suyu"
                 },
                 {
-                    "name": "ANKARA TAVA",
+                    "name": "ETLİ TÜRLÜ",
+                    "cal": 221,
+                    "ingredients": "Dana Eti, salça, Kuru Soğan, Patlıcan patates, yağ, havuç, tuz, karabiber"
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
                     "cal": 283,
-                    "ingredients": "şehriye, et, yağ, tuz"
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
                 },
                 {
-                    "name": "ZEYTİNYAĞLI TAZE FASULYE",
-                    "cal": 232,
-                    "ingredients": ""
-                },
-                {
-                    "name": "MEŞRUBAT",
-                    "cal": 60,
-                    "ingredients": ""
+                    "name": "İRMİK HELVASI",
+                    "cal": 532,
+                    "ingredients": "İrmik, Süt, Şeker, Yağ, Tarçın"
                 }
             ],
             "aksam": [
                 {
-                    "name": "SEBZE ÇORBA",
-                    "cal": 114,
-                    "ingredients": "Havuç,patates,bezelye,un ,yumurta,süt,yağ,tuz,karabiber,limon suyu"
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125,
+                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                },
+                {
+                    "name": "BİBER DOLMA",
+                    "cal": 166,
+                    "ingredients": "Dolmalık Bİber, Dana Eti, kuru soğan, salça ,sıvı yağ, pirinç ,tuz, kimyon, karabiber"
+                },
+                {
+                    "name": "MAKARNA (PEYNİRLİ)",
+                    "cal": 308,
+                    "ingredients": ""
+                },
+                {
+                    "name": "YOĞURT",
+                    "cal": 130,
+                    "ingredients": ""
+                }
+            ]
+        },
+        "2026-11-18": {
+            "ogle": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125,
+                    "ingredients": "Tel şehriye,salça,yağ,tuz"
                 },
                 {
                     "name": "FIRIN TAVUK",
@@ -82,50 +106,26 @@
                     "ingredients": "Tavuk but,salça,tuz.yağ,kekik,patates,karabiber"
                 },
                 {
-                    "name": "BULGUR PİLAVI",
-                    "cal": 169,
-                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
+                    "name": "GÖKKUŞAĞI PİLAVI",
+                    "cal": 306,
+                    "ingredients": "Pirinç,yağ,bezelye,havuç,tuz"
                 },
                 {
                     "name": "SALATA",
                     "cal": 90,
                     "ingredients": "Marul,havuç,z.y,tuz,limon"
                 }
-            ]
-        },
-        "2026-11-12": {
-            "ogle": [
+            ],
+            "aksam": [
                 {
                     "name": "SEBZE ÇORBA",
                     "cal": 114,
                     "ingredients": "Havuç,patates,bezelye,un ,yumurta,süt,yağ,tuz,karabiber,limon suyu"
                 },
                 {
-                    "name": "İZMİR KÖFTE",
-                    "cal": 197,
-                    "ingredients": "Dana Eti,Yağ, Salça, Tuz, Karabiber, Yumurta, Kuru Soğan, ekmek, Maydanoz"
-                },
-                {
-                    "name": "MISIRLI PİLAV",
-                    "cal": 336,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, MISIR, TUZ"
-                },
-                {
-                    "name": "ŞEKERPARE",
-                    "cal": 420,
-                    "ingredients": ""
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "MERCİMEK ÇORBA",
-                    "cal": 137,
-                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
-                },
-                {
-                    "name": "FIRIN TAVUK",
-                    "cal": 465,
-                    "ingredients": "Tavuk but,salça,tuz.yağ,kekik,patates,karabiber"
+                    "name": "ÇOBAN KAVURMA",
+                    "cal": 370,
+                    "ingredients": "Dana Eti, K. soğan, Patates, Biber, Sıvı Yağ"
                 },
                 {
                     "name": "BULGUR PİLAVI",
@@ -133,13 +133,13 @@
                     "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
-                    "name": "ŞEKERPARE",
-                    "cal": 420,
-                    "ingredients": ""
+                    "name": "SÜTLAÇ",
+                    "cal": 268,
+                    "ingredients": "Süt,Şeker,pirinç,nişasta,tarçın,vanilya"
                 }
             ]
         },
-        "2026-11-20": {
+        "2026-11-10": {
             "ogle": [
                 {
                     "name": "TAVUK SUYU ÇORBA",
@@ -147,14 +147,14 @@
                     "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
                 },
                 {
-                    "name": "KURU FASULYE",
-                    "cal": 267,
-                    "ingredients": "Dana Eti, Yağ, Biber, Domates, Kuru Soğan, Salça, Tuz"
+                    "name": "ETLİ TÜRLÜ",
+                    "cal": 221,
+                    "ingredients": "Dana Eti, salça, Kuru Soğan, Patlıcan patates, yağ, havuç, tuz, karabiber"
                 },
                 {
-                    "name": "MISIRLI PİLAV",
-                    "cal": 336,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, MISIR, TUZ"
+                    "name": "FIRIN MAKARNA",
+                    "cal": 292,
+                    "ingredients": "Makarna,yumurta,süt,k.peynir,yağ,tuz,un,maydonoz"
                 },
                 {
                     "name": "CACIK",
@@ -169,18 +169,202 @@
                     "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
                 },
                 {
-                    "name": "ANKARA TAVA",
-                    "cal": 283,
-                    "ingredients": "şehriye, et, yağ, tuz"
+                    "name": "İÇLİ KÖFTE",
+                    "cal": 320,
+                    "ingredients": "Köftelik bulgur, Kıyma, Soğan, Pulbiber, Karabiber, Kimyon, Sıvı yağ, Salça"
                 },
                 {
-                    "name": "KARIŞIK KIZARTMA (SOSLU)",
-                    "cal": 224,
-                    "ingredients": ""
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
                 },
                 {
                     "name": "YOĞURT",
                     "cal": 130,
+                    "ingredients": ""
+                }
+            ]
+        },
+        "2026-11-04": {
+            "ogle": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125,
+                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                },
+                {
+                    "name": "FIRIN TAVUK",
+                    "cal": 465,
+                    "ingredients": "Tavuk but,salça,tuz.yağ,kekik,patates,karabiber"
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169,
+                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
+                },
+                {
+                    "name": "TULUMBA TATLISI",
+                    "cal": 420,
+                    "ingredients": "İrmik, yumurta, un, şeker,  limon suyu ,  kabartma tozu, sıvı yağ,"
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132,
+                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
+                },
+                {
+                    "name": "BEZELYE YEMEĞİ",
+                    "cal": 150,
+                    "ingredients": "Bezelye, havuç,  patates , salça, k.soğan, karabiber ,tuz"
+                },
+                {
+                    "name": "ERİŞTE (DOM. BİB.)",
+                    "cal": 244,
+                    "ingredients": "Erişte, domates,biber, yağ,tuz"
+                },
+                {
+                    "name": "SALATA",
+                    "cal": 90,
+                    "ingredients": "Marul,havuç,z.y,tuz,limon"
+                }
+            ]
+        },
+        "2026-11-23": {
+            "ogle": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125,
+                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                },
+                {
+                    "name": "NOHUT",
+                    "cal": 285,
+                    "ingredients": "Nohut,k. soğan, et, sıvı yağ, salça, karabiber, pulbiber , tuz,"
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
+                },
+                {
+                    "name": "MEYVE",
+                    "cal": 65,
+                    "ingredients": ""
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "TAVUK SUYU ÇORBA",
+                    "cal": 117,
+                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
+                },
+                {
+                    "name": "PATATES MUSAKKA",
+                    "cal": 468,
+                    "ingredients": ""
+                },
+                {
+                    "name": "MAKARNA(SADE)",
+                    "cal": 280,
+                    "ingredients": "Makarna, sıvı yağ, tuz"
+                },
+                {
+                    "name": "HAYDARİ",
+                    "cal": 134,
+                    "ingredients": "Yoğurt, kuru nane, zeytinyağı"
+                }
+            ]
+        },
+        "2026-11-17": {
+            "ogle": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132,
+                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
+                },
+                {
+                    "name": "TERBİYELİ KÖFTE",
+                    "cal": 244,
+                    "ingredients": ""
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169,
+                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
+                },
+                {
+                    "name": "MEYVE",
+                    "cal": 65,
+                    "ingredients": ""
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125,
+                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                },
+                {
+                    "name": "TAVUK DÖNER",
+                    "cal": 149,
+                    "ingredients": "Tavuk eti, salça, sıvı yağ, karabiber , tuz"
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56,
+                    "ingredients": "Yoğurt,tuz,su"
+                }
+            ]
+        },
+        "2026-11-16": {
+            "ogle": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137,
+                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
+                },
+                {
+                    "name": "ETLİ PATATES YEMEĞİ",
+                    "cal": 400,
+                    "ingredients": "Patates, Et, Kuru Soğan, Sıvı Yağ, Salça, Karabiber, Pulbiber , Tuz"
+                },
+                {
+                    "name": "PİRİNÇ PİLAVI",
+                    "cal": 283,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56,
+                    "ingredients": "Yoğurt,tuz,su"
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "MAHLUTA ÇORBA",
+                    "cal": 161,
+                    "ingredients": "K.mercimek,pirinç,un ,yağ,salça,limon,tuz"
+                },
+                {
+                    "name": "HASAN PAŞA KÖFTE",
+                    "cal": 282,
+                    "ingredients": ""
+                },
+                {
+                    "name": "MAKARNA (PEYNİRLİ)",
+                    "cal": 308,
+                    "ingredients": ""
+                },
+                {
+                    "name": "MEŞRUBAT",
+                    "cal": 60,
                     "ingredients": ""
                 }
             ]
@@ -231,7 +415,7 @@
                 }
             ]
         },
-        "2026-11-09": {
+        "2026-11-30": {
             "ogle": [
                 {
                     "name": "EZOGELİN ÇORBA",
@@ -239,9 +423,9 @@
                     "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
                 },
                 {
-                    "name": "ET DÖNER",
-                    "cal": 239,
-                    "ingredients": "Dana Eti, Tuz, Pulbiber, Karabiber, Salça , tuz, Yağ"
+                    "name": "TAVUK DÖNER",
+                    "cal": 149,
+                    "ingredients": "Tavuk, Kırmızı Biber, Yağ, Tuz, Salça"
                 },
                 {
                     "name": "PİRİNÇ PİLAVI",
@@ -261,9 +445,9 @@
                     "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
                 },
                 {
-                    "name": "KURU FASULYE",
-                    "cal": 267,
-                    "ingredients": "Kuru fasülye,et,k.soğan,salça,tuz,yağ"
+                    "name": "NOHUT",
+                    "cal": 285,
+                    "ingredients": "Nohut,k. soğan, et, sıvı yağ, salça, karabiber, pulbiber , tuz,"
                 },
                 {
                     "name": "BULGUR PİLAVI",
@@ -271,59 +455,13 @@
                     "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
-                    "name": "AYRAN",
-                    "cal": 56,
-                    "ingredients": "Yoğurt,tuz,su"
+                    "name": "YOĞURT",
+                    "cal": 130,
+                    "ingredients": ""
                 }
             ]
         },
-        "2026-11-17": {
-            "ogle": [
-                {
-                    "name": "EZOGELİN ÇORBA",
-                    "cal": 132,
-                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
-                },
-                {
-                    "name": "TERBİYELİ KÖFTE",
-                    "cal": 244,
-                    "ingredients": ""
-                },
-                {
-                    "name": "BULGUR PİLAVI",
-                    "cal": 169,
-                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
-                },
-                {
-                    "name": "MEYVE",
-                    "cal": 65,
-                    "ingredients": ""
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "TEL ŞEHRİYE ÇORBA",
-                    "cal": 125,
-                    "ingredients": "Tel şehriye,salça,yağ,tuz"
-                },
-                {
-                    "name": "TAVUK DÖNER",
-                    "cal": 149,
-                    "ingredients": "Tavuk eti, salça, sıvı yağ, karabiber , tuz"
-                },
-                {
-                    "name": "PİRİNÇ PİLAVI",
-                    "cal": 283,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
-                },
-                {
-                    "name": "AYRAN",
-                    "cal": 56,
-                    "ingredients": "Yoğurt,tuz,su"
-                }
-            ]
-        },
-        "2026-11-19": {
+        "2026-11-06": {
             "ogle": [
                 {
                     "name": "MERCİMEK ÇORBA",
@@ -331,36 +469,36 @@
                     "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
                 },
                 {
-                    "name": "ETLİ TÜRLÜ",
-                    "cal": 221,
-                    "ingredients": "Dana Eti, salça, Kuru Soğan, Patlıcan patates, yağ, havuç, tuz, karabiber"
-                },
-                {
-                    "name": "MAKARNA (SOSLU)",
-                    "cal": 206,
-                    "ingredients": "Makarna,salça,tuz,yağ"
-                },
-                {
-                    "name": "TULUMBA TATLISI",
-                    "cal": 420,
-                    "ingredients": "İrmik, yumurta, un, şeker,  limon suyu ,  kabartma tozu, sıvı yağ,"
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "YOĞURT ÇORBA",
-                    "cal": 160,
-                    "ingredients": ""
-                },
-                {
-                    "name": "TAVUK KAVURMA (KÖRİLİ)",
-                    "cal": 243,
+                    "name": "ÇOBAN KAVURMA",
+                    "cal": 370,
                     "ingredients": ""
                 },
                 {
                     "name": "PİRİNÇ PİLAVI",
                     "cal": 283,
                     "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56,
+                    "ingredients": "Yoğurt,tuz,su"
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "TAVUK SUYU ÇORBA",
+                    "cal": 117,
+                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
+                },
+                {
+                    "name": "NOHUT",
+                    "cal": 285,
+                    "ingredients": "Nohut,Dana Eti,salça,k.soğan,tuz,yağ"
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169,
+                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
                     "name": "MEYVE",
@@ -415,12 +553,34 @@
                 }
             ]
         },
-        "2026-11-04": {
+        "2026-11-12": {
             "ogle": [
                 {
-                    "name": "TEL ŞEHRİYE ÇORBA",
-                    "cal": 125,
-                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                    "name": "SEBZE ÇORBA",
+                    "cal": 114,
+                    "ingredients": "Havuç,patates,bezelye,un ,yumurta,süt,yağ,tuz,karabiber,limon suyu"
+                },
+                {
+                    "name": "İZMİR KÖFTE",
+                    "cal": 197,
+                    "ingredients": "Dana Eti,Yağ, Salça, Tuz, Karabiber, Yumurta, Kuru Soğan, ekmek, Maydanoz"
+                },
+                {
+                    "name": "MISIRLI PİLAV",
+                    "cal": 336,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, MISIR, TUZ"
+                },
+                {
+                    "name": "ŞEKERPARE",
+                    "cal": 420,
+                    "ingredients": ""
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137,
+                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
                 },
                 {
                     "name": "FIRIN TAVUK",
@@ -433,26 +593,50 @@
                     "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
-                    "name": "TULUMBA TATLISI",
+                    "name": "ŞEKERPARE",
                     "cal": 420,
-                    "ingredients": "İrmik, yumurta, un, şeker,  limon suyu ,  kabartma tozu, sıvı yağ,"
+                    "ingredients": ""
+                }
+            ]
+        },
+        "2026-11-26": {
+            "ogle": [
+                {
+                    "name": "YAYLA ÇORBA",
+                    "cal": 98,
+                    "ingredients": "Yoğurt, Pirinç, Yumurta, Un, Yağ, Nane, Tuz"
+                },
+                {
+                    "name": "ANKARA TAVA",
+                    "cal": 283,
+                    "ingredients": "şehriye, et, yağ, tuz"
+                },
+                {
+                    "name": "ZEYTİNYAĞLI TAZE FASULYE",
+                    "cal": 232,
+                    "ingredients": ""
+                },
+                {
+                    "name": "MEŞRUBAT",
+                    "cal": 60,
+                    "ingredients": ""
                 }
             ],
             "aksam": [
                 {
-                    "name": "EZOGELİN ÇORBA",
-                    "cal": 132,
-                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
+                    "name": "SEBZE ÇORBA",
+                    "cal": 114,
+                    "ingredients": "Havuç,patates,bezelye,un ,yumurta,süt,yağ,tuz,karabiber,limon suyu"
                 },
                 {
-                    "name": "BEZELYE YEMEĞİ",
-                    "cal": 150,
-                    "ingredients": "Bezelye, havuç,  patates , salça, k.soğan, karabiber ,tuz"
+                    "name": "FIRIN TAVUK",
+                    "cal": 465,
+                    "ingredients": "Tavuk but,salça,tuz.yağ,kekik,patates,karabiber"
                 },
                 {
-                    "name": "ERİŞTE (DOM. BİB.)",
-                    "cal": 244,
-                    "ingredients": "Erişte, domates,biber, yağ,tuz"
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169,
+                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
                     "name": "SALATA",
@@ -461,39 +645,17 @@
                 }
             ]
         },
-        "2026-11-30": {
+        "2026-11-24": {
             "ogle": [
                 {
-                    "name": "EZOGELİN ÇORBA",
-                    "cal": 132,
-                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137,
+                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
                 },
                 {
-                    "name": "TAVUK DÖNER",
-                    "cal": 149,
-                    "ingredients": "Tavuk, Kırmızı Biber, Yağ, Tuz, Salça"
-                },
-                {
-                    "name": "PİRİNÇ PİLAVI",
-                    "cal": 283,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
-                },
-                {
-                    "name": "AYRAN",
-                    "cal": 56,
-                    "ingredients": "Yoğurt,tuz,su"
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "TAVUK SUYU ÇORBA",
-                    "cal": 117,
-                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
-                },
-                {
-                    "name": "NOHUT",
-                    "cal": 285,
-                    "ingredients": "Nohut,k. soğan, et, sıvı yağ, salça, karabiber, pulbiber , tuz,"
+                    "name": "KÖFTE  PATATES",
+                    "cal": 150,
+                    "ingredients": "köfte, patates, yağ, tuz"
                 },
                 {
                     "name": "BULGUR PİLAVI",
@@ -501,330 +663,30 @@
                     "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
-                    "name": "YOĞURT",
-                    "cal": 130,
-                    "ingredients": ""
-                }
-            ]
-        },
-        "2026-11-27": {
-            "ogle": [
-                {
-                    "name": "PRENSES ÇORBA",
-                    "cal": 122,
-                    "ingredients": "tavuk göğsü, kuru soğan,un ,yumurta,havuç, tuz, karabiber, limon suyu"
-                },
-                {
-                    "name": "ETLİ TÜRLÜ",
-                    "cal": 221,
-                    "ingredients": "Dana Eti, salça, Kuru Soğan, Patlıcan patates, yağ, havuç, tuz, karabiber"
-                },
-                {
-                    "name": "PİRİNÇ PİLAVI",
-                    "cal": 283,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
-                },
-                {
-                    "name": "İRMİK HELVASI",
-                    "cal": 532,
-                    "ingredients": "İrmik, Süt, Şeker, Yağ, Tarçın"
+                    "name": "SALATA",
+                    "cal": 90,
+                    "ingredients": "Marul,havuç,z.y,tuz,limon"
                 }
             ],
             "aksam": [
                 {
-                    "name": "TEL ŞEHRİYE ÇORBA",
-                    "cal": 125,
-                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                    "name": "DOMATES ÇORBA",
+                    "cal": 160,
+                    "ingredients": "Un, salça, yağ, tuz, süt, kaşar peyniri"
                 },
                 {
-                    "name": "BİBER DOLMA",
-                    "cal": 166,
-                    "ingredients": "Dolmalık Bİber, Dana Eti, kuru soğan, salça ,sıvı yağ, pirinç ,tuz, kimyon, karabiber"
+                    "name": "ELBASAN TAVA (TAVUK)",
+                    "cal": 306,
+                    "ingredients": "TAVUK GÖĞÜS, UN, SÜT, YUMURTA, YAĞ, TUZ, KARABİBER"
                 },
                 {
-                    "name": "MAKARNA (PEYNİRLİ)",
-                    "cal": 308,
-                    "ingredients": ""
-                },
-                {
-                    "name": "YOĞURT",
-                    "cal": 130,
-                    "ingredients": ""
-                }
-            ]
-        },
-        "2026-11-23": {
-            "ogle": [
-                {
-                    "name": "TEL ŞEHRİYE ÇORBA",
-                    "cal": 125,
-                    "ingredients": "Tel şehriye,salça,yağ,tuz"
-                },
-                {
-                    "name": "NOHUT",
-                    "cal": 285,
-                    "ingredients": "Nohut,k. soğan, et, sıvı yağ, salça, karabiber, pulbiber , tuz,"
-                },
-                {
-                    "name": "PİRİNÇ PİLAVI",
-                    "cal": 283,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
+                    "name": "MISIRLI PİLAV",
+                    "cal": 336,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, MISIR, TUZ"
                 },
                 {
                     "name": "MEYVE",
                     "cal": 65,
-                    "ingredients": ""
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "TAVUK SUYU ÇORBA",
-                    "cal": 117,
-                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
-                },
-                {
-                    "name": "PATATES MUSAKKA",
-                    "cal": 468,
-                    "ingredients": ""
-                },
-                {
-                    "name": "MAKARNA(SADE)",
-                    "cal": 280,
-                    "ingredients": "Makarna, sıvı yağ, tuz"
-                },
-                {
-                    "name": "HAYDARİ",
-                    "cal": 134,
-                    "ingredients": "Yoğurt, kuru nane, zeytinyağı"
-                }
-            ]
-        },
-        "2026-11-06": {
-            "ogle": [
-                {
-                    "name": "MERCİMEK ÇORBA",
-                    "cal": 137,
-                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
-                },
-                {
-                    "name": "ÇOBAN KAVURMA",
-                    "cal": 370,
-                    "ingredients": ""
-                },
-                {
-                    "name": "PİRİNÇ PİLAVI",
-                    "cal": 283,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
-                },
-                {
-                    "name": "AYRAN",
-                    "cal": 56,
-                    "ingredients": "Yoğurt,tuz,su"
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "TAVUK SUYU ÇORBA",
-                    "cal": 117,
-                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
-                },
-                {
-                    "name": "NOHUT",
-                    "cal": 285,
-                    "ingredients": "Nohut,Dana Eti,salça,k.soğan,tuz,yağ"
-                },
-                {
-                    "name": "BULGUR PİLAVI",
-                    "cal": 169,
-                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
-                },
-                {
-                    "name": "MEYVE",
-                    "cal": 65,
-                    "ingredients": ""
-                }
-            ]
-        },
-        "2026-11-11": {
-            "ogle": [
-                {
-                    "name": "EZOGELİN ÇORBA",
-                    "cal": 132,
-                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
-                },
-                {
-                    "name": "TAVUK SOTE",
-                    "cal": 288,
-                    "ingredients": "Tavuk eti,çarliston  biber, Domates, Kuru Soğan, Salça, sıvı yağ, tuz, karabiber"
-                },
-                {
-                    "name": "BULGUR PİLAVI",
-                    "cal": 169,
-                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
-                },
-                {
-                    "name": "MEYVE",
-                    "cal": 65,
-                    "ingredients": ""
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "TEL ŞEHRİYE ÇORBA",
-                    "cal": 125,
-                    "ingredients": "Tel şehriye,salça,yağ,tuz"
-                },
-                {
-                    "name": "ETLİ PATATES YEMEĞİ",
-                    "cal": 400,
-                    "ingredients": "Patates, Et, Kuru Soğan, Sıvı Yağ, Salça, Karabiber, Pulbiber , Tuz"
-                },
-                {
-                    "name": "MAKARNA (PEYNİRLİ)",
-                    "cal": 308,
-                    "ingredients": ""
-                },
-                {
-                    "name": "MEŞRUBAT",
-                    "cal": 60,
-                    "ingredients": ""
-                }
-            ]
-        },
-        "2026-11-16": {
-            "ogle": [
-                {
-                    "name": "MERCİMEK ÇORBA",
-                    "cal": 137,
-                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
-                },
-                {
-                    "name": "ETLİ PATATES YEMEĞİ",
-                    "cal": 400,
-                    "ingredients": "Patates, Et, Kuru Soğan, Sıvı Yağ, Salça, Karabiber, Pulbiber , Tuz"
-                },
-                {
-                    "name": "PİRİNÇ PİLAVI",
-                    "cal": 283,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
-                },
-                {
-                    "name": "AYRAN",
-                    "cal": 56,
-                    "ingredients": "Yoğurt,tuz,su"
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "MAHLUTA ÇORBA",
-                    "cal": 161,
-                    "ingredients": "K.mercimek,pirinç,un ,yağ,salça,limon,tuz"
-                },
-                {
-                    "name": "HASAN PAŞA KÖFTE",
-                    "cal": 282,
-                    "ingredients": ""
-                },
-                {
-                    "name": "MAKARNA (PEYNİRLİ)",
-                    "cal": 308,
-                    "ingredients": ""
-                },
-                {
-                    "name": "MEŞRUBAT",
-                    "cal": 60,
-                    "ingredients": ""
-                }
-            ]
-        },
-        "2026-11-13": {
-            "ogle": [
-                {
-                    "name": "MERCİMEK ÇORBA",
-                    "cal": 137,
-                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
-                },
-                {
-                    "name": "NOHUT",
-                    "cal": 285,
-                    "ingredients": "Nohut,k. soğan, et, sıvı yağ, salça, karabiber, pulbiber , tuz,"
-                },
-                {
-                    "name": "BULGUR PİLAVI",
-                    "cal": 169,
-                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
-                },
-                {
-                    "name": "YOĞURT",
-                    "cal": 130,
-                    "ingredients": ""
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "EZOGELİN ÇORBA",
-                    "cal": 132,
-                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
-                },
-                {
-                    "name": "GÜVEÇ",
-                    "cal": 148,
-                    "ingredients": "Patlıcan, patates, Dana Eti, Kuru Soğan, sıvı yağ, Salça , Kaşar Peyniri, Karabiber, Pulbiber, Tuz"
-                },
-                {
-                    "name": "ERİŞTE (SADE)",
-                    "cal": 244,
-                    "ingredients": ""
-                },
-                {
-                    "name": "CACIK",
-                    "cal": 128,
-                    "ingredients": "Yoğurt,salatalık,tuz,k.nane,z.yağ"
-                }
-            ]
-        },
-        "2026-11-10": {
-            "ogle": [
-                {
-                    "name": "TAVUK SUYU ÇORBA",
-                    "cal": 117,
-                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
-                },
-                {
-                    "name": "ETLİ TÜRLÜ",
-                    "cal": 221,
-                    "ingredients": "Dana Eti, salça, Kuru Soğan, Patlıcan patates, yağ, havuç, tuz, karabiber"
-                },
-                {
-                    "name": "FIRIN MAKARNA",
-                    "cal": 292,
-                    "ingredients": "Makarna,yumurta,süt,k.peynir,yağ,tuz,un,maydonoz"
-                },
-                {
-                    "name": "CACIK",
-                    "cal": 128,
-                    "ingredients": "Yoğurt,salatalık,tuz,k.nane,z.yağ"
-                }
-            ],
-            "aksam": [
-                {
-                    "name": "MERCİMEK ÇORBA",
-                    "cal": 137,
-                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
-                },
-                {
-                    "name": "İÇLİ KÖFTE",
-                    "cal": 320,
-                    "ingredients": "Köftelik bulgur, Kıyma, Soğan, Pulbiber, Karabiber, Kimyon, Sıvı yağ, Salça"
-                },
-                {
-                    "name": "PİRİNÇ PİLAVI",
-                    "cal": 283,
-                    "ingredients": "PİRİNÇ, SIVI YAĞ, TUZ"
-                },
-                {
-                    "name": "YOĞURT",
-                    "cal": 130,
                     "ingredients": ""
                 }
             ]
@@ -875,17 +737,63 @@
                 }
             ]
         },
-        "2026-11-02": {
+        "2026-11-11": {
             "ogle": [
                 {
-                    "name": "MERCİMEK ÇORBA",
-                    "cal": 137,
-                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132,
+                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
                 },
                 {
-                    "name": "TAVUK DÖNER",
-                    "cal": 149,
-                    "ingredients": "Tavuk eti, salça, sıvı yağ, karabiber , tuz"
+                    "name": "TAVUK SOTE",
+                    "cal": 288,
+                    "ingredients": "Tavuk eti,çarliston  biber, Domates, Kuru Soğan, Salça, sıvı yağ, tuz, karabiber"
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169,
+                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
+                },
+                {
+                    "name": "MEYVE",
+                    "cal": 65,
+                    "ingredients": ""
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "TEL ŞEHRİYE ÇORBA",
+                    "cal": 125,
+                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                },
+                {
+                    "name": "ETLİ PATATES YEMEĞİ",
+                    "cal": 400,
+                    "ingredients": "Patates, Et, Kuru Soğan, Sıvı Yağ, Salça, Karabiber, Pulbiber , Tuz"
+                },
+                {
+                    "name": "MAKARNA (PEYNİRLİ)",
+                    "cal": 308,
+                    "ingredients": ""
+                },
+                {
+                    "name": "MEŞRUBAT",
+                    "cal": 60,
+                    "ingredients": ""
+                }
+            ]
+        },
+        "2026-11-09": {
+            "ogle": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132,
+                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
+                },
+                {
+                    "name": "ET DÖNER",
+                    "cal": 239,
+                    "ingredients": "Dana Eti, Tuz, Pulbiber, Karabiber, Salça , tuz, Yağ"
                 },
                 {
                     "name": "PİRİNÇ PİLAVI",
@@ -900,14 +808,60 @@
             ],
             "aksam": [
                 {
-                    "name": "DOMATES ÇORBA",
-                    "cal": 160,
-                    "ingredients": "Un, salça, yağ, tuz, süt, kaşar peyniri"
+                    "name": "TAVUK SUYU ÇORBA",
+                    "cal": 117,
+                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
                 },
                 {
                     "name": "KURU FASULYE",
                     "cal": 267,
                     "ingredients": "Kuru fasülye,et,k.soğan,salça,tuz,yağ"
+                },
+                {
+                    "name": "BULGUR PİLAVI",
+                    "cal": 169,
+                    "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
+                },
+                {
+                    "name": "AYRAN",
+                    "cal": 56,
+                    "ingredients": "Yoğurt,tuz,su"
+                }
+            ]
+        },
+        "2026-11-19": {
+            "ogle": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137,
+                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
+                },
+                {
+                    "name": "ETLİ TÜRLÜ",
+                    "cal": 221,
+                    "ingredients": "Dana Eti, salça, Kuru Soğan, Patlıcan patates, yağ, havuç, tuz, karabiber"
+                },
+                {
+                    "name": "MAKARNA (SOSLU)",
+                    "cal": 206,
+                    "ingredients": "Makarna,salça,tuz,yağ"
+                },
+                {
+                    "name": "TULUMBA TATLISI",
+                    "cal": 420,
+                    "ingredients": "İrmik, yumurta, un, şeker,  limon suyu ,  kabartma tozu, sıvı yağ,"
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "YOĞURT ÇORBA",
+                    "cal": 160,
+                    "ingredients": ""
+                },
+                {
+                    "name": "TAVUK KAVURMA (KÖRİLİ)",
+                    "cal": 243,
+                    "ingredients": ""
                 },
                 {
                     "name": "PİRİNÇ PİLAVI",
@@ -921,39 +875,63 @@
                 }
             ]
         },
-        "2026-11-18": {
+        "2026-11-20": {
             "ogle": [
                 {
-                    "name": "TEL ŞEHRİYE ÇORBA",
-                    "cal": 125,
-                    "ingredients": "Tel şehriye,salça,yağ,tuz"
+                    "name": "TAVUK SUYU ÇORBA",
+                    "cal": 117,
+                    "ingredients": "Tavuk göğüs,un,yumurta,süt, limon,tuz,"
                 },
                 {
-                    "name": "FIRIN TAVUK",
-                    "cal": 465,
-                    "ingredients": "Tavuk but,salça,tuz.yağ,kekik,patates,karabiber"
+                    "name": "KURU FASULYE",
+                    "cal": 267,
+                    "ingredients": "Dana Eti, Yağ, Biber, Domates, Kuru Soğan, Salça, Tuz"
                 },
                 {
-                    "name": "GÖKKUŞAĞI PİLAVI",
-                    "cal": 306,
-                    "ingredients": "Pirinç,yağ,bezelye,havuç,tuz"
+                    "name": "MISIRLI PİLAV",
+                    "cal": 336,
+                    "ingredients": "PİRİNÇ, SIVI YAĞ, MISIR, TUZ"
                 },
                 {
-                    "name": "SALATA",
-                    "cal": 90,
-                    "ingredients": "Marul,havuç,z.y,tuz,limon"
+                    "name": "CACIK",
+                    "cal": 128,
+                    "ingredients": "Yoğurt,salatalık,tuz,k.nane,z.yağ"
                 }
             ],
             "aksam": [
                 {
-                    "name": "SEBZE ÇORBA",
-                    "cal": 114,
-                    "ingredients": "Havuç,patates,bezelye,un ,yumurta,süt,yağ,tuz,karabiber,limon suyu"
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137,
+                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
                 },
                 {
-                    "name": "ÇOBAN KAVURMA",
-                    "cal": 370,
-                    "ingredients": "Dana Eti, K. soğan, Patates, Biber, Sıvı Yağ"
+                    "name": "ANKARA TAVA",
+                    "cal": 283,
+                    "ingredients": "şehriye, et, yağ, tuz"
+                },
+                {
+                    "name": "KARIŞIK KIZARTMA (SOSLU)",
+                    "cal": 224,
+                    "ingredients": ""
+                },
+                {
+                    "name": "YOĞURT",
+                    "cal": 130,
+                    "ingredients": ""
+                }
+            ]
+        },
+        "2026-11-13": {
+            "ogle": [
+                {
+                    "name": "MERCİMEK ÇORBA",
+                    "cal": 137,
+                    "ingredients": "Mercimek, Soğan, Un, Yağ, Limon, Tuz"
+                },
+                {
+                    "name": "NOHUT",
+                    "cal": 285,
+                    "ingredients": "Nohut,k. soğan, et, sıvı yağ, salça, karabiber, pulbiber , tuz,"
                 },
                 {
                     "name": "BULGUR PİLAVI",
@@ -961,14 +939,58 @@
                     "ingredients": "Bulgur, salça,domates,biber, kuru soğan, tuz,karabiber"
                 },
                 {
-                    "name": "SÜTLAÇ",
-                    "cal": 268,
-                    "ingredients": "Süt,Şeker,pirinç,nişasta,tarçın,vanilya"
+                    "name": "YOĞURT",
+                    "cal": 130,
+                    "ingredients": ""
+                }
+            ],
+            "aksam": [
+                {
+                    "name": "EZOGELİN ÇORBA",
+                    "cal": 132,
+                    "ingredients": "Pirinç,mercimek,un,yağ,tuz,limon,karabiber,salça,nane"
+                },
+                {
+                    "name": "GÜVEÇ",
+                    "cal": 148,
+                    "ingredients": "Patlıcan, patates, Dana Eti, Kuru Soğan, sıvı yağ, Salça , Kaşar Peyniri, Karabiber, Pulbiber, Tuz"
+                },
+                {
+                    "name": "ERİŞTE (SADE)",
+                    "cal": 244,
+                    "ingredients": ""
+                },
+                {
+                    "name": "CACIK",
+                    "cal": 128,
+                    "ingredients": "Yoğurt,salatalık,tuz,k.nane,z.yağ"
                 }
             ]
         }
     },
     "announcements": [
+        {
+            "title": "Önemli Duyuru – Sınav Yeri Bilgilendirmesi",
+            "date": "12 Kasım 2026 Perşembe",
+            "category": "Öğrenci İşleri",
+            "url": "https://yalova.edu.tr/Page/Duyuru/onemli-duyuru-sinav-yeri-bilgilendirmesi",
+            "original_url": "https://yalova.edu.tr/Page/Duyuru/onemli-duyuru-sinav-yeri-bilgilendirmesi",
+            "summary": "ÜSD136 – Zero Waste dersi kapsamında, 13 Kasım Cuma günü saat 15.00'te gerçekleştirilecek ÜSD sınavının derslik bilgileri güncellenmiştir. Sınav, Mühendislik...",
+            "content_html": "<p>ÜSD136 – Zero Waste dersi kapsamında, 13 Kasım Cuma günü saat 15.00'te gerçekleştirilecek ÜSD sınavının derslik bilgileri güncellenmiştir.</p>\n<p>Sınav, Mühendislik Fakültesi'nde gerçekleştirilecek olup sınav salonları aşağıdaki şekilde belirlenmiştir:</p>\n<p>D310 – D311<br/>\r\nD305 – D306<br/>\r\nDers sorumlusu Doç. Dr. Hatice Aylin Karahan Toprakçı ve gözetmenlerimiz Arş. Gör. Neslihan Sogur ile Arş. Gör. Kübra Al eşliğinde gerçekleştirilecek sınav için öğrencilerimizin belirtilen dersliklerde hazır bulunmaları gerekmektedir.</p>\n<p>Dikkat: Fakülte değişikliği bulunmamaktadır. Yalnızca sınav derslikleri güncellenmiştir.</p>\n<p>Tüm öğrencilerimize önemle duyurulur.</p>",
+            "attachments": [],
+            "images": []
+        },
+        {
+            "title": "Önemli Duyuru – Sınavı Yeri Değişikliği",
+            "date": "12 Kasım 2026 Perşembe",
+            "category": "Öğrenci İşleri",
+            "url": "https://yalova.edu.tr/Page/Duyuru/onemli-duyuru-sinavi-yeri-degisikligi",
+            "original_url": "https://yalova.edu.tr/Page/Duyuru/onemli-duyuru-sinavi-yeri-degisikligi",
+            "summary": "ÜSD149 – Etkili Zaman Yönetimi dersi kapsamında, 13 Kasım Cuma günü saat 15.00'te gerçekleştirilecek ÜSD dersinin sınav yeri, öğrenci kapasitesi nedeniyle...",
+            "content_html": "<p>ÜSD149 – Etkili Zaman Yönetimi dersi kapsamında, 13 Kasım Cuma günü saat 15.00'te gerçekleştirilecek ÜSD dersinin sınav yeri, öğrenci kapasitesi nedeniyle değiştirilmiştir.</p>\n<p>Daha önce Mühendislik Fakültesi olarak belirlenen sınav yeri, öğrenci sayısının fazla olması sebebiyle İktisadi ve İdari Bilimler Fakültesi 308 ve 309 numaralı sınıflar olarak güncellenmiştir.</p>\n<p>Ders sorumlusu Doç. Dr. Mithat Çelebi ve gözetmenlerimiz Arş. Gör. Ali Seven ile Arş. Gör. Dr. Abdulkadir Orak eşliğinde gerçekleştirilecek sınav için öğrencilerimizin belirtilen sınıflarda hazır bulunmaları önemle rica olunur.</p>\n<p>Tüm öğrencilerimizin dikkatine!</p>\n<p>Lütfen sınav günü herhangi bir mağduriyet yaşamamak adına yeni sınav yerini dikkate alınız.</p>",
+            "attachments": [],
+            "images": []
+        },
         {
             "title": "2026 Erasmus KA131 Projesi Erasmus+ Personel Hareketliliği Başvuru Çağrısı",
             "date": "10 Kasım 2026 Salı",
@@ -1169,34 +1191,6 @@
                     "type": "pdf"
                 }
             ],
-            "images": []
-        },
-        {
-            "title": "2026-2027 Yemek Bursu Başvurusu Başladı",
-            "date": "28 Eylül 2026 Pazartesi",
-            "category": "Burs & Kariyer",
-            "url": "https://sks.yalova.edu.tr/Page/Haber/2026-27-yemek-bursu-basvurusu-basladi-",
-            "original_url": "https://yalova.edu.tr/Page/Duyuru/2026-2027-yemek-bursu-basvurusu-basladi",
-            "summary": "📢 Yemek Bursu Başvuru Duyurusu Tarih: 18.09.2026 Yemek bursundan yararlanmak isteyen öğrencilerimizin, aşağıdaki bağlantıda yer alan “Yemek Bursu Başvuru Formu”nu...",
-            "content_html": "<p>📢 <strong>Yemek Bursu Başvuru Duyurusu</strong><br/>\n<strong>Tarih: 18.09.2026</strong></p>\n<p>Yemek bursundan yararlanmak isteyen öğrencilerimizin, aşağıdaki bağlantıda yer alan <strong>“Yemek Bursu Başvuru Formu”</strong>nu doldurarak en geç <strong>16.10.2026 mesai bitimine kadar</strong> ilgili birimlere teslim etmeleri gerekmektedir.</p>\n<ul>\n<li>\n<p><strong>Merkez Yerleşkede bulunan öğrenciler</strong> başvuru formlarını, <strong>Öğrenci Yemekhanesine</strong> teslim etmelidir.</p>\n</li>\n<li>\n<p><strong>Merkez Yerleşke dışında bulunan öğrenciler</strong> ise başvuru formlarını <strong>Fakülte Sekreterliği</strong> veya <strong>Yüksekokul Sekreterliğine</strong> teslim etmelidir.</p>\n</li>\n</ul>\n<p>🔗 Başvuru Formu: <a href=\"https://sks.yalova.edu.tr/tr/Icerik/DosyaIndir?dosyaUrl=%2FUploads%2FSa%C4%9Fl%C4%B1k%2C%20K%C3%BClt%C3%BCr%20Ve%20Spor%20Daire%20Ba%C5%9Fkanl%C4%B1%C4%9F%C4%B1%2FFILE_20250415_105342338_yemek-bursu-talep-formu.pdf&amp;dosyaAd=Yemek%20Bursu%20Talep%20Formu.pdf\" rel=\"noopener noreferrer\" target=\"_blank\">Yemek Bursu Başvuru Formu</a></p>",
-            "attachments": [
-                {
-                    "label": "Yemek Bursu Başvuru Formu",
-                    "url": "https://sks.yalova.edu.tr/tr/Icerik/DosyaIndir?dosyaUrl=%2FUploads%2FSa%C4%9Fl%C4%B1k%2C%20K%C3%BClt%C3%BCr%20Ve%20Spor%20Daire%20Ba%C5%9Fkanl%C4%B1%C4%9F%C4%B1%2FFILE_20250415_105342338_yemek-bursu-talep-formu.pdf&dosyaAd=Yemek%20Bursu%20Talep%20Formu.pdf",
-                    "type": "link"
-                }
-            ],
-            "images": []
-        },
-        {
-            "title": "Öğrenci Toplulukları Genel Kurul ve Başvuru Süreçleri Hakkında",
-            "date": "28 Eylül 2026 Pazartesi",
-            "category": "SKS & Kampüs",
-            "url": "https://sks.yalova.edu.tr/Page/Haber/duyuru-ogrenci-topluluklari-genel-kurul-ve-basvuru-surecleri-hakkinda",
-            "original_url": "https://yalova.edu.tr/Page/Duyuru/ogrenci-topluluklari-genel-kurul-ve-basvuru-surecleri-hakkinda",
-            "summary": "📢 DUYURU: Öğrenci Toplulukları Genel Kurul ve Başvuru Süreçleri Hakkında Değerli Öğrenci Topluluklarımız, 04.06.2026 tarihli ve 346 sayılı Senato kararı ile yürürlüğe...",
-            "content_html": "<p>📢 <b>DUYURU: Öğrenci Toplulukları Genel Kurul ve Başvuru Süreçleri Hakkında</b></p>\n<p>Değerli Öğrenci Topluluklarımız,</p>\n<p>04.06.2026 tarihli ve 346 sayılı Senato kararı ile yürürlüğe giren <i>Öğrenci Toplulukları Kuruluş ve İşleyiş Yönergesi</i> kapsamında, yeni eğitim-öğretim dönemindeki genel kurul ve başvuru süreçlerimize dair dikkat edilmesi gereken hususlar aşağıda belirtilmiştir:</p>\n<p>📅 <b>Son Tarih:</b> Mevcut öğrenci topluluklarımızın en geç <b>16 Ekim 2026 Cuma günü mesai bitimine kadar</b> genel kurullarını toplayarak yönetim organlarını belirlemeleri ve ilgili evrakları Kültür Ofisi'ne teslim etmeleri zorunludur.</p>\n<p>🆕 <b>Yeni Topluluk Başvuruları:</b> Üniversitemiz bünyesinde yeni açılacak olan öğrenci toplulukları için de son başvuru tarihi <b>16 Ekim 2026 Cuma günü mesai bitimidir</b>. Yeni topluluk kurma başvurularının bu tarihe kadar Kültür Ofisi'ne iletilmesi gerekmektedir. (FORMLAR-ÖĞRENCİ TOPLULUKLARI GEREKLİ EVRAKLAR-ÖĞRENCİ TOPLULUKLARI KURULMASI BAŞVURU FORMU)</p>\n<p>⚠️ <b>Stant Açma İzni:</b> Genel kurullarını gerçekleştirmeyen ve yönetim organlarını oluşturmayan topluluklarımızın, <b>16 Ekim 2026 tarihine kadar stant açmalarına izin verilmeyecektir.</b> Etkinlik planlamalarınızın aksamaması adına bu kurala dikkat edilmesi önem taşımaktadır.</p>\n<p>📍 <b>Genel Kurul Yeri ve İşleyişi:</b></p>\n<ul>\n<li>\n<p>Tüm genel kurul işlemleri, Kültür Hizmetleri görevlilerimizin katılımı ile <b>Bilim Kafe’de</b> gerçekleştirilmelidir.</p>\n</li>\n<li>\n<p>Kurul planlamanızı yapmadan önce Bilim Kafe’nin müsaitlik durumu için <b>Öğr. Gör. Eda Buse Sekizkardeş</b> ile iletişime geçmeniz gerekmektedir.</p>\n</li>\n</ul>\n<p>Sürecin sağlıklı ve hızlı ilerleyebilmesi için gerekli hassasiyeti göstermenizi rica eder, yeni dönem çalışmalarınızda başarılar dileriz.</p>\n<p><b>Sağlık, Kültür ve Spor Daire Başkanlığı</b> <b>Kültür Hizmetleri Şube Müdürlüğü</b></p>",
-            "attachments": [],
             "images": []
         }
     ],
