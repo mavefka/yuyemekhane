@@ -1,5 +1,5 @@
 {
-    "last_updated": "23.11.2026",
+    "last_updated": "24.11.2026",
     "menus": {
         "2026-11-10": {
             "ogle": [
@@ -1179,38 +1179,6 @@
         }
     ],
     "comments": {
-        "2026-11-09_ogle": [
-            {
-                "id": "c_1793981023126_nkp2w",
-                "author": "ET DÖNER",
-                "rating": 5,
-                "text": "ET DÖNER Mİ?",
-                "img": "",
-                "time": "19:03",
-                "ts": 1793981023126,
-                "sig": "EYtmc8Iu6q34RhVH/Ns15bzK5Whc+pvIuC2JVLTvgGku8F0voJYELxHx2fSMMAnTUo3FQtgCwGyOOahBh9gQSw=="
-            },
-            {
-                "id": "c_1794209665913_d68v5",
-                "author": "umut",
-                "rating": 5,
-                "text": "bune böyle amk",
-                "img": "",
-                "time": "10:34",
-                "ts": 1794209665913,
-                "sig": "2ebZ/w5kb9kcNXjHg2j4j6WgVo7n/3E+nSjQZWNVXQyWbDEog3ACV4EN8wyHckeR19M1NZ+8IIPJwAzebyv77g=="
-            },
-            {
-                "id": "c_1794212106135_kfska",
-                "author": "NABER MÜDÜR",
-                "rating": 5,
-                "text": "geleceğim ve yiyeceğim",
-                "img": "",
-                "time": "11:15",
-                "ts": 1794212106135,
-                "sig": "uZflWNNK4SqYlMCjo7zd9TdTHweOVq7sPsFAas6RtmDfseDbZg4m9CNSLXzckBCucYLPrUUfDY4x2KfAv1lu3Q=="
-            }
-        ],
         "2026-11-10_ogle": [
             {
                 "id": "c_1794293516057_9ks10",
