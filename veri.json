@@ -1,5 +1,5 @@
 {
-    "last_updated": "25.11.2026",
+    "last_updated": "26.11.2026",
     "menus": {
         "2026-11-10": {
             "ogle": [
@@ -1178,18 +1178,5 @@
             "images": []
         }
     ],
-    "comments": {
-        "2026-11-11_ogle": [
-            {
-                "id": "c_1794325950629_dqtqw",
-                "author": "umut",
-                "rating": 4,
-                "text": "sonunda guzel yemek",
-                "img": "",
-                "time": "18:52",
-                "ts": 1794325950629,
-                "sig": "DbVDCVYbPoMaA67MFfvgctinpJU6C9jow0Yx3JrF7+/asCFYPgG8fbS+tU86NacrLBeVIwUnD7OE29exfjiROA=="
-            }
-        ]
-    }
+    "comments": {}
 }
